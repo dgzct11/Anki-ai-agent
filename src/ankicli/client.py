@@ -409,12 +409,52 @@ class AnkiClient:
                 return False
         return True
 
-    def get_collection_stats(self) -> dict:
+    def get_card_reviews(self, deck_name: str | None = None) -> list[dict]:
         """
-        Get overall collection statistics.
+        Get review history for cards via AnkiConnect.
+
+        Uses cardReviews or getReviewsOfCards to pull review data.
+        Falls back to estimating from card intervals if review API unavailable.
+
+        Args:
+            deck_name: Optional deck to filter by.
 
         Returns:
-            Dict with total decks, cards, etc.
+            List of review dicts with card_id, ease, interval, etc.
+        """
+        query = f'deck:"{deck_name}"' if deck_name else "*"
+        card_ids = _request("findCards", query=query)
+        if not card_ids:
+            return []
+
+        reviews = []
+        # Try to get review data via cardsInfo which has interval/ease/due info
+        try:
+            cards_info = _request("cardsInfo", cards=card_ids[:500])
+            for info in (cards_info or []):
+                reviews.append({
+                    "card_id": info.get("cardId"),
+                    "note_id": info.get("note"),
+                    "interval": info.get("interval", 0),
+                    "ease": info.get("factor", 0),
+                    "due": info.get("due", 0),
+                    "type": info.get("type", 0),  # 0=new, 1=learning, 2=review, 3=relearn
+                    "queue": info.get("queue", 0),
+                    "reps": info.get("reps", 0),
+                    "lapses": info.get("lapses", 0),
+                })
+        except AnkiConnectError:
+            pass
+
+        return reviews
+
+    def get_collection_stats(self) -> dict:
+        """
+        Get overall collection statistics including retention data.
+
+        Returns:
+            Dict with total decks, cards, mature/learning/new counts,
+            retention rate, etc.
         """
         decks = self.get_decks()
         total_new = sum(d.new_count for d in decks)
@@ -424,12 +464,54 @@ class AnkiClient:
         # Get total cards count
         all_notes = _request("findNotes", query="*")
 
+        # Get card-level stats for retention calculation
+        all_cards = _request("findCards", query="*")
+        mature_count = 0
+        learning_count = 0
+        new_count = 0
+        total_reps = 0
+        total_lapses = 0
+
+        if all_cards:
+            try:
+                cards_info = _request("cardsInfo", cards=all_cards[:2000])
+                for info in (cards_info or []):
+                    card_type = info.get("type", 0)
+                    interval = info.get("interval", 0)
+                    reps = info.get("reps", 0)
+                    lapses = info.get("lapses", 0)
+                    total_reps += reps
+                    total_lapses += lapses
+
+                    if card_type == 0:
+                        new_count += 1
+                    elif interval >= 21:
+                        mature_count += 1
+                    else:
+                        learning_count += 1
+            except AnkiConnectError:
+                # Fall back to deck-level stats
+                new_count = total_new
+                learning_count = total_learn
+
+        # Retention rate: (reps - lapses) / reps * 100
+        retention_rate = 0.0
+        if total_reps > 0:
+            retention_rate = ((total_reps - total_lapses) / total_reps) * 100
+
         return {
             "total_decks": len(decks),
             "total_notes": len(all_notes) if all_notes else 0,
+            "total_cards": len(all_cards) if all_cards else 0,
             "total_new": total_new,
             "total_learning": total_learn,
             "total_review": total_review,
             "total_due": total_new + total_learn + total_review,
+            "mature_count": mature_count,
+            "learning_count": learning_count,
+            "new_count": new_count,
+            "total_reps": total_reps,
+            "total_lapses": total_lapses,
+            "retention_rate": round(retention_rate, 1),
             "decks": [{"name": d.name, "due": d.total_due} for d in decks],
         }

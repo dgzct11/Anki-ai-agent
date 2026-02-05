@@ -188,7 +188,10 @@ class TestPracticeSession:
         session = self._make_session(num_cards=5)
         for _ in range(3):
             session.record_result(self._make_result(FeedbackLevel.CORRECT))
-        assert session.correct_streak == 3
+        # After 3 correct, adaptive difficulty triggers: difficulty_num increases
+        # and correct_streak resets to 0
+        assert session.correct_streak == 0
+        assert session.difficulty_num == 3  # went from 2 to 3
 
     def test_incorrect_resets_correct_streak(self):
         session = self._make_session(num_cards=5)
@@ -233,13 +236,19 @@ class TestPracticeSession:
         session = self._make_session(num_cards=5)
         for _ in range(3):
             session.record_result(self._make_result(FeedbackLevel.CORRECT))
-        assert session.difficulty_level == "harder"
+        # After 3 correct, adaptive difficulty increases difficulty_num from 2->3
+        # and resets correct_streak to 0, so difficulty_level returns "normal"
+        assert session.difficulty_level == "normal"
+        assert session.difficulty_num == 3  # difficulty actually went up
 
     def test_difficulty_level_easier(self):
         session = self._make_session(num_cards=5)
         session.record_result(self._make_result(FeedbackLevel.INCORRECT))
         session.record_result(self._make_result(FeedbackLevel.INCORRECT))
-        assert session.difficulty_level == "easier"
+        # After 2 incorrect, adaptive difficulty decreases difficulty_num from 2->1
+        # and resets incorrect_streak to 0, so difficulty_level returns "normal"
+        assert session.difficulty_level == "normal"
+        assert session.difficulty_num == 1  # difficulty actually went down
 
     def test_get_weak_words(self):
         session = self._make_session(num_cards=3)

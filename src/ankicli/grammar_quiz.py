@@ -352,7 +352,22 @@ def build_quiz_generation_prompt(
         sample = known_vocabulary[:50]
         vocab_text = f"\n\nThe user already knows these Spanish words (use them in sentences so grammar is the focus, not vocabulary): {', '.join(sample)}"
 
+    # A3: Structured quiz flow for larger quizzes
+    structure_instruction = ""
+    if count >= 20:
+        warmup = max(2, count // 5)
+        practice = count // 2
+        review = count - warmup - practice
+        structure_instruction = f"""
+QUIZ STRUCTURE (follow this order):
+- Questions 1-{warmup}: WARM-UP on known grammar (easier questions to build confidence)
+- Questions {warmup+1}-{warmup+practice}: FOCUSED PRACTICE on "{topic}" with increasing difficulty
+- Questions {warmup+practice+1}-{count}: MIXED REVIEW combining "{topic}" with related grammar
+
+"""
+
     return f"""Generate exactly {count} Spanish grammar quiz questions about "{topic}" at CEFR {cefr_level} level.
+{structure_instruction}
 
 Question types to use (distribute evenly across these types):
 {types_text}

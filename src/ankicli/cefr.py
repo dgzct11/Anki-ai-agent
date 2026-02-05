@@ -29,6 +29,7 @@ class CEFRWord:
     subcategory: str
     tags: list[str]
     level: str = ""
+    cognate_type: str | None = None  # transparent, semi_transparent, false_friend, or None
 
 
 @dataclass
@@ -106,6 +107,7 @@ class CEFRData:
                             subcategory=entry.get("subcategory", ""),
                             tags=entry.get("tags", []),
                             level=level,
+                            cognate_type=entry.get("cognate_type"),
                         )
                         words.append(w)
                         # Index by lowercase word for fast lookup
@@ -325,15 +327,31 @@ def invalidate_cache() -> None:
 # Suggestions
 # ---------------------------------------------------------------------------
 
+# Cognate type sort priority: transparent first, then semi, false_friend, then none/unknown
+_COGNATE_SORT_ORDER = {
+    "transparent": 0,
+    "semi_transparent": 1,
+    "false_friend": 2,
+}
+
+
+def _cognate_sort_key(word: CEFRWord) -> int:
+    """Return sort key for cognate-first ordering. Lower = show first."""
+    return _COGNATE_SORT_ORDER.get(word.cognate_type or "", 3)
+
+
 def get_suggestions(
     cefr_data: CEFRData,
     progress: dict[str, LevelProgress],
     level: str | None = None,
     count: int = 10,
+    cognate_first: bool = True,
 ) -> list[CEFRWord]:
     """Get suggested words to learn next based on gaps.
 
     Prioritizes the lowest incomplete level, then categories with worst coverage.
+    When cognate_first=True (C5), sorts suggestions by cognate_type:
+    transparent first, then semi_transparent, then false_friend, then none.
     """
     cefr_data.load()
 
@@ -352,6 +370,8 @@ def get_suggestions(
     if not lp:
         # No progress data, just return first N words
         words = cefr_data.get_words_for_level(target_level)
+        if cognate_first:
+            words = sorted(words, key=_cognate_sort_key)
         return words[:count]
 
     # Sort categories by worst coverage
@@ -373,7 +393,96 @@ def get_suggestions(
         ]
         suggestions.extend(cat_words[:count - len(suggestions)])
 
+    # C5: Sort by cognate type (transparent first) when cognate data is available
+    if cognate_first:
+        suggestions = sorted(suggestions, key=_cognate_sort_key)
+
     return suggestions[:count]
+
+
+# ---------------------------------------------------------------------------
+# Difficulty scoring (C7)
+# ---------------------------------------------------------------------------
+
+# Cognate type to base difficulty mapping:
+#   1 = transparent cognate in 2+ languages
+#   2 = cognate in 1 language or morphological derivative
+#   3 = semi-transparent cognate or partial cognate
+#   4 = no cognate but concrete meaning
+#   5 = abstract non-cognate or false friend
+_COGNATE_DIFFICULTY: dict[str, int] = {
+    "transparent_multi": 1,
+    "transparent": 2,
+    "cognate_multi": 1,
+    "cognate": 2,
+    "semi_transparent": 3,
+    "partial_cognate": 3,
+    "false_friend": 5,
+    "none": 4,
+}
+
+# Abstract categories bump difficulty up by 1 (capped at 5)
+_ABSTRACT_CATEGORIES = frozenset({
+    "perception_emotions",
+    "abstract_concepts",
+    "politics",
+    "philosophy",
+    "opinions",
+    "mental_processes",
+})
+
+
+def score_word_difficulty(
+    cognate_type: str | None = None,
+    category: str = "",
+    is_morphological_derivative: bool = False,
+) -> int:
+    """Score word difficulty from 1 (easiest) to 5 (hardest).
+
+    Args:
+        cognate_type: Value of the cognate_type field from CEFR data.
+            One of: transparent_multi, transparent, cognate_multi, cognate,
+            semi_transparent, partial_cognate, false_friend, none.
+        category: The thematic category of the word.
+        is_morphological_derivative: True if the word can be derived from
+            a known root (e.g. "librería" from "libro").
+    """
+    if not cognate_type:
+        base = 4  # Default: no cognate info means assume harder
+    else:
+        base = _COGNATE_DIFFICULTY.get(cognate_type.lower().strip(), 4)
+
+    # Morphological derivatives are easier
+    if is_morphological_derivative and base > 1:
+        base = min(base, 2)
+
+    # Abstract categories are harder
+    if category.lower() in _ABSTRACT_CATEGORIES and base < 5:
+        base += 1
+
+    return max(1, min(5, base))
+
+
+def get_difficulty_distribution(anki, deck_name: str | None = None) -> dict[int, int]:
+    """Get current difficulty distribution from Anki tags.
+
+    Returns a dict {difficulty_level: count} for levels 1-5.
+    Reads difficulty::N tags from cards.
+    """
+    query = f'deck:"{deck_name}"' if deck_name else "*"
+    cards = anki.search_cards(query, limit=10000)
+
+    distribution: dict[int, int] = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+    for card in cards:
+        for tag in card.tags:
+            if tag.startswith("difficulty::"):
+                try:
+                    level = int(tag.split("::")[1])
+                    if 1 <= level <= 5:
+                        distribution[level] += 1
+                except (ValueError, IndexError):
+                    pass
+    return distribution
 
 
 # ---------------------------------------------------------------------------
@@ -455,7 +564,15 @@ def format_suggestions_text(suggestions: list[CEFRWord]) -> str:
         return "No suggestions available."
     lines = [f"Suggested words to learn ({len(suggestions)}):"]
     for w in suggestions:
-        lines.append(f"  {w.word} - {w.english}  [{w.category}] ({w.level})")
+        cognate_label = ""
+        if w.cognate_type:
+            labels = {
+                "transparent": " [cognate - easy!]",
+                "semi_transparent": " [semi-cognate]",
+                "false_friend": " [FALSE FRIEND!]",
+            }
+            cognate_label = labels.get(w.cognate_type, "")
+        lines.append(f"  {w.word} - {w.english}  [{w.category}] ({w.level}){cognate_label}")
     return "\n".join(lines)
 
 

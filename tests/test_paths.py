@@ -16,6 +16,8 @@ from ankicli.paths import (
     ERROR_JOURNAL_FILE,
     DAILY_CHALLENGE_FILE,
     HISTORY_FILE,
+    WORD_NETWORK_FILE,
+    DISAMBIGUATION_FILE,
     ensure_data_dir,
 )
 
@@ -53,6 +55,12 @@ class TestPathDefinitions:
     def test_daily_challenge_file_in_data_dir(self):
         assert DAILY_CHALLENGE_FILE.parent == DATA_DIR
 
+    def test_word_network_file_in_data_dir(self):
+        assert WORD_NETWORK_FILE.parent == DATA_DIR
+
+    def test_disambiguation_file_in_data_dir(self):
+        assert DISAMBIGUATION_FILE.parent == DATA_DIR
+
     def test_cefr_data_dir_is_path(self):
         assert isinstance(CEFR_DATA_DIR, Path)
 
@@ -71,6 +79,8 @@ class TestPathDefinitions:
         assert CEFR_CACHE_FILE.suffix == ".json"
         assert ERROR_JOURNAL_FILE.suffix == ".json"
         assert DAILY_CHALLENGE_FILE.suffix == ".json"
+        assert WORD_NETWORK_FILE.suffix == ".json"
+        assert DISAMBIGUATION_FILE.suffix == ".json"
 
 
 class TestEnsureDataDir:

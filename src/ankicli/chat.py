@@ -59,7 +59,10 @@ def format_tokens(n: int) -> str:
 
 
 def create_context_bar(status: dict) -> Text:
-    """Create a context usage bar with session stats."""
+    """Create a richer context usage bar with session stats (U8).
+
+    Format: Context: [........] 23% | 12 min | +5 cards | A2: 147/500 | Streak: 12d
+    """
     percent = status["percent_used"]
     input_tokens = status["input_tokens"]
     max_tokens = status["max_tokens"]
@@ -74,8 +77,8 @@ def create_context_bar(status: dict) -> Text:
     else:
         color = "red"
 
-    # Create bar
-    bar_width = 30
+    # Create bar (narrower to fit more stats in 70 chars)
+    bar_width = 10
     filled = int(bar_width * percent / 100)
     empty = bar_width - filled
     bar = "\u2588" * filled + "\u2591" * empty
@@ -84,17 +87,31 @@ def create_context_bar(status: dict) -> Text:
     text.append("Context: [", style="dim")
     text.append(bar, style=color)
     text.append("] ", style="dim")
-    text.append(f"{percent:.1f}%", style=color)
-    text.append(f" ({format_tokens(input_tokens)}/{format_tokens(max_tokens)})", style="dim")
+    text.append(f"{percent:.0f}%", style=color)
 
     # Session stats
     session_minutes = status.get("session_minutes", 0)
     session_cards = status.get("session_cards_added", 0)
-    if session_minutes > 0 or session_cards > 0:
-        text.append("  |  ", style="dim")
+    if session_minutes > 0:
+        text.append(" | ", style="dim")
         text.append(f"{session_minutes} min", style="cyan")
-        if session_cards > 0:
-            text.append(f"  +{session_cards} cards", style="green")
+    if session_cards > 0:
+        text.append(" | ", style="dim")
+        text.append(f"+{session_cards} cards", style="green")
+
+    # CEFR level progress (if available in status)
+    cefr_level = status.get("cefr_current_level")
+    cefr_known = status.get("cefr_known", 0)
+    cefr_total = status.get("cefr_total", 0)
+    if cefr_level and cefr_total > 0:
+        text.append(" | ", style="dim")
+        text.append(f"{cefr_level}: {cefr_known}/{cefr_total}", style="cyan")
+
+    # Study streak (if available)
+    streak = status.get("streak_days", 0)
+    if streak > 0:
+        text.append(" | ", style="dim")
+        text.append(f"Streak: {streak}d", style="bright_green")
 
     return text
 
@@ -290,6 +307,220 @@ def _summarize_tool_input(tool_name: str, input_data: dict) -> str:
     return ", ".join(parts[:3])  # Limit to 3 key params
 
 
+def create_cefr_deep_dive_panel(
+    level: str,
+    level_progress: dict,
+    grammar_mastery: dict,
+) -> Panel:
+    """Create a CEFR deep-dive panel for a specific level (U7).
+
+    Shows per-category known/missing words, grammar checklist for
+    that level, and actionable recommendations.
+    """
+    content = Text()
+    content.append(f"CEFR {level} DEEP DIVE\n\n", style="bold cyan")
+
+    words_known = level_progress.get("words_known", 0)
+    words_total = level_progress.get("words_total", 0)
+    pct = (words_known / words_total * 100) if words_total > 0 else 0
+
+    # Overall bar
+    bar_w = 25
+    filled = int(bar_w * pct / 100)
+    empty = bar_w - filled
+    color = "green" if pct >= 75 else "yellow" if pct >= 50 else "red"
+    content.append("  Vocabulary: ", style="bold")
+    content.append(f"{words_known}/{words_total} ", style=color)
+    content.append("[", style="dim")
+    content.append("\u2588" * filled, style=color)
+    content.append("\u2591" * empty, style="dim")
+    content.append("] ", style="dim")
+    content.append(f"{pct:.0f}%\n\n", style=f"bold {color}")
+
+    # Per-category breakdown
+    categories = level_progress.get("categories", {})
+    if categories:
+        content.append("  CATEGORIES\n", style="bold dim")
+        sorted_cats = sorted(categories.items(), key=lambda x: x[1].get("percent", 0))
+        for cat_name, cat_data in sorted_cats[:12]:
+            k = cat_data.get("known", 0)
+            t = cat_data.get("total", 0)
+            cp = cat_data.get("percent", 0)
+            cat_bar_w = 8
+            cat_filled = int(cat_bar_w * cp / 100)
+            cat_empty = cat_bar_w - cat_filled
+            cat_color = "green" if cp >= 75 else "yellow" if cp >= 50 else "red"
+            content.append(f"    {cat_name:<22}", style="dim")
+            content.append(f"{k:>3}/{t:<3} ", style=cat_color)
+            content.append("\u2588" * cat_filled, style=cat_color)
+            content.append("\u2591" * cat_empty, style="dim")
+            content.append(f" {cp:.0f}%\n", style=cat_color)
+        content.append("\n")
+
+    # Grammar checklist for this level
+    topics = GRAMMAR_TOPICS.get(level, [])
+    if topics:
+        content.append("  GRAMMAR\n", style="bold dim")
+        for topic in topics:
+            topic_data = grammar_mastery.get(topic)
+            if topic_data and topic_data.get("mastered"):
+                icon = "\u2713"
+                style = "green"
+            elif topic_data and topic_data.get("avg_score", 0) >= 70:
+                icon = "~"
+                style = "yellow"
+            elif topic_data:
+                icon = "\u2717"
+                style = "red"
+            else:
+                icon = "\u2717"
+                style = "dim"
+            content.append(f"    {icon} ", style=f"bold {style}")
+            content.append(f"{topic}\n", style=style)
+        content.append("\n")
+
+    # Recommendations
+    content.append("  RECOMMENDATIONS\n", style="bold dim")
+    if pct < 50:
+        content.append("    Focus on building core vocabulary\n", style="yellow")
+    elif pct < 75:
+        content.append("    Fill category gaps to reach 75%\n", style="yellow")
+    else:
+        content.append("    Near mastery - review weak categories\n", style="green")
+
+    # Find weakest categories
+    weak_cats = [name for name, d in sorted_cats[:3]] if categories else []
+    if weak_cats:
+        content.append(f"    Weakest areas: {', '.join(weak_cats)}\n", style="yellow")
+
+    # Find unmastered grammar
+    unmastered = [t for t in topics if not grammar_mastery.get(t, {}).get("mastered")]
+    if unmastered:
+        content.append(f"    Grammar to practice: {', '.join(unmastered[:3])}\n", style="yellow")
+
+    return Panel(
+        content,
+        title=f"[bold cyan]{level} Progress[/bold cyan]",
+        border_style="cyan",
+        box=box.DOUBLE,
+        padding=(1, 2),
+    )
+
+
+def create_grammar_mastery_checklist() -> Panel:
+    """Create a grammar mastery checklist grouped by CEFR level (U6).
+
+    Shows: check for mastered (85%+), ~ for developing (70-84%), x for needs review (<70%).
+    """
+    mastery = get_topic_mastery()
+
+    content = Text()
+    content.append("GRAMMAR MASTERY\n\n", style="bold")
+
+    for level in ["A1", "A2", "B1", "B2"]:
+        topics = GRAMMAR_TOPICS.get(level, [])
+        if not topics:
+            continue
+
+        content.append(f"  {level}\n", style="bold cyan")
+
+        for topic in topics:
+            topic_data = mastery.get(topic)
+            if topic_data and topic_data.get("mastered"):
+                icon = "\u2713"
+                style = "green"
+                pct = topic_data.get("avg_score", 100)
+            elif topic_data:
+                avg = topic_data.get("avg_score", 0)
+                pct = avg
+                if avg >= 70:
+                    icon = "~"
+                    style = "yellow"
+                else:
+                    icon = "\u2717"
+                    style = "red"
+            else:
+                icon = "\u2717"
+                style = "dim"
+                pct = 0
+
+            content.append(f"    {icon} ", style=f"bold {style}")
+            content.append(f"{topic:<40}", style=style)
+            if pct > 0:
+                content.append(f" {pct:.0f}%", style=style)
+            content.append("\n")
+
+        content.append("\n")
+
+    # Legend
+    content.append("  ", style="")
+    content.append("\u2713", style="bold green")
+    content.append(" mastered (85%+)  ", style="dim")
+    content.append("~", style="bold yellow")
+    content.append(" developing (70-84%)  ", style="dim")
+    content.append("\u2717", style="bold red")
+    content.append(" needs review (<70%)", style="dim")
+
+    return Panel(
+        content,
+        title="[bold cyan]GRAMMAR[/bold cyan]",
+        border_style="cyan",
+        padding=(1, 2),
+    )
+
+
+def create_conjugation_table(verb: str, tense: str = "") -> Table:
+    """Create a Rich Table for conjugation quiz questions.
+
+    Displays rows for each person (yo, tu, el, nosotros, vosotros, ellos).
+    """
+    table = Table(
+        title=f"{verb} - {tense}" if tense else verb,
+        title_style="bold magenta",
+        box=box.SIMPLE_HEAVY,
+        show_header=True,
+        header_style="bold",
+        padding=(0, 1),
+    )
+    table.add_column("Person", style="cyan", min_width=12)
+    table.add_column("Conjugation", style="bold white", min_width=15)
+
+    persons = ["yo", "tu", "el/ella/Ud.", "nosotros", "vosotros", "ellos/Uds."]
+    for person in persons:
+        table.add_row(person, "___")
+
+    return table
+
+
+def create_session_progress_bar(current: int, total: int) -> Text:
+    """Create a progress bar for quiz/practice sessions.
+
+    Renders: "Question 3/10 [===......] 30%"
+    """
+    if total <= 0:
+        total = 1
+    percent = int(current / total * 100)
+    bar_width = 20
+    filled = int(bar_width * current / total)
+    empty = bar_width - filled
+
+    if percent >= 80:
+        color = "green"
+    elif percent >= 50:
+        color = "yellow"
+    else:
+        color = "cyan"
+
+    text = Text()
+    text.append(f"Question {current}/{total} ", style="bold")
+    text.append("[", style="dim")
+    text.append("\u2588" * filled, style=color)
+    text.append("\u2591" * empty, style="dim")
+    text.append("] ", style="dim")
+    text.append(f"{percent}%", style=f"bold {color}")
+    return text
+
+
 def create_practice_question_panel(
     question_num: int,
     total: int,
@@ -300,7 +531,9 @@ def create_practice_question_panel(
 ) -> Panel:
     """Create a styled panel for a practice question."""
     content = Text()
-    content.append(f"Question {question_num}/{total}", style="bold")
+
+    # U2: Progress bar in header
+    content.append_text(create_session_progress_bar(question_num, total))
     if difficulty == "harder":
         content.append("  [HARDER]", style="bold magenta")
     elif difficulty == "easier":
@@ -326,12 +559,49 @@ def create_practice_question_panel(
     )
 
 
+def highlight_word_diff(user_answer: str, correct_answer: str) -> Text:
+    """Highlight words in user's answer: green=correct, red=wrong, yellow=partial.
+
+    Compares user answer words to correct answer words positionally.
+    """
+    import re as _re
+
+    user_words = _re.findall(r'\S+', user_answer.strip())
+    correct_words = _re.findall(r'\S+', correct_answer.strip())
+
+    result = Text()
+
+    for i, word in enumerate(user_words):
+        if i > 0:
+            result.append(" ")
+        if i < len(correct_words):
+            clean_u = _re.sub(r'[^\w]', '', word.lower())
+            clean_c = _re.sub(r'[^\w]', '', correct_words[i].lower())
+            if clean_u == clean_c:
+                result.append(word, style="green")
+            elif clean_u and clean_c and (clean_u in clean_c or clean_c in clean_u):
+                result.append(word, style="yellow")
+            else:
+                result.append(word, style="red")
+        else:
+            result.append(word, style="red")
+
+    return result
+
+
 def create_practice_feedback_panel(
     feedback_level: FeedbackLevel,
     feedback_text: str,
     scores: dict[str, int],
+    user_answer: str = "",
+    correct_answer: str = "",
 ) -> Panel:
-    """Create a styled feedback panel after answer evaluation."""
+    """Create a styled feedback panel after answer evaluation.
+
+    When user_answer and correct_answer are provided, highlights words
+    in the user's answer: green for correct, red for wrong, yellow for
+    partially matching words.
+    """
     if feedback_level == FeedbackLevel.CORRECT:
         border = "green"
         title = "[bold green]CORRECT[/bold green]"
@@ -347,8 +617,18 @@ def create_practice_feedback_panel(
 
     content = Text()
     content.append(f" {icon} ", style=f"bold {border}")
-    content.append(feedback_text)
-    content.append("\n\n")
+
+    # U1: Word-level highlighting when both answers are available
+    if user_answer and correct_answer and feedback_level != FeedbackLevel.CORRECT:
+        content.append("Your answer: ", style="dim")
+        content.append_text(highlight_word_diff(user_answer, correct_answer))
+        content.append("\n")
+        content.append("  Correct:    ", style="dim")
+        content.append(correct_answer, style="green")
+        content.append("\n\n")
+    else:
+        content.append(feedback_text)
+        content.append("\n\n")
 
     # Score breakdown
     content.append("Scores: ", style="bold dim")
@@ -630,6 +910,13 @@ def run_practice_loop(
 
         # Show feedback panel
         console.print()
+        # Determine the correct answer for word-level diff (U1)
+        import re as _re_clean
+        if session.direction == PracticeDirection.EN_TO_ES:
+            correct_ans = _re_clean.sub(r'<[^>]+>', ' ', card.back).strip()
+        else:
+            correct_ans = _re_clean.sub(r'<[^>]+>', ' ', card.front).strip()
+
         console.print(create_practice_feedback_panel(
             feedback_level=feedback_level,
             feedback_text=response_text[:300] if len(response_text) > 300 else response_text,
@@ -639,6 +926,8 @@ def run_practice_loop(
                 "Natural": naturalness,
                 "Vocab": vocabulary,
             },
+            user_answer=answer,
+            correct_answer=correct_ans,
         ))
 
         # Record result
@@ -792,14 +1081,24 @@ def create_quiz_question_panel(
     )
 
     content = Text()
-    content.append(f"Question {question_num}/{total}", style="bold")
+
+    # U2: Progress bar in header
+    content.append_text(create_session_progress_bar(question_num, total))
     content.append(f"  [{type_label}]", style="bold magenta")
     content.append("\n\n")
 
     if instruction:
         content.append(f"{instruction}\n\n", style="dim italic")
 
-    content.append(f"  {question_text}", style="bold white")
+    # U3: Conjugation table display
+    if question_type == "conjugation":
+        content.append(f"  {question_text}", style="bold white")
+        content.append("\n\n")
+        content.append("  yo ___  |  nosotros ___\n", style="dim")
+        content.append("  tu ___  |  vosotros ___\n", style="dim")
+        content.append("  el ___  |  ellos    ___\n", style="dim")
+    else:
+        content.append(f"  {question_text}", style="bold white")
 
     if options:
         content.append("\n\n")
@@ -854,6 +1153,43 @@ def create_quiz_feedback_panel(correct: bool, feedback: str, correct_answer: str
     )
 
 
+def create_quiz_type_breakdown_table(type_breakdown: dict[str, dict]) -> Table:
+    """Create a Rich Table showing per-type quiz score breakdown (U4).
+
+    Example output:
+      Fill-in-blank    4/5  80%
+      Multiple choice  3/3 100%
+      Conjugation      1/2  50%
+    """
+    table = Table(
+        box=box.SIMPLE,
+        show_header=True,
+        header_style="bold dim",
+        padding=(0, 1),
+    )
+    table.add_column("Question Type", style="dim", min_width=22)
+    table.add_column("Score", justify="right", min_width=5)
+    table.add_column("%", justify="right", min_width=5)
+
+    for qt, data in type_breakdown.items():
+        label = QUESTION_TYPE_LABELS.get(
+            QuestionType(qt) if qt in [q.value for q in QuestionType] else QuestionType.FILL_IN_BLANK,
+            qt.replace("_", " ").title(),
+        )
+        pct = data.get("score", 0)
+        ct = data.get("correct", 0)
+        tot = data.get("total", 0)
+        if pct >= 85:
+            style = "green"
+        elif pct >= 60:
+            style = "yellow"
+        else:
+            style = "red"
+        table.add_row(label, f"[{style}]{ct}/{tot}[/{style}]", f"[{style}]{pct:.0f}%[/{style}]")
+
+    return table
+
+
 def create_quiz_summary_panel(
     topic: str,
     level: str,
@@ -895,8 +1231,11 @@ def create_quiz_summary_panel(
         content.append("  NOT YET MASTERED ", style="bold yellow")
         content.append(f"Need 85% to master (got {score:.0f}%)\n\n", style="yellow")
 
-    # Type breakdown
+    # U4: Per-type quiz score breakdown as a Rich Table
     if type_breakdown:
+        content.append("\n")
+        type_table = create_quiz_type_breakdown_table(type_breakdown)
+        # We embed the table content as text lines for panel compatibility
         content.append("  BY TYPE\n", style="bold dim")
         for qt, data in type_breakdown.items():
             label = QUESTION_TYPE_LABELS.get(
@@ -906,14 +1245,21 @@ def create_quiz_summary_panel(
             pct = data.get("score", 0)
             ct = data.get("correct", 0)
             tot = data.get("total", 0)
+            bar_w = 10
+            filled = int(bar_w * pct / 100)
+            empty = bar_w - filled
             if pct >= 85:
                 style = "green"
             elif pct >= 60:
                 style = "yellow"
             else:
                 style = "red"
-            content.append(f"    {label:<30}", style="dim")
-            content.append(f"{ct}/{tot} ({pct:.0f}%)\n", style=style)
+            content.append(f"    {label:<25} ", style="dim")
+            content.append(f"{ct}/{tot}", style=style)
+            content.append(" [", style="dim")
+            content.append("\u2588" * filled, style=style)
+            content.append("\u2591" * empty, style="dim")
+            content.append("]\n", style="dim")
         content.append("\n")
 
     # Weak areas

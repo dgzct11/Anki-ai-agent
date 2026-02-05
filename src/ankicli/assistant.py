@@ -221,14 +221,44 @@ Use get_study_suggestion to give personalized recommendations based on:
 
 Call this at the start of a session or when the user asks "what should I study?" to provide data-driven advice."""
 
-_VOCAB_NETWORK_GUIDE = """## Vocabulary Network
+_VOCAB_NETWORK_GUIDE = """## Vocabulary Network (V1-V11)
 
-When the user adds a new word, use get_related_words to suggest semantically related words from CEFR lists.
-This helps build vocabulary clusters rather than isolated words. Example:
-- User adds "comprar" -> suggest "vender", "precio", "tienda", "dinero"
-- User adds "hospital" -> suggest "medico", "enfermero", "paciente", "enfermedad"
+Build vocabulary networks, not isolated flashcards. After adding a card:
 
-Only suggest when relevant - don't overwhelm the user after every card addition."""
+**V1 - Connection discovery:** Call update_word_network to store connections (synonyms, antonyms,
+morphological family, collocations, thematic links, confusables). Use show_word_connections to display them.
+
+**V3 - Morphological families:** Use get_morphological_family to find word relatives (-cion, -mente,
+-dor, -able, des-, re-). Suggest creating cards for unknown family members.
+
+**V4 - Disambiguation practice:** Use get_disambiguation_practice for confusable pairs (ser/estar,
+por/para, saber/conocer). INTERNAL practice mode, not Anki cards. Use show_disambiguation_pairs to list all.
+After practice, call log_disambiguation_result to track progress.
+
+**V5 - Collocations:** Include important collocations on card backs when adding cards. Store them via
+update_word_network with the collocations parameter.
+
+**V6 - False friend alerts:** When adding a word, check against known false friends (check_false_friend).
+Add warnings to the card if detected.
+
+**V7 - Network-aware sentences:** During translation practice, include 2-3 related words from the network
+in practice sentences to reinforce connections.
+
+**V8 - Pair-based review:** Use start_pair_review for comparative practice of antonym/contrast pairs.
+INTERNAL mode, not Anki cards.
+
+**V9 - Semantic field progress:** Use get_semantic_field_progress to show vocabulary coverage per theme
+(food, travel, health, etc.) from CEFR data.
+
+**V10 - Connection map:** Use show_connection_map for an on-demand ASCII visualization of a word's network.
+
+**V11 - Spaced network activation:** Use get_network_study_suggestions to suggest words connected to
+recently-reviewed words, reinforcing vocabulary clusters.
+
+When to use get_related_words vs the network:
+- get_related_words: For CEFR-based semantic suggestions (same category/subcategory)
+- show_word_connections: For stored network connections (explicit relationships you've built)
+- get_morphological_family: For derivation patterns (suffixes/prefixes)"""
 
 _CONTEXTUAL_SENTENCES_GUIDE = """## Contextual Sentence Generator
 
@@ -244,6 +274,90 @@ Use this when:
 - The user wants to see a word used in different registers
 - Creating cards that show real-world usage patterns"""
 
+_COGNATE_GUIDE = """## Cognate Hints on Card Backs (C1)
+
+When creating flashcards for Spanish vocabulary, include a cognate hint line on the card back
+when it would aid memorization. Use this HTML format at the end of the card back:
+
+<br><hr style="border:0;border-top:1px solid #ccc;margin:8px 0">
+<span style="color:#666;font-size:0.9em">cf. FR <i>word</i> / RO <i>word</i> / EN <i>word</i> — from Latin <i>root</i></span>
+
+Guidelines:
+- Include French (FR), Romanian (RO), and/or English (EN) cognates when they help memory
+- Add the Latin root when it illuminates the connection
+- Skip obvious transparent cognates (restaurante/restaurant, hotel/hotel) — no hint needed
+- Skip when there is no useful cognate connection
+- Examples of when to include:
+  - "biblioteca" -> cf. FR bibliothèque / EN bibliography — from Greek bibliotheke
+  - "hablar" -> cf. FR parler / RO a vorbi — from Latin fabulare (to tell stories)
+  - "comprar" -> cf. FR acheter / EN compare — from Latin comparare"""
+
+_FALSE_FRIENDS_GUIDE = """## False Friend Warnings (C2)
+
+CRITICAL: When creating or showing cards for known false friends, add a prominent warning.
+Use this HTML format on the card back, placed right after the Spanish word:
+
+<div style="background:#fff3f3;border-left:4px solid #e74c3c;padding:6px 10px;margin:8px 0;font-size:0.95em">
+<b style="color:#e74c3c">False Friend Warning:</b> <i>warning text</i>
+</div>
+
+The ~20 critical Spanish-English false friends you MUST flag:
+- embarazada = pregnant (NOT embarrassed; avergonzado = embarrassed)
+- éxito = success (NOT exit; salida = exit)
+- carpeta = folder (NOT carpet; alfombra = carpet)
+- actual = current (NOT actual; real/verdadero = actual)
+- realizar = to carry out (NOT to realize; darse cuenta = to realize)
+- asistir = to attend (NOT to assist; ayudar = to assist)
+- sensible = sensitive (NOT sensible; sensato = sensible)
+- molestar = to bother (NOT to molest; abusar = to molest)
+- constipado = having a cold (NOT constipated; estreñido = constipated)
+- librería = bookstore (NOT library; biblioteca = library)
+- fábrica = factory (NOT fabric; tela = fabric)
+- recordar = to remember (NOT to record; grabar = to record)
+- soportar = to endure (NOT to support; apoyar = to support)
+- largo = long (NOT large; grande = large)
+- suceso = event (NOT success; éxito = success)
+- contestar = to answer (NOT to contest; competir = to contest)
+- introducir = to insert (NOT to introduce someone; presentar = to introduce)
+- compromiso = commitment (NOT compromise; acuerdo mutuo = compromise)
+- pretender = to try/aspire (NOT to pretend; fingir = to pretend)
+- ropa = clothing (NOT rope; cuerda = rope)
+
+Always check if a word is a false friend before creating a card. When found, the warning is mandatory."""
+
+_ETYMOLOGY_DISAMBIGUATION_GUIDE = """## Etymology for Disambiguation (C3)
+
+When explaining commonly confused word pairs, use Latin etymology as a memory anchor.
+Include this as part of your explanation when the user encounters these pairs:
+
+**ser vs estar:**
+- ser < Latin sedere (to sit, to be settled) = permanent/essential traits
+- estar < Latin stare (to stand, temporary state) = temporary conditions, location
+- Mnemonic: "SER = settled/permanent. ESTAR = standing in a temporary state."
+
+**por vs para:**
+- por < Latin pro (on behalf of, because of) = cause, exchange, duration, through
+- para < Latin per ad (through toward) = purpose, destination, deadline, recipient
+- Mnemonic: "POR = the reason behind. PARA = the goal ahead."
+
+**saber vs conocer:**
+- saber < Latin sapere (to taste, to have wisdom) = facts, information, how-to
+- conocer < Latin cognoscere (to become acquainted) = people, places, familiarity
+- Mnemonic: "SABER = tasting knowledge/facts. CONOCER = getting to know."
+
+**pedir vs preguntar:**
+- pedir < Latin petere (to seek, request) = to request/ask for something
+- preguntar < Latin percontari (to inquire) = to ask a question
+- Mnemonic: "PEDIR = request something. PREGUNTAR = ask a question."
+
+**llevar vs traer:**
+- llevar < Latin levare (to lift, carry away) = to take away from here
+- traer < Latin trahere (to pull toward) = to bring toward here
+- Mnemonic: "LLEVAR = carry away. TRAER = bring here."
+
+Use these etymologies whenever explaining these pairs in practice, quizzes, or card creation.
+When creating cards for these words, include the Latin root on the card back."""
+
 _TOOL_NOTES_GUIDE = """## User Preferences (Tool Notes)
 
 You can save and manage user preferences using the set_tool_note, get_tool_notes, and remove_tool_note tools.
@@ -256,12 +370,45 @@ When the user expresses a preference about how cards should be created or how yo
 
 Always check and follow any saved preferences when performing actions."""
 
+_PREFERENCE_DETECTION_GUIDE = """## Proactive Preference Detection
+
+Watch for implicit preferences the user reveals through repeated behavior or casual comments. If you notice a pattern appearing 2-3 times, offer to save it as a persistent preference.
+
+Patterns to watch for:
+- **Card style**: "Can you make it shorter?" / always asking for fewer examples -> offer to set example count
+- **Language variant**: User consistently uses Latin American vocab / avoids vosotros -> offer to set dialect preference
+- **Formality**: User prefers tu over usted, casual over formal examples -> offer to note formality level
+- **Correction style**: "Just tell me the answer" / "Explain more" -> offer to save feedback verbosity preference
+- **Study habits**: User always practices at certain times, prefers certain topics -> note for study suggestions
+- **Card content**: User always asks for pronunciation, etymology, or mnemonics -> offer to include by default
+
+When you detect a pattern, say something like:
+"I notice you consistently prefer [X]. Would you like me to save this as a preference so I always do this automatically?"
+
+Then use set_tool_note to save it. Be specific in the saved note so future sessions respect it exactly."""
+
+_MICRO_LESSON_GUIDE = """## Error Pattern Micro-Lessons
+
+When you check the error journal (get_error_patterns) and find an error type with 3 or more occurrences, proactively offer a targeted micro-lesson using generate_micro_lesson.
+
+Micro-lesson format (2-3 minutes):
+1. Name the grammar rule clearly
+2. Show the rule with 2-3 correct examples
+3. Show the common mistake vs correct form (using the user's actual errors from the journal)
+4. Quick practice: 3 fill-in-the-blank exercises
+5. Offer to create Anki cards for the rule
+
+Trigger this at the start of a practice session or when the user asks "what should I work on?"
+Do not repeat a micro-lesson for the same error type within the same session."""
+
 _GRAMMAR_QUIZ_GUIDE = """## Grammar Quiz Mode
 
 You can start grammar quizzes using the start_grammar_quiz tool. The quiz system:
 - Generates questions dynamically based on CEFR level and grammar topic
 - Supports 5 question types: fill-in-the-blank, multiple choice, conjugation table, error correction, sentence transformation
+- Supports 3 sizes: quick (10q), assessment (25-30q), comprehensive (50q) via --size parameter
 - Tracks mastery per topic (>85% = mastered)
+- Tracks per-topic grammar scores across sessions (get_grammar_scores tool)
 - After a quiz, offers to create Anki cards for weak areas
 
 When presenting quiz questions (messages starting with [QUIZ SESSION]):
@@ -269,9 +416,73 @@ When presenting quiz questions (messages starting with [QUIZ SESSION]):
 - Do NOT reveal the answer until the user responds
 - After each answer, provide grammar feedback with the rule explanation
 - Use the log_quiz_results tool after the quiz ends to save results
+- Track errors within the session - if same error type occurs 2+ times, flag it prominently
+
+## Structured Quiz Flow (A3)
+
+For assessment and comprehensive quizzes, follow this 5-step structure:
+1. **Warm-up** (20% of questions): Review known grammar with easy questions to build confidence
+2. **Teach concept** (brief): Before the main practice, give a 2-sentence explanation of the target grammar rule
+3. **Practice** (50% of questions): Focus on the target concept with increasing difficulty
+4. **Mixed review** (30% of questions): Mix the target concept with other related grammar
+5. **Summary**: Score breakdown, weak areas, specific study recommendations
+
+For quick quizzes, skip the warm-up and go straight to practice.
 
 When the user asks to practice grammar or take a quiz, use start_grammar_quiz.
 Use get_learning_summary to check grammar gaps and recommend topics."""
+
+_ADAPTIVE_DIFFICULTY_GUIDE = """## Adaptive Difficulty (A2)
+
+During translation practice, adapt sentence complexity based on user performance:
+
+**5 Difficulty Levels per CEFR band:**
+1. Single word translation (easiest)
+2. Simple sentence (subject + verb + object)
+3. Tense-targeted sentence (specific conjugation focus)
+4. Complex sentence (subordinate clauses, multiple tenses)
+5. Conversational context (idioms, colloquial expressions)
+
+**Adaptation rules:**
+- Start at level 2 (simple sentence)
+- After 3+ correct in a row: increase difficulty by 1 level
+- After 2+ wrong in a row: decrease difficulty by 1 level
+- Never go below level 1 or above level 5
+- When increasing difficulty, tell the user: "Great streak! Trying something harder..."
+- When decreasing difficulty, tell the user: "Let's review the basics for this one."
+
+Track the current difficulty level in your responses and mention level changes."""
+
+_ANKI_REVIEW_INTEGRATION_GUIDE = """## Anki Review Integration (P11)
+
+CRITICAL: After ANY practice session (translation, quiz, conversation, pair review):
+1. Use get_session_due_words to check which session words are due for Anki review
+2. Show the user which words are due
+3. ASK if they want to mark them as reviewed
+4. NEVER auto-mark cards - always wait for explicit user confirmation
+5. If confirmed, use the mark_cards_reviewed tool with the card IDs and ease=3 (Good)
+
+This should be part of every session summary flow."""
+
+_READING_PRACTICE_GUIDE = """## Reading Practice (P9)
+
+Use start_reading_practice to generate reading-only content. This is purely for vocabulary exposure:
+- Claude generates a 100-150 word paragraph using the user's known vocabulary + review words
+- NO testing, NO comprehension questions, NO translation requests
+- Present in a Rich panel for pleasant reading
+- Include a vocabulary glossary for unfamiliar words
+- End with encouragement
+
+Use when the user says "I want to read" or "reading practice" or when suggesting variety in study activities."""
+
+_SESSION_ERROR_TRACKING_GUIDE = """## Within-Session Error Tracking (P10)
+
+During practice and quiz sessions, track error patterns within the current session:
+- If the same error type (gender_agreement, ser_vs_estar, etc.) occurs 2+ times in the session, flag it prominently
+- Use format: "Pattern detected: you're consistently confusing [X]. [Brief explanation of the rule]."
+- After flagging, offer a quick targeted exercise on that specific pattern
+- At session end, include flagged patterns in the summary
+- Also log these patterns to the persistent error journal using log_error"""
 
 # All prompt sections in order, for build_system_prompt to assemble.
 _PROMPT_SECTIONS = [
@@ -289,21 +500,147 @@ _PROMPT_SECTIONS = [
     _VOCAB_NETWORK_GUIDE,
     _CONTEXTUAL_SENTENCES_GUIDE,
     _CONTEXT_MANAGEMENT,
+    _COGNATE_GUIDE,
+    _FALSE_FRIENDS_GUIDE,
+    _ETYMOLOGY_DISAMBIGUATION_GUIDE,
     _TOOL_NOTES_GUIDE,
+    _PREFERENCE_DETECTION_GUIDE,
+    _MICRO_LESSON_GUIDE,
+    _ADAPTIVE_DIFFICULTY_GUIDE,
+    _ANKI_REVIEW_INTEGRATION_GUIDE,
+    _READING_PRACTICE_GUIDE,
+    _SESSION_ERROR_TRACKING_GUIDE,
 ]
 
 
-def build_system_prompt(*, general_note: str | None = None, extra_sections: list[str] | None = None) -> str:
+def build_student_context() -> str | None:
+    """Build a dynamic student context section from CEFR progress, quiz scores,
+    error journal, and difficulty tags.
+
+    Returns the formatted section string, or None if no data is available.
+    """
+    from .cefr import load_progress_cache, LEVELS
+    from .error_journal import get_error_patterns
+    from .learning_summary import load_summary
+
+    lines = ["## Your Current Student"]
+    has_data = False
+
+    # CEFR level progress
+    progress = load_progress_cache()
+    if progress:
+        level_parts = []
+        for lv in LEVELS:
+            lp = progress.get(lv)
+            if lp and lp.words_total > 0:
+                level_parts.append(f"{lv} ({lp.percent:.0f}%)")
+        if level_parts:
+            lines.append(f"- Active level: {' / '.join(level_parts)}")
+            has_data = True
+
+    # Learning summary - grammar and topics
+    try:
+        summary = load_summary()
+        total_cards = summary.get("total_cards_added", 0)
+        if total_cards > 0:
+            lines.append(f"- {total_cards} cards total")
+            has_data = True
+
+        last_updated = summary.get("last_updated", "")
+        if last_updated:
+            lines.append(f"- Last session: {last_updated[:10]}")
+
+        # Gather strong areas (grammar concepts from levels with >50% coverage)
+        strong_areas = []
+        weak_areas = []
+        levels_data = summary.get("levels", {})
+        for lv in ("A1", "A2", "B1", "B2"):
+            level_data = levels_data.get(lv, {})
+            coverage = level_data.get("estimated_coverage", 0)
+            grammar = level_data.get("what_i_know", {}).get("grammar_concepts", [])
+            grammar_gaps = level_data.get("what_to_learn", {}).get("grammar_gaps", [])
+            if coverage >= 50:
+                strong_areas.extend(grammar[:3])
+            weak_areas.extend(grammar_gaps[:2])
+
+        if strong_areas:
+            lines.append(f"- Strong areas: {', '.join(strong_areas[:5])}")
+            has_data = True
+        if weak_areas:
+            lines.append(f"- Weak areas: {', '.join(weak_areas[:5])}")
+            has_data = True
+
+        # Quiz score summary
+        quiz_results = summary.get("quiz_results", [])
+        if quiz_results:
+            recent = quiz_results[-5:]
+            avg_score = sum(q.get("score", 0) for q in recent) / len(recent)
+            lines.append(f"- Recent quiz avg: {avg_score:.0f}% (last {len(recent)} quizzes)")
+            has_data = True
+
+        # Practice session stats
+        practice_sessions = summary.get("practice_sessions", [])
+        if practice_sessions:
+            recent_practice = practice_sessions[-3:]
+            avg_practice = sum(p.get("score_percent", 0) for p in recent_practice) / len(recent_practice)
+            lines.append(f"- Recent practice avg: {avg_practice:.0f}% (last {len(recent_practice)} sessions)")
+            has_data = True
+    except Exception:
+        pass
+
+    # Error patterns
+    try:
+        errors = get_error_patterns(min_count=2, limit=5)
+        if errors:
+            error_summary = ", ".join(f"{e.error_type} (x{e.count})" for e in errors[:3])
+            lines.append(f"- Recurring errors: {error_summary}")
+            has_data = True
+    except Exception:
+        pass
+
+    # Difficulty distribution from CEFR categories
+    if progress:
+        try:
+            difficulty_counts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+            total_known = 0
+            for lv_idx, lv in enumerate(LEVELS, 1):
+                lp = progress.get(lv)
+                if lp and lp.words_known > 0:
+                    bucket = min(lv_idx, 5)
+                    difficulty_counts[bucket] += lp.words_known
+                    total_known += lp.words_known
+            if total_known > 0:
+                dist_parts = []
+                for d in range(1, 6):
+                    pct = difficulty_counts[d] / total_known * 100
+                    if pct > 0:
+                        dist_parts.append(f"{d}:{pct:.0f}%")
+                if dist_parts:
+                    lines.append(f"- Difficulty distribution: {' '.join(dist_parts)}")
+                    has_data = True
+        except Exception:
+            pass
+
+    if not has_data:
+        return None
+
+    return "\n".join(lines)
+
+
+def build_system_prompt(*, general_note: str | None = None, extra_sections: list[str] | None = None, student_context: str | None = None) -> str:
     """Assemble the system prompt from composable sections.
 
     Args:
         general_note: User-set general preference note (injected at end).
         extra_sections: Additional prompt sections to append (e.g. CEFR guide).
+        student_context: Dynamic student context section (from build_student_context).
     """
     sections = list(_PROMPT_SECTIONS)
     if extra_sections:
         sections.extend(extra_sections)
     prompt = "\n\n".join(sections)
+    if student_context:
+        prompt += f"\n\n{student_context}"
     if general_note:
         prompt += f"\n\n## Active User Preferences\n\nIMPORTANT - The user has set these global preferences. Always follow them:\n{general_note}"
     return prompt
@@ -348,9 +685,14 @@ class AnkiAssistant:
         return tools
 
     def _get_system_prompt(self) -> str:
-        """Return system prompt with user preferences injected."""
+        """Return system prompt with user preferences and student context injected."""
+        try:
+            student_ctx = build_student_context()
+        except Exception:
+            student_ctx = None
         return build_system_prompt(
             general_note=self.config.tool_notes.get("general"),
+            student_context=student_ctx,
         )
 
     @property

@@ -1,6 +1,9 @@
 """Persistent learning summary storage."""
 
+from __future__ import annotations
+
 import json
+from dataclasses import dataclass, field, asdict
 from datetime import datetime, date, timedelta
 
 from rich import box
@@ -22,80 +25,172 @@ LEVEL_DESCRIPTIONS = {
 }
 
 
+# ---------------------------------------------------------------------------
+# Typed dataclasses for the learning summary
+# ---------------------------------------------------------------------------
+
+@dataclass
+class KnowledgeItem:
+    """What the learner knows or needs to learn for a CEFR level."""
+    summary: str = ""
+    vocabulary: list[str] = field(default_factory=list)
+    grammar_concepts: list[str] = field(default_factory=list)
+    topics_covered: list[str] = field(default_factory=list)
+    vocabulary_gaps: list[str] = field(default_factory=list)
+    grammar_gaps: list[str] = field(default_factory=list)
+    priority_topics: list[str] = field(default_factory=list)
+
+
+@dataclass
+class LevelData:
+    """Data for a single CEFR level in the learning summary."""
+    what_i_know: KnowledgeItem = field(default_factory=KnowledgeItem)
+    what_to_learn: KnowledgeItem = field(default_factory=KnowledgeItem)
+    estimated_coverage: int = 0
+
+
+@dataclass
+class LearningProgress:
+    """Top-level learning summary with typed fields."""
+    last_updated: str | None = None
+    total_cards_added: int = 0
+    levels: dict[str, LevelData] = field(default_factory=dict)
+    recent_additions: list[str] = field(default_factory=list)
+    notes: str = ""
+    daily_activity: dict[str, int] = field(default_factory=dict)
+
+    def to_dict(self) -> dict:
+        """Convert to a plain dict matching the JSON format."""
+        result = asdict(self)
+        # Flatten KnowledgeItem into what_i_know / what_to_learn sub-dicts
+        # asdict already handles this, but we clean up empty fields from
+        # what_i_know (remove gap fields) and what_to_learn (remove vocab/grammar/topics).
+        for level_key, level_data in result.get("levels", {}).items():
+            wi = level_data.get("what_i_know", {})
+            # Remove gap-related keys from what_i_know to match original format
+            wi.pop("vocabulary_gaps", None)
+            wi.pop("grammar_gaps", None)
+            wi.pop("priority_topics", None)
+
+            wl = level_data.get("what_to_learn", {})
+            # Remove knowledge-related keys from what_to_learn to match original format
+            wl.pop("vocabulary", None)
+            wl.pop("grammar_concepts", None)
+            wl.pop("topics_covered", None)
+        return result
+
+    @classmethod
+    def from_dict(cls, data: dict) -> LearningProgress:
+        """Create a LearningProgress from a plain dict (e.g. loaded from JSON)."""
+        levels = {}
+        for level_key, level_raw in data.get("levels", {}).items():
+            wi_raw = level_raw.get("what_i_know", {})
+            wl_raw = level_raw.get("what_to_learn", {})
+            levels[level_key] = LevelData(
+                what_i_know=KnowledgeItem(
+                    summary=wi_raw.get("summary", ""),
+                    vocabulary=wi_raw.get("vocabulary", []),
+                    grammar_concepts=wi_raw.get("grammar_concepts", []),
+                    topics_covered=wi_raw.get("topics_covered", []),
+                ),
+                what_to_learn=KnowledgeItem(
+                    summary=wl_raw.get("summary", ""),
+                    vocabulary_gaps=wl_raw.get("vocabulary_gaps", []),
+                    grammar_gaps=wl_raw.get("grammar_gaps", []),
+                    priority_topics=wl_raw.get("priority_topics", []),
+                ),
+                estimated_coverage=level_raw.get("estimated_coverage", 0),
+            )
+        return cls(
+            last_updated=data.get("last_updated"),
+            total_cards_added=data.get("total_cards_added", 0),
+            levels=levels,
+            recent_additions=data.get("recent_additions", []),
+            notes=data.get("notes", ""),
+            daily_activity=data.get("daily_activity", {}),
+        )
+
+
+# ---------------------------------------------------------------------------
+# Default summary data
+# ---------------------------------------------------------------------------
+
+_DEFAULT_WHAT_TO_LEARN = {
+    "A1": KnowledgeItem(
+        summary="Basic greetings, introductions, numbers 1-100, colors, days/months, telling time, basic present tense verbs (ser, estar, tener, ir), simple questions, basic pronouns",
+        vocabulary_gaps=["greetings", "numbers", "colors", "days", "months", "basic-verbs", "pronouns", "family", "common-objects"],
+        grammar_gaps=["Present tense regular verbs", "Ser vs Estar basics", "Gender and number agreement", "Basic question formation"],
+        priority_topics=["Self-introduction", "Basic conversation", "Numbers and time", "Common everyday objects"],
+    ),
+    "A2": KnowledgeItem(
+        summary="Everyday vocabulary for routine activities, past tense (preterite/imperfect), reflexive verbs, direct/indirect object pronouns, comparisons, basic connectors",
+        vocabulary_gaps=["daily-routine", "food", "travel", "work", "health", "emotions", "directions", "shopping"],
+        grammar_gaps=["Preterite tense", "Imperfect tense", "Reflexive verbs", "Object pronouns", "Comparatives/superlatives"],
+        priority_topics=["Daily routines", "Restaurant/food", "Travel basics", "Describing past events"],
+    ),
+    "B1": KnowledgeItem(
+        summary="Subjunctive mood (present), conditional tense, future tense, relative clauses, advanced connectors, abstract vocabulary, opinions and hypotheticals",
+        vocabulary_gaps=["abstract-concepts", "opinions", "media", "environment", "politics", "culture", "idioms"],
+        grammar_gaps=["Present subjunctive", "Conditional tense", "Future tense", "Relative pronouns", "Subjunctive triggers"],
+        priority_topics=["Expressing opinions", "Hypothetical situations", "News and media", "Cultural topics"],
+    ),
+    "B2": KnowledgeItem(
+        summary="Imperfect subjunctive, conditional perfect, passive voice, advanced idiomatic expressions, nuanced vocabulary, formal/informal register",
+        vocabulary_gaps=["professional", "academic", "nuanced-expressions", "regional-variations", "advanced-idioms"],
+        grammar_gaps=["Imperfect subjunctive", "Conditional perfect", "Passive constructions", "Sequence of tenses", "Advanced clause structures"],
+        priority_topics=["Professional communication", "Academic discourse", "Nuanced argumentation", "Literary and formal styles"],
+    ),
+}
+
+
+def get_default_progress() -> LearningProgress:
+    """Return a default typed LearningProgress."""
+    levels = {}
+    for level in ("A1", "A2", "B1", "B2"):
+        levels[level] = LevelData(
+            what_i_know=KnowledgeItem(),
+            what_to_learn=KnowledgeItem(
+                summary=_DEFAULT_WHAT_TO_LEARN[level].summary,
+                vocabulary_gaps=list(_DEFAULT_WHAT_TO_LEARN[level].vocabulary_gaps),
+                grammar_gaps=list(_DEFAULT_WHAT_TO_LEARN[level].grammar_gaps),
+                priority_topics=list(_DEFAULT_WHAT_TO_LEARN[level].priority_topics),
+            ),
+            estimated_coverage=0,
+        )
+    return LearningProgress(levels=levels)
+
+
 def get_default_summary() -> dict:
-    """Return a default empty summary structure."""
-    return {
-        "last_updated": None,
-        "total_cards_added": 0,
-        "levels": {
-            "A1": {
-                "what_i_know": {
-                    "summary": "",
-                    "vocabulary": [],
-                    "grammar_concepts": [],
-                    "topics_covered": []
-                },
-                "what_to_learn": {
-                    "summary": "Basic greetings, introductions, numbers 1-100, colors, days/months, telling time, basic present tense verbs (ser, estar, tener, ir), simple questions, basic pronouns",
-                    "vocabulary_gaps": ["greetings", "numbers", "colors", "days", "months", "basic-verbs", "pronouns", "family", "common-objects"],
-                    "grammar_gaps": ["Present tense regular verbs", "Ser vs Estar basics", "Gender and number agreement", "Basic question formation"],
-                    "priority_topics": ["Self-introduction", "Basic conversation", "Numbers and time", "Common everyday objects"]
-                },
-                "estimated_coverage": 0
-            },
-            "A2": {
-                "what_i_know": {
-                    "summary": "",
-                    "vocabulary": [],
-                    "grammar_concepts": [],
-                    "topics_covered": []
-                },
-                "what_to_learn": {
-                    "summary": "Everyday vocabulary for routine activities, past tense (preterite/imperfect), reflexive verbs, direct/indirect object pronouns, comparisons, basic connectors",
-                    "vocabulary_gaps": ["daily-routine", "food", "travel", "work", "health", "emotions", "directions", "shopping"],
-                    "grammar_gaps": ["Preterite tense", "Imperfect tense", "Reflexive verbs", "Object pronouns", "Comparatives/superlatives"],
-                    "priority_topics": ["Daily routines", "Restaurant/food", "Travel basics", "Describing past events"]
-                },
-                "estimated_coverage": 0
-            },
-            "B1": {
-                "what_i_know": {
-                    "summary": "",
-                    "vocabulary": [],
-                    "grammar_concepts": [],
-                    "topics_covered": []
-                },
-                "what_to_learn": {
-                    "summary": "Subjunctive mood (present), conditional tense, future tense, relative clauses, advanced connectors, abstract vocabulary, opinions and hypotheticals",
-                    "vocabulary_gaps": ["abstract-concepts", "opinions", "media", "environment", "politics", "culture", "idioms"],
-                    "grammar_gaps": ["Present subjunctive", "Conditional tense", "Future tense", "Relative pronouns", "Subjunctive triggers"],
-                    "priority_topics": ["Expressing opinions", "Hypothetical situations", "News and media", "Cultural topics"]
-                },
-                "estimated_coverage": 0
-            },
-            "B2": {
-                "what_i_know": {
-                    "summary": "",
-                    "vocabulary": [],
-                    "grammar_concepts": [],
-                    "topics_covered": []
-                },
-                "what_to_learn": {
-                    "summary": "Imperfect subjunctive, conditional perfect, passive voice, advanced idiomatic expressions, nuanced vocabulary, formal/informal register",
-                    "vocabulary_gaps": ["professional", "academic", "nuanced-expressions", "regional-variations", "advanced-idioms"],
-                    "grammar_gaps": ["Imperfect subjunctive", "Conditional perfect", "Passive constructions", "Sequence of tenses", "Advanced clause structures"],
-                    "priority_topics": ["Professional communication", "Academic discourse", "Nuanced argumentation", "Literary and formal styles"]
-                },
-                "estimated_coverage": 0
-            }
-        },
-        "recent_additions": [],
-        "notes": ""
-    }
+    """Return a default empty summary structure (dict form for backward compat)."""
+    return get_default_progress().to_dict()
+
+
+def load_progress() -> LearningProgress:
+    """Load the learning summary from disk as a typed LearningProgress."""
+    ensure_data_dir()
+    if not SUMMARY_FILE.exists():
+        return get_default_progress()
+    try:
+        with open(SUMMARY_FILE) as f:
+            data = json.load(f)
+            if data.get("levels") and "what_i_know" not in data["levels"].get("A1", {}):
+                return get_default_progress()
+            return LearningProgress.from_dict(data)
+    except (json.JSONDecodeError, IOError):
+        return get_default_progress()
+
+
+def save_progress(progress: LearningProgress) -> None:
+    """Save a typed LearningProgress to disk."""
+    ensure_data_dir()
+    progress.last_updated = datetime.now().isoformat()
+    data = progress.to_dict()
+    with open(SUMMARY_FILE, "w") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
 
 
 def load_summary() -> dict:
-    """Load the learning summary from disk."""
+    """Load the learning summary from disk (dict form for backward compat)."""
     ensure_data_dir()
     if not SUMMARY_FILE.exists():
         return get_default_summary()
@@ -111,7 +206,7 @@ def load_summary() -> dict:
 
 
 def save_summary(summary: dict) -> None:
-    """Save the learning summary to disk."""
+    """Save the learning summary to disk (dict form for backward compat)."""
     ensure_data_dir()
     summary["last_updated"] = datetime.now().isoformat()
     with open(SUMMARY_FILE, "w") as f:
@@ -223,15 +318,36 @@ def _create_level_table(data: dict) -> Table:
     return table
 
 
-def _create_activity_heatmap(summary: dict) -> Text:
-    """Create a 14-day activity heatmap using Unicode blocks."""
+def compute_study_streak(summary: dict) -> int:
+    """Compute the current study streak (consecutive days with activity)."""
     activity = summary.get("daily_activity", {})
     today = date.today()
+    streak = 0
+    for days_ago in range(0, 365):
+        d = today - timedelta(days=days_ago)
+        day_key = d.isoformat()
+        if activity.get(day_key, 0) > 0:
+            streak += 1
+        else:
+            break
+    return streak
+
+
+def _create_activity_heatmap(summary: dict) -> Text:
+    """Create a 14-day activity heatmap using colored blocks (U5).
+
+    bright_green for active days, dim for inactive. Shows streak count.
+    """
+    activity = summary.get("daily_activity", {})
+    today = date.today()
+    streak = compute_study_streak(summary)
 
     text = Text()
     text.append("  ACTIVITY ", style="bold dim")
-    text.append("(last 14 days)\n", style="dim")
-    text.append("  ", style="")
+    text.append("(last 14 days)", style="dim")
+    if streak > 0:
+        text.append(f"  Streak: {streak}d", style="bold bright_green")
+    text.append("\n  ", style="")
 
     for days_ago in range(13, -1, -1):
         d = today - timedelta(days=days_ago)
@@ -243,9 +359,9 @@ def _create_activity_heatmap(summary: dict) -> Text:
         elif count <= 5:
             text.append("\u2592\u2592", style="yellow")
         elif count <= 10:
-            text.append("\u2593\u2593", style="cyan")
+            text.append("\u2593\u2593", style="bright_green")
         else:
-            text.append("\u2588\u2588", style="green")
+            text.append("\u2588\u2588", style="bright_green")
         text.append(" ", style="")
 
     text.append("\n  ", style="")
@@ -253,9 +369,9 @@ def _create_activity_heatmap(summary: dict) -> Text:
     text.append("=0  ", style="dim")
     text.append("\u2592\u2592", style="yellow")
     text.append("=1-5  ", style="dim")
-    text.append("\u2593\u2593", style="cyan")
+    text.append("\u2593\u2593", style="bright_green")
     text.append("=6-10  ", style="dim")
-    text.append("\u2588\u2588", style="green")
+    text.append("\u2588\u2588", style="bright_green")
     text.append("=11+", style="dim")
 
     return text

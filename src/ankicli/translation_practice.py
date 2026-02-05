@@ -82,6 +82,7 @@ class PracticeSession:
     current_index: int = 0
     correct_streak: int = 0
     incorrect_streak: int = 0
+    difficulty_num: int = 2  # A2: 1-5 scale, start at 2 (simple sentence)
     started_at: str = field(default_factory=lambda: datetime.now().isoformat())
 
     @property
@@ -130,6 +131,15 @@ class PracticeSession:
     def score_percent(self) -> float:
         return (self.total_score / self.max_possible_score) * 100 if self.max_possible_score > 0 else 0
 
+    # A2: Difficulty level labels
+    DIFFICULTY_LABELS = {
+        1: "single word",
+        2: "simple sentence",
+        3: "tense targeting",
+        4: "complex sentence",
+        5: "conversational context",
+    }
+
     @property
     def difficulty_level(self) -> str:
         """Adaptive difficulty based on streak."""
@@ -139,15 +149,28 @@ class PracticeSession:
             return "easier"
         return "normal"
 
+    @property
+    def difficulty_label(self) -> str:
+        """Human-readable label for current difficulty level."""
+        return self.DIFFICULTY_LABELS.get(self.difficulty_num, "normal")
+
     def record_result(self, result: PracticeResult) -> None:
-        """Record a practice result and update streaks."""
+        """Record a practice result and update streaks + adaptive difficulty."""
         self.results.append(result)
         if result.feedback_level == FeedbackLevel.CORRECT:
             self.correct_streak += 1
             self.incorrect_streak = 0
+            # A2: Increase difficulty after 3+ correct
+            if self.correct_streak >= 3 and self.difficulty_num < 5:
+                self.difficulty_num += 1
+                self.correct_streak = 0  # Reset streak after level change
         elif result.feedback_level == FeedbackLevel.INCORRECT:
             self.incorrect_streak += 1
             self.correct_streak = 0
+            # A2: Decrease difficulty after 2+ wrong
+            if self.incorrect_streak >= 2 and self.difficulty_num > 1:
+                self.difficulty_num -= 1
+                self.incorrect_streak = 0  # Reset streak after level change
         else:
             # Partial - reset both streaks
             self.correct_streak = 0

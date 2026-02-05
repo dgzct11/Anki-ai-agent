@@ -562,7 +562,12 @@ ANKI_TOOLS = [
                 },
                 "count": {
                     "type": "integer",
-                    "description": "Number of questions (default: 5, max: 10)"
+                    "description": "Number of questions (default: 5, max: 50). Overridden by 'size' if set."
+                },
+                "size": {
+                    "type": "string",
+                    "enum": ["quick", "assessment", "comprehensive"],
+                    "description": "Quiz size preset: 'quick' (10q, 1 topic), 'assessment' (25-30q, full CEFR level), 'comprehensive' (50q, multi-level). Overrides count."
                 },
                 "question_types": {
                     "type": "array",
@@ -929,6 +934,123 @@ ANKI_TOOLS = [
         }
     },
     {
+        "name": "generate_micro_lesson",
+        "description": "Generate a targeted 2-3 minute micro-lesson for a specific error pattern. Use when the error journal shows 3+ occurrences of the same error type. Creates a focused lesson with rule explanation, examples, the user's actual mistakes, and practice exercises.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "error_type": {
+                    "type": "string",
+                    "description": "The error type from the error journal (e.g., 'gender_agreement', 'ser_vs_estar', 'preterite_vs_imperfect')"
+                },
+                "level": {
+                    "type": "string",
+                    "enum": ["A1", "A2", "B1", "B2"],
+                    "description": "CEFR level for the lesson complexity (default: A2)"
+                }
+            },
+            "required": ["error_type"]
+        }
+    },
+    {
+        "name": "start_reading_practice",
+        "description": "Start a reading practice session. Claude generates a short paragraph (100-150 words) using known vocabulary plus words due for review. This is READ-ONLY - no testing, no comprehension questions. Just reading exposure to reinforce vocabulary in context.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "deck_name": {
+                    "type": "string",
+                    "description": "Anki deck to pull vocabulary from"
+                },
+                "level": {
+                    "type": "string",
+                    "enum": ["A1", "A2", "B1", "B2"],
+                    "description": "CEFR level for the reading passage (default: A2)"
+                },
+                "topic": {
+                    "type": "string",
+                    "description": "Optional topic for the passage (e.g., 'daily routine', 'travel', 'food')"
+                }
+            },
+            "required": ["deck_name"]
+        }
+    },
+    {
+        "name": "get_grammar_scores",
+        "description": "Get per-topic grammar scores across all quiz sessions. Shows percentage per topic with mastery levels: below 70% = needs review, 70-85% = developing, 85%+ = mastered.",
+        "input_schema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+        }
+    },
+    {
+        "name": "get_session_due_words",
+        "description": "After ANY practice session (translation, quiz, conversation, pair review), get which words from the session are due for Anki review today. Shows the words and ASKS if user wants to mark them reviewed. NEVER auto-mark.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "deck_name": {
+                    "type": "string",
+                    "description": "Deck to check for due cards"
+                },
+                "session_words": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "List of Spanish words encountered during the session"
+                }
+            },
+            "required": ["deck_name", "session_words"]
+        }
+    },
+    {
+        "name": "mark_cards_reviewed",
+        "description": "Mark specific cards as reviewed in Anki. ONLY call this AFTER the user explicitly confirms they want to mark cards as reviewed. Never call without user confirmation. Uses answer_card() with the given ease rating.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "card_ids": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "List of card/note IDs to mark as reviewed"
+                },
+                "ease": {
+                    "type": "integer",
+                    "description": "Ease rating: 1=Again, 2=Hard, 3=Good, 4=Easy (default: 3)"
+                }
+            },
+            "required": ["card_ids"]
+        }
+    },
+    {
+        "name": "batch_delegate",
+        "description": "General-purpose batch processing using parallel Claude sub-agents. Process a list of items with a prompt template. Supports delegate types: cognate_scan (classify words by cognate type), network_update (generate word connections), difficulty_score (compute difficulty scores), context_generation (generate practice sentences). Each item is processed independently in parallel.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "delegate_type": {
+                    "type": "string",
+                    "enum": ["cognate_scan", "network_update", "difficulty_score", "context_generation"],
+                    "description": "Type of batch processing to perform"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "List of items to process (words, phrases, etc.)"
+                },
+                "prompt_override": {
+                    "type": "string",
+                    "description": "Optional custom prompt template. Use {item} as placeholder for each item."
+                },
+                "workers": {
+                    "type": "integer",
+                    "description": "Parallel workers (default: 5, max: 10)"
+                }
+            },
+            "required": ["delegate_type", "items"]
+        }
+    },
+    {
         "name": "start_conversation_sim",
         "description": "Start a conversation simulation where Claude role-plays a character (waiter, doctor, colleague, etc.) and the user responds in Spanish. Scenarios are tied to CEFR levels. After the conversation, offers to create Anki cards for new vocabulary encountered.",
         "input_schema": {
@@ -950,5 +1072,311 @@ ANKI_TOOLS = [
             },
             "required": ["scenario", "level"]
         }
-    }
+    },
+    {
+        "name": "get_skills_radar",
+        "description": "Get a skills radar showing proficiency across 5 dimensions: vocabulary breadth (CEFR coverage), grammar accuracy (quiz scores), productive skill (translation practice scores), topic coverage (themes with learned words), and retention (Anki retention rate). Each dimension is scored 0-100.",
+        "input_schema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+        }
+    },
+    {
+        "name": "get_progress_over_time",
+        "description": "Get time-based progress showing cards added per week/month, CEFR level progression, and retention rate trends over time. Shows historical snapshots.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "period": {
+                    "type": "string",
+                    "enum": ["week", "month"],
+                    "description": "Time grouping: 'week' or 'month' (default: month)"
+                }
+            },
+            "required": []
+        }
+    },
+    {
+        "name": "get_weak_spots",
+        "description": "Get a weak spots dashboard aggregating: grammar topics with lowest quiz scores, vocabulary themes with highest error rates, and most-forgotten Anki cards (high lapses, low ease factor). Use to identify areas needing the most attention.",
+        "input_schema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+        }
+    },
+    {
+        "name": "get_study_streaks",
+        "description": "Get study streak information: current consecutive-day streak, longest ever streak, last 7 days activity, and total active days.",
+        "input_schema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+        }
+    },
+    {
+        "name": "record_study_activity",
+        "description": "Record study activity for today (or a specific date) to maintain the study streak. Called automatically during practice/quiz sessions but can also be called manually.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string",
+                    "description": "Date in YYYY-MM-DD format (defaults to today)"
+                }
+            },
+            "required": []
+        }
+    },
+    {
+        "name": "scan_cognates",
+        "description": "Classify a list of Spanish words by cognate type relative to English/French/Romanian. Groups words into: 'transparent' (you probably already recognize these), 'semi_transparent' (close - easy to learn), 'false_friend' (watch out!), and 'none' (need real study). Uses cognate_type data from CEFR vocabulary lists. Great for prioritizing which unknown words to study first.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "words": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "List of Spanish words to classify (lowercase, infinitive for verbs)"
+                },
+                "level": {
+                    "type": "string",
+                    "enum": ["A1", "A2", "B1", "B2", "C1", "C2"],
+                    "description": "Optional: only scan words at this CEFR level"
+                }
+            },
+            "required": ["words"]
+        }
+    },
+    {
+        "name": "check_false_friend",
+        "description": "Check if a Spanish word is a known false friend (false cognate with English). Returns the warning and correct meanings if it is. Use this before creating cards to catch false friends that need special warning labels.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "word": {
+                    "type": "string",
+                    "description": "Spanish word to check (lowercase)"
+                }
+            },
+            "required": ["word"]
+        }
+    },
+    # -------------------------------------------------------------------
+    # Vocabulary Network tools (V1, V3-V11)
+    # -------------------------------------------------------------------
+    {
+        "name": "update_word_network",
+        "description": "V1: Update the vocabulary network after adding a card. Claude provides connections (antonyms, synonyms, morphological family, collocations, thematic links, confusables) and the system stores them. Call this AFTER add_card to build the network graph.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "word": {
+                    "type": "string",
+                    "description": "The Spanish word just added (lowercase, infinitive for verbs)"
+                },
+                "level": {
+                    "type": "string",
+                    "description": "CEFR level (e.g., 'A1', 'B2')"
+                },
+                "pos": {
+                    "type": "string",
+                    "description": "Part of speech (noun, verb, adjective, adverb, preposition, etc.)"
+                },
+                "theme": {
+                    "type": "string",
+                    "description": "Thematic field (e.g., 'food', 'travel', 'health', 'emotions')"
+                },
+                "connections": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": ["antonym", "morphological", "collocation", "thematic", "synonym", "confusable"],
+                                "description": "Connection type"
+                            },
+                            "target": {
+                                "type": "string",
+                                "description": "The connected word"
+                            },
+                            "strength": {
+                                "type": "number",
+                                "description": "Connection strength 0.0-1.0 (default: 1.0)"
+                            }
+                        },
+                        "required": ["type", "target"]
+                    },
+                    "description": "List of connections to other words"
+                },
+                "collocations": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "phrase": {"type": "string", "description": "The collocation phrase"},
+                            "translation": {"type": "string", "description": "English translation"}
+                        },
+                        "required": ["phrase"]
+                    },
+                    "description": "Common collocations (V5)"
+                },
+                "family_root": {
+                    "type": "string",
+                    "description": "Morphological family root (e.g., 'educar' for 'educacion')"
+                },
+                "note_id": {
+                    "type": "integer",
+                    "description": "Anki note ID of the card just added"
+                }
+            },
+            "required": ["word"]
+        }
+    },
+    {
+        "name": "show_word_connections",
+        "description": "V1: Show all existing connections for a word in the vocabulary network. Displays synonyms, antonyms, morphological family, collocations, thematic links, and confusables.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "word": {
+                    "type": "string",
+                    "description": "Spanish word to look up (lowercase)"
+                }
+            },
+            "required": ["word"]
+        }
+    },
+    {
+        "name": "get_morphological_family",
+        "description": "V3: Find morphological relatives of a Spanish word. Identifies patterns like -cion, -mente, -dor, -able, des-, re- and suggests family members. Example: 'educar' -> educacion, educador, educable, reeducar.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "word": {
+                    "type": "string",
+                    "description": "Spanish word to find morphological family for (lowercase)"
+                }
+            },
+            "required": ["word"]
+        }
+    },
+    {
+        "name": "get_disambiguation_practice",
+        "description": "V4: Get a disambiguation practice exercise for a confusable pair (INTERNAL practice, not Anki cards). Presents contrast exercises for pairs like ser/estar, saber/conocer, por/para. Tracks errors per pair.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "pair": {
+                    "type": "string",
+                    "description": "Disambiguation pair ID (e.g., 'ser-estar', 'por-para', 'saber-conocer'). Use show_disambiguation_pairs to see all available pairs."
+                }
+            },
+            "required": ["pair"]
+        }
+    },
+    {
+        "name": "show_disambiguation_pairs",
+        "description": "V4: List all available disambiguation pairs with their practice stats and error counts. Shows which pairs need the most work.",
+        "input_schema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+        }
+    },
+    {
+        "name": "log_disambiguation_result",
+        "description": "V4: Log the result of a disambiguation practice exercise. Records errors and practice count for the pair.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "pair_id": {
+                    "type": "string",
+                    "description": "The disambiguation pair ID (e.g., 'ser-estar')"
+                },
+                "correct": {
+                    "type": "integer",
+                    "description": "Number of correct answers"
+                },
+                "total": {
+                    "type": "integer",
+                    "description": "Total questions"
+                },
+                "confused_words": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Words the user confused (for error tracking)"
+                }
+            },
+            "required": ["pair_id", "correct", "total"]
+        }
+    },
+    {
+        "name": "get_semantic_field_progress",
+        "description": "V9: Show vocabulary progress for a specific semantic/thematic field. Shows known vs missing words per theme from CEFR word lists (e.g., 'food_nutrition': 15/30 known).",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "theme": {
+                    "type": "string",
+                    "description": "Theme/category name from CEFR data (e.g., 'food_nutrition', 'travel_transport', 'health_body', 'emotions_feelings'). Omit to see all themes."
+                }
+            },
+            "required": []
+        }
+    },
+    {
+        "name": "show_connection_map",
+        "description": "V10: Display an ASCII connection map for a word showing all its network relationships (synonyms, antonyms, morphological family, collocations, thematic links). On-demand visualization.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "word": {
+                    "type": "string",
+                    "description": "Spanish word to map (lowercase)"
+                }
+            },
+            "required": ["word"]
+        }
+    },
+    {
+        "name": "start_pair_review",
+        "description": "V8: Start a pair-based review session (INTERNAL mode, not Anki cards). Presents antonym/contrast pairs together for comparative practice. Pulls pairs from the vocabulary network.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "pair_type": {
+                    "type": "string",
+                    "enum": ["antonym", "synonym", "confusable", "thematic", "all"],
+                    "description": "Type of pairs to review (default: all)"
+                },
+                "count": {
+                    "type": "integer",
+                    "description": "Number of pairs to review (default: 5)"
+                }
+            },
+            "required": []
+        }
+    },
+    {
+        "name": "get_network_study_suggestions",
+        "description": "V11: Get study suggestions weighted by network connections to recently-reviewed words. Words connected to what you just reviewed get priority, activating related vocabulary clusters.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "recently_reviewed": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "List of Spanish words recently reviewed (from current or recent Anki session)"
+                },
+                "limit": {
+                    "type": "integer",
+                    "description": "Maximum suggestions to return (default: 5)"
+                }
+            },
+            "required": ["recently_reviewed"]
+        }
+    },
 ]

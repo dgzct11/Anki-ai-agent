@@ -283,3 +283,184 @@ class TestHandlerBehavior:
         anki.get_note.return_value = None
         result = HANDLERS["get_note"](anki, {"note_id": 999})
         assert "not found" in result
+
+
+# ---------------------------------------------------------------------------
+# Vocabulary Network handler tests (V1, V3-V11)
+# ---------------------------------------------------------------------------
+
+class TestNetworkHandlers:
+    """Tests for vocabulary network handler behaviors."""
+
+    def test_update_word_network_basic(self):
+        """V1: update_word_network creates a node."""
+        anki = MagicMock()
+        with patch("ankicli.word_network.WORD_NETWORK_FILE") as mock_nf, \
+             patch("ankicli.word_network.DISAMBIGUATION_FILE") as mock_df, \
+             patch("ankicli.word_network.ensure_data_dir"):
+            mock_nf.exists.return_value = False
+            mock_df.exists.return_value = False
+
+            result = HANDLERS["update_word_network"](anki, {
+                "word": "gato",
+                "level": "A1",
+                "pos": "noun",
+                "theme": "animals",
+            })
+            assert "gato" in result
+            assert "Network updated" in result
+
+    def test_update_word_network_with_connections(self):
+        """V1: update_word_network adds connections."""
+        anki = MagicMock()
+        with patch("ankicli.word_network.WORD_NETWORK_FILE") as mock_nf, \
+             patch("ankicli.word_network.DISAMBIGUATION_FILE") as mock_df, \
+             patch("ankicli.word_network.ensure_data_dir"):
+            mock_nf.exists.return_value = False
+            mock_df.exists.return_value = False
+
+            result = HANDLERS["update_word_network"](anki, {
+                "word": "bueno",
+                "connections": [
+                    {"type": "antonym", "target": "malo"},
+                    {"type": "synonym", "target": "bien"},
+                ],
+                "collocations": [
+                    {"phrase": "bueno para", "translation": "good for"},
+                ],
+            })
+            assert "2 connection(s)" in result
+            assert "1 collocation(s)" in result
+
+    def test_show_word_connections_not_found(self):
+        """V1: show_word_connections for unknown word."""
+        anki = MagicMock()
+        with patch("ankicli.word_network.WORD_NETWORK_FILE") as mock_nf, \
+             patch("ankicli.word_network.DISAMBIGUATION_FILE") as mock_df, \
+             patch("ankicli.word_network.ensure_data_dir"):
+            mock_nf.exists.return_value = False
+            mock_df.exists.return_value = False
+
+            result = HANDLERS["show_word_connections"](anki, {"word": "nonexistent"})
+            assert "not found" in result
+
+    def test_get_morphological_family(self):
+        """V3: get_morphological_family finds relatives."""
+        anki = MagicMock()
+        anki.search_cards.return_value = []  # No cards in Anki
+        with patch("ankicli.word_network.WORD_NETWORK_FILE") as mock_nf, \
+             patch("ankicli.word_network.DISAMBIGUATION_FILE") as mock_df, \
+             patch("ankicli.word_network.ensure_data_dir"):
+            mock_nf.exists.return_value = False
+            mock_df.exists.return_value = False
+
+            result = HANDLERS["get_morphological_family"](anki, {"word": "educar"})
+            assert "educacion" in result
+            assert "Morphological family" in result
+
+    def test_show_disambiguation_pairs(self):
+        """V4: show_disambiguation_pairs lists defaults."""
+        anki = MagicMock()
+        with patch("ankicli.word_network.WORD_NETWORK_FILE") as mock_nf, \
+             patch("ankicli.word_network.DISAMBIGUATION_FILE") as mock_df, \
+             patch("ankicli.word_network.ensure_data_dir"):
+            mock_nf.exists.return_value = False
+            mock_df.exists.return_value = False
+
+            result = HANDLERS["show_disambiguation_pairs"](anki, {})
+            assert "ser-estar" in result
+            assert "por-para" in result
+            assert "saber-conocer" in result
+
+    def test_get_disambiguation_practice(self):
+        """V4: get_disambiguation_practice returns instructions."""
+        anki = MagicMock()
+        with patch("ankicli.word_network.WORD_NETWORK_FILE") as mock_nf, \
+             patch("ankicli.word_network.DISAMBIGUATION_FILE") as mock_df, \
+             patch("ankicli.word_network.ensure_data_dir"):
+            mock_nf.exists.return_value = False
+            mock_df.exists.return_value = False
+
+            result = HANDLERS["get_disambiguation_practice"](anki, {"pair": "ser-estar"})
+            assert "DISAMBIGUATION PRACTICE" in result
+            assert "ser / estar" in result
+
+    def test_get_disambiguation_practice_not_found(self):
+        """V4: get_disambiguation_practice for unknown pair."""
+        anki = MagicMock()
+        with patch("ankicli.word_network.WORD_NETWORK_FILE") as mock_nf, \
+             patch("ankicli.word_network.DISAMBIGUATION_FILE") as mock_df, \
+             patch("ankicli.word_network.ensure_data_dir"):
+            mock_nf.exists.return_value = False
+            mock_df.exists.return_value = False
+
+            result = HANDLERS["get_disambiguation_practice"](anki, {"pair": "nonexistent-pair"})
+            assert "not found" in result
+
+    def test_log_disambiguation_result(self):
+        """V4: log_disambiguation_result records results."""
+        anki = MagicMock()
+        with patch("ankicli.word_network.WORD_NETWORK_FILE") as mock_nf, \
+             patch("ankicli.word_network.DISAMBIGUATION_FILE") as mock_df, \
+             patch("ankicli.word_network.ensure_data_dir"):
+            mock_nf.exists.return_value = False
+            mock_df.exists.return_value = False
+
+            result = HANDLERS["log_disambiguation_result"](anki, {
+                "pair_id": "ser-estar",
+                "correct": 4,
+                "total": 5,
+                "confused_words": ["estar"],
+            })
+            assert "80%" in result
+            assert "ser-estar" in result
+
+    def test_show_connection_map_not_found(self):
+        """V10: show_connection_map for unknown word."""
+        anki = MagicMock()
+        with patch("ankicli.word_network.WORD_NETWORK_FILE") as mock_nf, \
+             patch("ankicli.word_network.DISAMBIGUATION_FILE") as mock_df, \
+             patch("ankicli.word_network.ensure_data_dir"):
+            mock_nf.exists.return_value = False
+            mock_df.exists.return_value = False
+
+            result = HANDLERS["show_connection_map"](anki, {"word": "unknown"})
+            assert "not found" in result
+
+    def test_start_pair_review_empty_network(self):
+        """V8: start_pair_review with no pairs."""
+        anki = MagicMock()
+        with patch("ankicli.word_network.WORD_NETWORK_FILE") as mock_nf, \
+             patch("ankicli.word_network.DISAMBIGUATION_FILE") as mock_df, \
+             patch("ankicli.word_network.ensure_data_dir"):
+            mock_nf.exists.return_value = False
+            mock_df.exists.return_value = False
+
+            result = HANDLERS["start_pair_review"](anki, {})
+            assert "No" in result
+
+    def test_get_network_study_suggestions_empty(self):
+        """V11: get_network_study_suggestions with empty network."""
+        anki = MagicMock()
+        with patch("ankicli.word_network.WORD_NETWORK_FILE") as mock_nf, \
+             patch("ankicli.word_network.DISAMBIGUATION_FILE") as mock_df, \
+             patch("ankicli.word_network.ensure_data_dir"):
+            mock_nf.exists.return_value = False
+            mock_df.exists.return_value = False
+
+            result = HANDLERS["get_network_study_suggestions"](anki, {
+                "recently_reviewed": ["gato", "perro"],
+            })
+            assert "No network-based suggestions" in result
+
+    def test_network_handler_names_registered(self):
+        """All network tools have registered handlers."""
+        network_tools = [
+            "update_word_network", "show_word_connections",
+            "get_morphological_family", "get_disambiguation_practice",
+            "show_disambiguation_pairs", "log_disambiguation_result",
+            "get_semantic_field_progress", "show_connection_map",
+            "start_pair_review", "get_network_study_suggestions",
+        ]
+        for tool_name in network_tools:
+            assert tool_name in HANDLERS, f"Handler '{tool_name}' not registered"

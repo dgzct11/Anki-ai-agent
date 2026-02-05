@@ -9,7 +9,8 @@
     "tags": [
       "literary",
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "talante",
@@ -20,7 +21,8 @@
     "subcategory": "appearance",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "apostura",
@@ -31,7 +33,8 @@
     "subcategory": "appearance",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "macilento",
@@ -42,7 +45,8 @@
     "subcategory": "physical_traits",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "enjuto",
@@ -53,7 +57,8 @@
     "subcategory": "physical_traits",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "ataviarse",
@@ -64,7 +69,8 @@
     "subcategory": "appearance",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "escudriñar",
@@ -75,7 +81,8 @@
     "subcategory": "senses",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "avizor",
@@ -86,7 +93,8 @@
     "subcategory": "senses",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "trastabillar",
@@ -97,7 +105,8 @@
     "subcategory": "physical_actions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "zarandear",
@@ -108,7 +117,8 @@
     "subcategory": "physical_actions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "zozobra",
@@ -119,7 +129,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "desazón",
@@ -130,7 +141,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "embeleso",
@@ -141,7 +153,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "desdén",
@@ -152,7 +165,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "pesadumbre",
@@ -163,7 +177,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "congoja",
@@ -174,7 +189,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "arrobo",
@@ -185,7 +201,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "ensimismamiento",
@@ -196,7 +213,8 @@
     "subcategory": "mental_states",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "hosco",
@@ -207,7 +225,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "pusilánime",
@@ -218,7 +237,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "magnánimo",
@@ -229,7 +249,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "abyecto",
@@ -240,7 +261,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "taciturno",
@@ -251,7 +273,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "flemático",
@@ -262,7 +285,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "desabrido",
@@ -273,7 +297,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "arrobarse",
@@ -284,7 +309,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "regocijarse",
@@ -295,7 +321,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "acongojarse",
@@ -306,7 +333,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "estirpe",
@@ -317,7 +345,8 @@
     "subcategory": "basic_info",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "abolengo",
@@ -328,7 +357,8 @@
     "subcategory": "basic_info",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "prosapia",
@@ -339,7 +369,8 @@
     "subcategory": "basic_info",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "cabal",
@@ -350,7 +381,8 @@
     "subcategory": "formality",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "galantería",
@@ -361,7 +393,8 @@
     "subcategory": "formality",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "deferente",
@@ -372,7 +405,8 @@
     "subcategory": "formality",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "aquiescencia",
@@ -383,7 +417,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "menospreciar",
@@ -394,7 +429,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "vianda",
@@ -405,7 +441,8 @@
     "subcategory": "food_items",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "pitanza",
@@ -417,7 +454,8 @@
     "tags": [
       "literary",
       "archaic"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "yantar",
@@ -428,7 +466,8 @@
     "subcategory": "meals",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "ágape",
@@ -439,7 +478,8 @@
     "subcategory": "restaurants",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "sibarita",
@@ -450,7 +490,8 @@
     "subcategory": "diet",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "erudición",
@@ -461,7 +502,8 @@
     "subcategory": "learning_process",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "acervo cultural",
@@ -472,7 +514,8 @@
     "subcategory": "learning_process",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "magisterio",
@@ -483,7 +526,8 @@
     "subcategory": "institutions",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "cátedra",
@@ -494,7 +538,8 @@
     "subcategory": "institutions",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "preceptor",
@@ -506,7 +551,8 @@
     "tags": [
       "literary",
       "archaic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "prebenda",
@@ -517,7 +563,8 @@
     "subcategory": "employment",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "emolumento",
@@ -529,7 +576,8 @@
     "tags": [
       "formal",
       "legal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "desagravio",
@@ -541,7 +589,8 @@
     "tags": [
       "formal",
       "legal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "esparcimiento",
@@ -552,7 +601,8 @@
     "subcategory": "entertainment",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "solaz",
@@ -563,7 +613,8 @@
     "subcategory": "entertainment",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "regodeo",
@@ -574,7 +625,8 @@
     "subcategory": "entertainment",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "libelo",
@@ -586,7 +638,8 @@
     "tags": [
       "legal",
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "panfleto",
@@ -597,7 +650,8 @@
     "subcategory": "press",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "diatriba",
@@ -608,7 +662,8 @@
     "subcategory": "press",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "soflama",
@@ -619,7 +674,8 @@
     "subcategory": "press",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "aposento",
@@ -631,7 +687,8 @@
     "tags": [
       "literary",
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "morada",
@@ -642,7 +699,8 @@
     "subcategory": "types",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "alcoba",
@@ -653,7 +711,8 @@
     "subcategory": "rooms",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "zaguán",
@@ -664,7 +723,8 @@
     "subcategory": "rooms",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "canonjía",
@@ -675,7 +735,8 @@
     "subcategory": "banking",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "fideicomiso",
@@ -686,7 +747,8 @@
     "subcategory": "banking",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "atavío",
@@ -697,7 +759,8 @@
     "subcategory": "clothing",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "atuendo",
@@ -708,7 +771,8 @@
     "subcategory": "clothing",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "achaque",
@@ -719,7 +783,8 @@
     "subcategory": "illnesses",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "bálsamo",
@@ -730,7 +795,8 @@
     "subcategory": "medical_care",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "botica",
@@ -741,7 +807,8 @@
     "subcategory": "medical_care",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "panacea",
@@ -752,7 +819,8 @@
     "subcategory": "medical_care",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "periplo",
@@ -763,7 +831,8 @@
     "subcategory": "tourism",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "derrotero",
@@ -774,7 +843,8 @@
     "subcategory": "directions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "hito",
@@ -785,7 +855,8 @@
     "subcategory": "tourism",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "errabundo",
@@ -796,7 +867,8 @@
     "subcategory": "tourism",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "peculio",
@@ -807,7 +879,8 @@
     "subcategory": "money",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "usura",
@@ -818,7 +891,8 @@
     "subcategory": "money",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "oneroso",
@@ -830,7 +904,8 @@
     "tags": [
       "formal",
       "legal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "lucro",
@@ -841,7 +916,8 @@
     "subcategory": "commerce",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "erario",
@@ -852,7 +928,8 @@
     "subcategory": "economy",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "axioma",
@@ -863,7 +940,8 @@
     "subcategory": "mathematics",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "corolario",
@@ -874,7 +952,8 @@
     "subcategory": "mathematics",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "postulado",
@@ -885,7 +964,8 @@
     "subcategory": "science",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "conjetura",
@@ -896,7 +976,8 @@
     "subcategory": "science",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "autocracia",
@@ -907,7 +988,8 @@
     "subcategory": "politics",
     "tags": [
       "politics"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "plutocracia",
@@ -919,7 +1001,8 @@
     "tags": [
       "politics",
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "teocracia",
@@ -930,7 +1013,8 @@
     "subcategory": "politics",
     "tags": [
       "politics"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "demagogia",
@@ -941,7 +1025,8 @@
     "subcategory": "politics",
     "tags": [
       "politics"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "caciquismo",
@@ -953,7 +1038,8 @@
     "tags": [
       "politics",
       "spanish_specific"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "jurisconsulto",
@@ -965,7 +1051,8 @@
     "tags": [
       "legal",
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "usurpar",
@@ -976,7 +1063,8 @@
     "subcategory": "politics",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "conminar",
@@ -987,7 +1075,8 @@
     "subcategory": "law",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "espurio",
@@ -998,7 +1087,8 @@
     "subcategory": "law",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "inicuo",
@@ -1009,7 +1099,8 @@
     "subcategory": "law",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "epifanía",
@@ -1020,7 +1111,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "catarsis",
@@ -1031,7 +1123,8 @@
     "subcategory": "theater",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "mímesis",
@@ -1043,7 +1136,8 @@
     "tags": [
       "literary",
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "palimpsesto",
@@ -1055,7 +1149,8 @@
     "tags": [
       "literary",
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "leitmotiv",
@@ -1067,7 +1162,8 @@
     "tags": [
       "music",
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "elipsis",
@@ -1078,7 +1174,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "sinécdoque",
@@ -1090,7 +1187,8 @@
     "tags": [
       "literary",
       "rhetoric"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "metonimia",
@@ -1102,7 +1200,8 @@
     "tags": [
       "literary",
       "rhetoric"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "prosopopeya",
@@ -1113,7 +1212,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "hipérbaton",
@@ -1124,7 +1224,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "oximoron",
@@ -1135,7 +1236,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "anáfora",
@@ -1146,7 +1248,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "aliteración",
@@ -1157,7 +1260,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "claroscuro",
@@ -1168,7 +1272,8 @@
     "subcategory": "visual_arts",
     "tags": [
       "art"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "sfumato",
@@ -1179,7 +1284,8 @@
     "subcategory": "visual_arts",
     "tags": [
       "art"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "escatología",
@@ -1191,7 +1297,8 @@
     "tags": [
       "philosophy",
       "religion"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "hermenéutica",
@@ -1203,7 +1310,8 @@
     "tags": [
       "philosophy",
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "solipsismo",
@@ -1214,7 +1322,8 @@
     "subcategory": "philosophy",
     "tags": [
       "philosophy"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "teleología",
@@ -1226,7 +1335,8 @@
     "tags": [
       "philosophy",
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "panteísmo",
@@ -1238,7 +1348,8 @@
     "tags": [
       "religion",
       "philosophy"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "iconoclasta",
@@ -1249,7 +1360,8 @@
     "subcategory": "religion",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "apostasía",
@@ -1260,7 +1372,8 @@
     "subcategory": "religion",
     "tags": [
       "religion"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "estepa",
@@ -1271,7 +1384,8 @@
     "subcategory": "landscapes",
     "tags": [
       "geography"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "tundra",
@@ -1282,7 +1396,8 @@
     "subcategory": "landscapes",
     "tags": [
       "geography"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "istmo",
@@ -1293,7 +1408,8 @@
     "subcategory": "landscapes",
     "tags": [
       "geography"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "atolón",
@@ -1304,7 +1420,8 @@
     "subcategory": "landscapes",
     "tags": [
       "geography"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "sotobosque",
@@ -1315,7 +1432,8 @@
     "subcategory": "plants",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "alimaña",
@@ -1326,7 +1444,8 @@
     "subcategory": "animals",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "dehesa",
@@ -1337,7 +1456,8 @@
     "subcategory": "environment",
     "tags": [
       "spanish_specific"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "rescoldo",
@@ -1348,7 +1468,8 @@
     "subcategory": "weather",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "acaecer",
@@ -1359,7 +1480,8 @@
     "subcategory": "mental_states",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "adolecer",
@@ -1370,7 +1492,8 @@
     "subcategory": "illnesses",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "aducir",
@@ -1381,7 +1504,8 @@
     "subcategory": "law",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "aseverar",
@@ -1392,7 +1516,8 @@
     "subcategory": "law",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "detentar",
@@ -1403,7 +1528,8 @@
     "subcategory": "politics",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "dimanar",
@@ -1415,7 +1541,8 @@
     "tags": [
       "formal",
       "legal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "granjear",
@@ -1426,7 +1553,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "incumbir",
@@ -1437,7 +1565,8 @@
     "subcategory": "tasks",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "inquirir",
@@ -1448,7 +1577,8 @@
     "subcategory": "law",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "propugnar",
@@ -1459,7 +1589,8 @@
     "subcategory": "politics",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "requerir",
@@ -1470,7 +1601,8 @@
     "subcategory": "law",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "socavar",
@@ -1481,7 +1613,8 @@
     "subcategory": "politics",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "suscitar",
@@ -1492,7 +1625,8 @@
     "subcategory": "emotions",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "tildar",
@@ -1503,7 +1637,8 @@
     "subcategory": "press",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "versar",
@@ -1514,7 +1649,8 @@
     "subcategory": "learning_process",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "acuciante",
@@ -1525,7 +1661,8 @@
     "subcategory": "social_issues",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "consustancial",
@@ -1536,7 +1673,8 @@
     "subcategory": "philosophy",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "deletéreo",
@@ -1547,7 +1685,8 @@
     "subcategory": "science",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "desmesurado",
@@ -1558,7 +1697,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "eximio",
@@ -1569,7 +1709,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "irrisorio",
@@ -1580,7 +1721,8 @@
     "subcategory": "money",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "magro",
@@ -1591,7 +1733,8 @@
     "subcategory": "money",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "nefasto",
@@ -1602,7 +1745,8 @@
     "subcategory": "emotions",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "pertinaz",
@@ -1613,7 +1757,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "prolijo",
@@ -1624,7 +1769,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "recóndito",
@@ -1635,7 +1781,8 @@
     "subcategory": "landscapes",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "sempiterno",
@@ -1646,7 +1793,8 @@
     "subcategory": "philosophy",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "verosímil",
@@ -1657,7 +1805,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "acendrado",
@@ -1668,7 +1817,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "avieso",
@@ -1679,7 +1829,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "baladí",
@@ -1690,7 +1841,8 @@
     "subcategory": "mental_states",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "desaguisado",
@@ -1701,7 +1853,8 @@
     "subcategory": "law",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "denuedo",
@@ -1712,7 +1865,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "descalabro",
@@ -1723,7 +1877,8 @@
     "subcategory": "economy",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "subterfugio",
@@ -1734,7 +1889,8 @@
     "subcategory": "politics",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "vicisitud",
@@ -1745,7 +1901,8 @@
     "subcategory": "mental_states",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "idiosincrasia",
@@ -1756,7 +1913,8 @@
     "subcategory": "basic_info",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "impronta",
@@ -1767,7 +1925,8 @@
     "subcategory": "visual_arts",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "raigambre",
@@ -1778,7 +1937,8 @@
     "subcategory": "traditions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "tesón",
@@ -1789,7 +1949,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "aquilatamiento",
@@ -1800,7 +1961,8 @@
     "subcategory": "mental_states",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "a la sazón",
@@ -1811,7 +1973,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "a la postre",
@@ -1822,7 +1985,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "a guisa de",
@@ -1833,7 +1997,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "en ciernes",
@@ -1844,7 +2009,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "de marras",
@@ -1855,7 +2021,8 @@
     "subcategory": "literature",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "a ultranza",
@@ -1866,7 +2033,8 @@
     "subcategory": "politics",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "en detrimento",
@@ -1877,7 +2045,8 @@
     "subcategory": "law",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "so pretexto de",
@@ -1888,7 +2057,8 @@
     "subcategory": "law",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "dar al traste con",
@@ -1899,7 +2069,8 @@
     "subcategory": "economy",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "a resultas de",
@@ -1910,7 +2081,8 @@
     "subcategory": "law",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "semblanza",
@@ -1921,7 +2093,8 @@
     "subcategory": "appearance",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "gallardía",
@@ -1932,7 +2105,8 @@
     "subcategory": "appearance",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "lozanía",
@@ -1943,7 +2117,8 @@
     "subcategory": "physical_traits",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "garrido",
@@ -1955,7 +2130,8 @@
     "tags": [
       "literary",
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "cenceño",
@@ -1966,7 +2142,8 @@
     "subcategory": "physical_traits",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "adusto",
@@ -1977,7 +2154,8 @@
     "subcategory": "appearance",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "claudicar",
@@ -1988,7 +2166,8 @@
     "subcategory": "physical_actions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "deambular",
@@ -1999,7 +2178,8 @@
     "subcategory": "physical_actions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "olfatear",
@@ -2010,7 +2190,8 @@
     "subcategory": "senses",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "vislumbrar",
@@ -2021,7 +2202,8 @@
     "subcategory": "senses",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "cuita",
@@ -2033,7 +2215,8 @@
     "tags": [
       "literary",
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "delectación",
@@ -2044,7 +2227,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "morriña",
@@ -2056,7 +2240,8 @@
     "tags": [
       "dialectal",
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "desabrimiento",
@@ -2067,7 +2252,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "pugnaz",
@@ -2078,7 +2264,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "timorato",
@@ -2089,7 +2276,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "contumaz",
@@ -2100,7 +2288,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "amilanarse",
@@ -2111,7 +2300,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "languidecer",
@@ -2122,7 +2312,8 @@
     "subcategory": "moods",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "ofuscarse",
@@ -2133,7 +2324,8 @@
     "subcategory": "mental_states",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "enconar",
@@ -2144,7 +2336,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "aculturación",
@@ -2155,7 +2348,8 @@
     "subcategory": "beliefs",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "etnocentrismo",
@@ -2166,7 +2360,8 @@
     "subcategory": "beliefs",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "solera",
@@ -2178,7 +2373,8 @@
     "tags": [
       "literary",
       "dialectal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "alcurnia",
@@ -2189,7 +2385,8 @@
     "subcategory": "basic_info",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "contubernio",
@@ -2200,7 +2397,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "pundonor",
@@ -2211,7 +2409,8 @@
     "subcategory": "formality",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "anuencia",
@@ -2223,7 +2422,8 @@
     "tags": [
       "literary",
       "legal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "zaherir",
@@ -2234,7 +2434,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "medrar",
@@ -2245,7 +2446,8 @@
     "subcategory": "social_life",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "denostar",
@@ -2256,7 +2458,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "agraviar",
@@ -2267,7 +2470,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "condumio",
@@ -2278,7 +2482,8 @@
     "subcategory": "meals",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "manjar",
@@ -2289,7 +2494,8 @@
     "subcategory": "food_items",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "engullir",
@@ -2300,7 +2506,8 @@
     "subcategory": "meals",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "enología",
@@ -2311,7 +2518,8 @@
     "subcategory": "beverages",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "zampar",
@@ -2322,7 +2530,8 @@
     "subcategory": "meals",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "rebañar",
@@ -2333,7 +2542,8 @@
     "subcategory": "meals",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "diletante",
@@ -2344,7 +2554,8 @@
     "subcategory": "learning_process",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "exégesis",
@@ -2355,7 +2566,8 @@
     "subcategory": "learning_process",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "mayéutica",
@@ -2366,7 +2578,8 @@
     "subcategory": "learning_process",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "docto",
@@ -2377,7 +2590,8 @@
     "subcategory": "learning_process",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "peculado",
@@ -2389,7 +2603,8 @@
     "tags": [
       "legal",
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "menester",
@@ -2400,7 +2615,8 @@
     "subcategory": "tasks",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "desfalco",
@@ -2411,7 +2627,8 @@
     "subcategory": "business",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "confabularse",
@@ -2422,7 +2639,8 @@
     "subcategory": "workplace",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "pleitesía",
@@ -2433,7 +2651,8 @@
     "subcategory": "workplace",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "contienda",
@@ -2444,7 +2663,8 @@
     "subcategory": "sports",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "lid",
@@ -2455,7 +2675,8 @@
     "subcategory": "sports",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "jolgorio",
@@ -2466,7 +2687,8 @@
     "subcategory": "entertainment",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "jarana",
@@ -2478,7 +2700,8 @@
     "tags": [
       "colloquial",
       "dialectal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "refocilarse",
@@ -2489,7 +2712,8 @@
     "subcategory": "entertainment",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "holgar",
@@ -2501,7 +2725,8 @@
     "tags": [
       "literary",
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "parranda",
@@ -2512,7 +2737,8 @@
     "subcategory": "entertainment",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "alborozo",
@@ -2523,7 +2749,8 @@
     "subcategory": "cultural_activities",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "sarao",
@@ -2534,7 +2761,8 @@
     "subcategory": "cultural_activities",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "pasquín",
@@ -2545,7 +2773,8 @@
     "subcategory": "press",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "gacetilla",
@@ -2556,7 +2785,8 @@
     "subcategory": "press",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "amarillismo",
@@ -2567,7 +2797,8 @@
     "subcategory": "press",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "tertulia",
@@ -2578,7 +2809,8 @@
     "subcategory": "television",
     "tags": [
       "cultural"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "folletín",
@@ -2589,7 +2821,8 @@
     "subcategory": "press",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "plumilla",
@@ -2600,7 +2833,8 @@
     "subcategory": "press",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "solariega",
@@ -2611,7 +2845,8 @@
     "subcategory": "types",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "alcázar",
@@ -2623,7 +2858,8 @@
     "tags": [
       "literary",
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "tinglado",
@@ -2634,7 +2870,8 @@
     "subcategory": "types",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "cuchitril",
@@ -2645,7 +2882,8 @@
     "subcategory": "types",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "ajuar",
@@ -2656,7 +2894,8 @@
     "subcategory": "household_objects",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "alacena",
@@ -2667,7 +2906,8 @@
     "subcategory": "furniture",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "chamizo",
@@ -2678,7 +2918,8 @@
     "subcategory": "types",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "tugurio",
@@ -2689,7 +2930,8 @@
     "subcategory": "types",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "caserón",
@@ -2700,7 +2942,8 @@
     "subcategory": "types",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "pecuniario",
@@ -2711,7 +2954,8 @@
     "subcategory": "banking",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "fisco",
@@ -2722,7 +2966,8 @@
     "subcategory": "banking",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "laudo",
@@ -2733,7 +2978,8 @@
     "subcategory": "banking",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "embargo",
@@ -2744,7 +2990,8 @@
     "subcategory": "banking",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "buhonero",
@@ -2756,7 +3003,8 @@
     "tags": [
       "literary",
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "baratija",
@@ -2767,7 +3015,8 @@
     "subcategory": "stores",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "trapicheo",
@@ -2778,7 +3027,8 @@
     "subcategory": "stores",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "chamarilero",
@@ -2789,7 +3039,8 @@
     "subcategory": "stores",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "ganga",
@@ -2800,7 +3051,8 @@
     "subcategory": "prices",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "galeno",
@@ -2812,7 +3064,8 @@
     "tags": [
       "literary",
       "archaic"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "matasanos",
@@ -2823,7 +3076,8 @@
     "subcategory": "medical_care",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "alifafe",
@@ -2834,7 +3088,8 @@
     "subcategory": "illnesses",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "iatrogénico",
@@ -2846,7 +3101,8 @@
     "tags": [
       "medical",
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "marasmo",
@@ -2858,7 +3114,8 @@
     "tags": [
       "literary",
       "medical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "cataplasma",
@@ -2869,7 +3126,8 @@
     "subcategory": "medical_care",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "cauterizar",
@@ -2880,7 +3138,8 @@
     "subcategory": "medical_care",
     "tags": [
       "medical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "emplasto",
@@ -2891,7 +3150,8 @@
     "subcategory": "medical_care",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "singladura",
@@ -2902,7 +3162,8 @@
     "subcategory": "transport",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "trashumancia",
@@ -2913,7 +3174,8 @@
     "subcategory": "transport",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "trasiego",
@@ -2924,7 +3186,8 @@
     "subcategory": "transport",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "cabotaje",
@@ -2935,7 +3198,8 @@
     "subcategory": "transport",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "latifundio",
@@ -2946,7 +3210,8 @@
     "subcategory": "industry",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "minifundio",
@@ -2957,7 +3222,8 @@
     "subcategory": "industry",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "autarquía",
@@ -2968,7 +3234,8 @@
     "subcategory": "economy",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "mercantilismo",
@@ -2979,7 +3246,8 @@
     "subcategory": "economy",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "crematístico",
@@ -2990,7 +3258,8 @@
     "subcategory": "money",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "malversación",
@@ -3001,7 +3270,8 @@
     "subcategory": "business",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "lucro cesante",
@@ -3012,7 +3282,8 @@
     "subcategory": "money",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "estraperlista",
@@ -3023,7 +3294,8 @@
     "subcategory": "commerce",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "entropía",
@@ -3034,7 +3306,8 @@
     "subcategory": "science",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "isótopo",
@@ -3045,7 +3318,8 @@
     "subcategory": "science",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "polímero",
@@ -3056,7 +3330,8 @@
     "subcategory": "science",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "termodinámica",
@@ -3067,7 +3342,8 @@
     "subcategory": "science",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "homeostasis",
@@ -3078,7 +3354,8 @@
     "subcategory": "science",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "taxonomía",
@@ -3089,7 +3366,8 @@
     "subcategory": "science",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "cuántico",
@@ -3100,7 +3378,8 @@
     "subcategory": "science",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "epigenética",
@@ -3111,7 +3390,8 @@
     "subcategory": "science",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "estocástico",
@@ -3122,7 +3402,8 @@
     "subcategory": "mathematics",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "hegemonía",
@@ -3133,7 +3414,8 @@
     "subcategory": "politics",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "algarada",
@@ -3144,7 +3426,8 @@
     "subcategory": "social_issues",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "estamento",
@@ -3155,7 +3438,8 @@
     "subcategory": "social_issues",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "sinecura",
@@ -3166,7 +3450,8 @@
     "subcategory": "institutions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "asonada",
@@ -3177,7 +3462,8 @@
     "subcategory": "social_issues",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "proscripción",
@@ -3188,7 +3474,8 @@
     "subcategory": "law",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "epigrama",
@@ -3199,7 +3486,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "tenebrismo",
@@ -3210,7 +3498,8 @@
     "subcategory": "visual_arts",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "trampantojo",
@@ -3221,7 +3510,8 @@
     "subcategory": "visual_arts",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "bufonada",
@@ -3232,7 +3522,8 @@
     "subcategory": "theater",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "ditirambo",
@@ -3243,7 +3534,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "hagiografía",
@@ -3254,7 +3546,8 @@
     "subcategory": "literature",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "contrapunto",
@@ -3265,7 +3558,8 @@
     "subcategory": "music",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "ecumenismo",
@@ -3276,7 +3570,8 @@
     "subcategory": "religion",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "dialéctica",
@@ -3287,7 +3582,8 @@
     "subcategory": "philosophy",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "fenomenología",
@@ -3298,7 +3594,8 @@
     "subcategory": "philosophy",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "teodicea",
@@ -3309,7 +3606,8 @@
     "subcategory": "philosophy",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "ascetismo",
@@ -3320,7 +3618,8 @@
     "subcategory": "spirituality",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "beatitud",
@@ -3331,7 +3630,8 @@
     "subcategory": "spirituality",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "panegírico",
@@ -3342,7 +3642,8 @@
     "subcategory": "traditions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "silogismo",
@@ -3353,7 +3654,8 @@
     "subcategory": "philosophy",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "sofisma",
@@ -3364,7 +3666,8 @@
     "subcategory": "philosophy",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "sima",
@@ -3375,7 +3678,8 @@
     "subcategory": "landscapes",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "roquedal",
@@ -3386,7 +3690,8 @@
     "subcategory": "landscapes",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "vega",
@@ -3397,7 +3702,8 @@
     "subcategory": "landscapes",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "erial",
@@ -3408,7 +3714,8 @@
     "subcategory": "landscapes",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "albufera",
@@ -3419,7 +3726,8 @@
     "subcategory": "landscapes",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "marisma",
@@ -3430,7 +3738,8 @@
     "subcategory": "landscapes",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "borrasca",
@@ -3441,7 +3750,8 @@
     "subcategory": "weather",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "bruma",
@@ -3452,7 +3762,8 @@
     "subcategory": "weather",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "ventisca",
@@ -3463,7 +3774,8 @@
     "subcategory": "weather",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "robledal",
@@ -3474,7 +3786,8 @@
     "subcategory": "plants",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "encinar",
@@ -3485,7 +3798,8 @@
     "subcategory": "plants",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "rapaz",
@@ -3496,7 +3810,8 @@
     "subcategory": "animals",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "agreste",
@@ -3507,7 +3822,8 @@
     "subcategory": "landscapes",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "cárcava",
@@ -3518,7 +3834,8 @@
     "subcategory": "landscapes",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "cerrazón",
@@ -3529,7 +3846,8 @@
     "subcategory": "weather",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "boscaje",
@@ -3540,7 +3858,8 @@
     "subcategory": "plants",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "abogar",
@@ -3551,7 +3870,8 @@
     "subcategory": "law",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "abrogar",
@@ -3562,7 +3882,8 @@
     "subcategory": "law",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "acendrar",
@@ -3573,7 +3894,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "acopiar",
@@ -3584,7 +3906,8 @@
     "subcategory": "commerce",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "arremeter",
@@ -3595,7 +3918,8 @@
     "subcategory": "physical_actions",
     "tags": [
       "violent"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "atisbar",
@@ -3606,7 +3930,8 @@
     "subcategory": "senses",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "azuzar",
@@ -3617,7 +3942,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "negative"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "bregar",
@@ -3628,7 +3954,8 @@
     "subcategory": "tasks",
     "tags": [
       "effort"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "cernirse",
@@ -3639,7 +3966,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "colegir",
@@ -3650,7 +3978,8 @@
     "subcategory": "learning_process",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "desasirse",
@@ -3661,7 +3990,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "desbaratar",
@@ -3672,7 +4002,8 @@
     "subcategory": "law",
     "tags": [
       "prevention"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "desvirtuar",
@@ -3683,7 +4014,8 @@
     "subcategory": "press",
     "tags": [
       "manipulation"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "diezmar",
@@ -3694,7 +4026,8 @@
     "subcategory": "environment",
     "tags": [
       "destruction"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "dirimir",
@@ -3705,7 +4038,8 @@
     "subcategory": "law",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "disipar",
@@ -3716,7 +4050,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "enarbolar",
@@ -3727,7 +4062,8 @@
     "subcategory": "politics",
     "tags": [
       "symbolic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "encauzar",
@@ -3738,7 +4074,8 @@
     "subcategory": "tasks",
     "tags": [
       "management"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "enrarecer",
@@ -3749,7 +4086,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "tension"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "entreverarse",
@@ -3760,7 +4098,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "escrutar",
@@ -3771,7 +4110,8 @@
     "subcategory": "mental_states",
     "tags": [
       "observation"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "esgrimir",
@@ -3782,7 +4122,8 @@
     "subcategory": "politics",
     "tags": [
       "rhetoric"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "exacerbar",
@@ -3793,7 +4134,8 @@
     "subcategory": "symptoms",
     "tags": [
       "medical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "fulminar",
@@ -3804,7 +4146,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "granjearse",
@@ -3815,7 +4158,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "inmiscuirse",
@@ -3826,7 +4170,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "negative"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "interpelar",
@@ -3837,7 +4182,8 @@
     "subcategory": "politics",
     "tags": [
       "parliamentary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "lacerar",
@@ -3848,7 +4194,8 @@
     "subcategory": "illnesses",
     "tags": [
       "medical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "menoscabar",
@@ -3859,7 +4206,8 @@
     "subcategory": "law",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "pergeñar",
@@ -3870,7 +4218,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "perpetrar",
@@ -3881,7 +4230,8 @@
     "subcategory": "law",
     "tags": [
       "criminal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "preconizar",
@@ -3892,7 +4242,8 @@
     "subcategory": "politics",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "proferir",
@@ -3903,7 +4254,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "speech"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "pugnar",
@@ -3914,7 +4266,8 @@
     "subcategory": "politics",
     "tags": [
       "conflict"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "recabar",
@@ -3925,7 +4278,8 @@
     "subcategory": "science",
     "tags": [
       "research"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "reconvenir",
@@ -3936,7 +4290,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "solventar",
@@ -3947,7 +4302,8 @@
     "subcategory": "tasks",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "soslayar",
@@ -3958,7 +4314,8 @@
     "subcategory": "politics",
     "tags": [
       "avoidance"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "subyugar",
@@ -3969,7 +4326,8 @@
     "subcategory": "politics",
     "tags": [
       "domination"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "urdir",
@@ -3980,7 +4338,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "deception"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "aciago",
@@ -3991,7 +4350,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "altisonante",
@@ -4002,7 +4362,8 @@
     "subcategory": "literature",
     "tags": [
       "style"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "anodino",
@@ -4013,7 +4374,8 @@
     "subcategory": "mental_states",
     "tags": [
       "evaluation"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "aquiescente",
@@ -4024,7 +4386,8 @@
     "subcategory": "character",
     "tags": [
       "personality"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "atávico",
@@ -4035,7 +4398,8 @@
     "subcategory": "philosophy",
     "tags": [
       "hereditary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "avezado",
@@ -4046,7 +4410,8 @@
     "subcategory": "tasks",
     "tags": [
       "expertise"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "consuetudinario",
@@ -4057,7 +4422,8 @@
     "subcategory": "law",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "deleznable",
@@ -4068,7 +4434,8 @@
     "subcategory": "character",
     "tags": [
       "negative"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "diáfano",
@@ -4079,7 +4446,8 @@
     "subcategory": "mental_states",
     "tags": [
       "clarity"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "efímero",
@@ -4090,7 +4458,8 @@
     "subcategory": "mental_states",
     "tags": [
       "time"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "estrambótico",
@@ -4101,7 +4470,8 @@
     "subcategory": "character",
     "tags": [
       "description"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "execrable",
@@ -4112,7 +4482,8 @@
     "subcategory": "emotions",
     "tags": [
       "negative"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "ignominioso",
@@ -4123,7 +4494,8 @@
     "subcategory": "emotions",
     "tags": [
       "shame"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "ímprobo",
@@ -4134,7 +4506,8 @@
     "subcategory": "tasks",
     "tags": [
       "difficulty"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "inefable",
@@ -4145,7 +4518,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "inexorable",
@@ -4156,7 +4530,8 @@
     "subcategory": "mental_states",
     "tags": [
       "intensity"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "insoslayable",
@@ -4167,7 +4542,8 @@
     "subcategory": "mental_states",
     "tags": [
       "necessity"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "lacónico",
@@ -4178,7 +4554,8 @@
     "subcategory": "character",
     "tags": [
       "communication"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "lúgubre",
@@ -4189,7 +4566,8 @@
     "subcategory": "moods",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "malogrado",
@@ -4200,7 +4578,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "perecedero",
@@ -4211,7 +4590,8 @@
     "subcategory": "food_items",
     "tags": [
       "quality"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "primigenio",
@@ -4222,7 +4602,8 @@
     "subcategory": "philosophy",
     "tags": [
       "origin"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "prístino",
@@ -4233,7 +4614,8 @@
     "subcategory": "environment",
     "tags": [
       "quality"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "recalcitrante",
@@ -4244,7 +4626,8 @@
     "subcategory": "character",
     "tags": [
       "personality"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "suntuoso",
@@ -4255,7 +4638,8 @@
     "subcategory": "types",
     "tags": [
       "luxury"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "tortuoso",
@@ -4266,7 +4650,8 @@
     "subcategory": "landscapes",
     "tags": [
       "description"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "ubicuo",
@@ -4277,7 +4662,8 @@
     "subcategory": "technology",
     "tags": [
       "prevalence"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "vesánico",
@@ -4288,7 +4674,8 @@
     "subcategory": "mental_states",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "vituperioso",
@@ -4299,7 +4686,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "negative"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "acopio",
@@ -4310,7 +4698,8 @@
     "subcategory": "commerce",
     "tags": [
       "supply"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "adagio",
@@ -4321,7 +4710,8 @@
     "subcategory": "literature",
     "tags": [
       "saying"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "agudeza",
@@ -4332,7 +4722,8 @@
     "subcategory": "character",
     "tags": [
       "intelligence"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "andamiaje",
@@ -4343,7 +4734,8 @@
     "subcategory": "domestic_activities",
     "tags": [
       "construction"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "argucia",
@@ -4354,7 +4746,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "deception"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "atropello",
@@ -4365,7 +4758,8 @@
     "subcategory": "social_issues",
     "tags": [
       "injustice"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "baluarte",
@@ -4376,7 +4770,8 @@
     "subcategory": "politics",
     "tags": [
       "figurative"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "calamidad",
@@ -4387,7 +4782,8 @@
     "subcategory": "weather",
     "tags": [
       "disaster"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "connivencia",
@@ -4398,7 +4794,8 @@
     "subcategory": "law",
     "tags": [
       "criminal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "dédalo",
@@ -4409,7 +4806,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "disquisición",
@@ -4420,7 +4818,8 @@
     "subcategory": "learning_process",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "estupor",
@@ -4431,7 +4830,8 @@
     "subcategory": "emotions",
     "tags": [
       "shock"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "falacia",
@@ -4442,7 +4842,8 @@
     "subcategory": "learning_process",
     "tags": [
       "logic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "galimatías",
@@ -4453,7 +4854,8 @@
     "subcategory": "press",
     "tags": [
       "communication"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "idilio",
@@ -4464,7 +4866,8 @@
     "subcategory": "social_life",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "lacra",
@@ -4475,7 +4878,8 @@
     "subcategory": "social_issues",
     "tags": [
       "problem"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "maraña",
@@ -4486,7 +4890,8 @@
     "subcategory": "plants",
     "tags": [
       "figurative"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "oprobio",
@@ -4497,7 +4902,8 @@
     "subcategory": "emotions",
     "tags": [
       "shame"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "parangón",
@@ -4508,7 +4914,8 @@
     "subcategory": "learning_process",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "quimera",
@@ -4519,7 +4926,8 @@
     "subcategory": "mental_states",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "rémora",
@@ -4530,7 +4938,8 @@
     "subcategory": "economy",
     "tags": [
       "obstacle"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "requiebro",
@@ -4541,7 +4950,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "resquemor",
@@ -4552,7 +4962,8 @@
     "subcategory": "emotions",
     "tags": [
       "negative"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "sapiencia",
@@ -4563,7 +4974,8 @@
     "subcategory": "philosophy",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "sarcasmo",
@@ -4574,7 +4986,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "communication"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "sinuosidad",
@@ -4585,7 +4998,8 @@
     "subcategory": "landscapes",
     "tags": [
       "description"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "sortilegio",
@@ -4596,7 +5010,8 @@
     "subcategory": "spirituality",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "tesitura",
@@ -4607,7 +5022,8 @@
     "subcategory": "music",
     "tags": [
       "technical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "tropelía",
@@ -4618,7 +5034,8 @@
     "subcategory": "social_issues",
     "tags": [
       "injustice"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "vasallaje",
@@ -4629,7 +5046,8 @@
     "subcategory": "politics",
     "tags": [
       "historical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "vericueto",
@@ -4640,7 +5058,8 @@
     "subcategory": "landscapes",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "zarandeo",
@@ -4651,7 +5070,8 @@
     "subcategory": "physical_actions",
     "tags": [
       "movement"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "extemporáneo",
@@ -4662,7 +5082,8 @@
     "subcategory": "mental_states",
     "tags": [
       "time"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "advenedizo",
@@ -4673,7 +5094,8 @@
     "subcategory": "social_life",
     "tags": [
       "pejorative"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "concupiscencia",
@@ -4684,7 +5106,8 @@
     "subcategory": "ethics",
     "tags": [
       "theological"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "desavenencia",
@@ -4695,7 +5118,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "conflict"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "dilación",
@@ -4706,7 +5130,8 @@
     "subcategory": "law",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "estulticia",
@@ -4717,7 +5142,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "fruición",
@@ -4728,7 +5154,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "ignominia",
@@ -4739,7 +5166,8 @@
     "subcategory": "emotions",
     "tags": [
       "shame"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "loa",
@@ -4750,7 +5178,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "magnanimidad",
@@ -4761,7 +5190,8 @@
     "subcategory": "character",
     "tags": [
       "virtue"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "parsimonia",
@@ -4772,7 +5202,8 @@
     "subcategory": "money",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "perogrullada",
@@ -4783,7 +5214,8 @@
     "subcategory": "learning_process",
     "tags": [
       "rhetoric"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "procacidad",
@@ -4794,7 +5226,8 @@
     "subcategory": "character",
     "tags": [
       "negative"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "resabio",
@@ -4805,7 +5238,8 @@
     "subcategory": "mental_states",
     "tags": [
       "figurative"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "truculencia",
@@ -4816,7 +5250,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "vestigio",
@@ -4827,7 +5262,8 @@
     "subcategory": "landscapes",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "concomitante",
@@ -4838,7 +5274,8 @@
     "subcategory": "science",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "consabido",
@@ -4849,7 +5286,8 @@
     "subcategory": "mental_states",
     "tags": [
       "familiarity"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "coetáneo",
@@ -4860,7 +5298,8 @@
     "subcategory": "basic_info",
     "tags": [
       "time"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "desaforado",
@@ -4871,7 +5310,8 @@
     "subcategory": "emotions",
     "tags": [
       "intensity"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "dilatorio",
@@ -4882,7 +5322,8 @@
     "subcategory": "law",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "draconiano",
@@ -4893,7 +5334,8 @@
     "subcategory": "law",
     "tags": [
       "severity"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "febricitante",
@@ -4904,7 +5346,8 @@
     "subcategory": "symptoms",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "inane",
@@ -4915,7 +5358,8 @@
     "subcategory": "mental_states",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "incólume",
@@ -4926,7 +5370,8 @@
     "subcategory": "physical_traits",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "meritorio",
@@ -4937,7 +5382,8 @@
     "subcategory": "tasks",
     "tags": [
       "evaluation"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "palmario",
@@ -4948,7 +5394,8 @@
     "subcategory": "mental_states",
     "tags": [
       "clarity"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "perspicaz",
@@ -4959,7 +5406,8 @@
     "subcategory": "character",
     "tags": [
       "intelligence"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "punzante",
@@ -4970,7 +5418,8 @@
     "subcategory": "sensations",
     "tags": [
       "description"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "rimbombante",
@@ -4981,7 +5430,8 @@
     "subcategory": "literature",
     "tags": [
       "style"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "solapado",
@@ -4992,7 +5442,8 @@
     "subcategory": "character",
     "tags": [
       "deception"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "vetusto",
@@ -5003,7 +5454,8 @@
     "subcategory": "types",
     "tags": [
       "age"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "palmariamente",
@@ -5014,7 +5466,8 @@
     "subcategory": "mental_states",
     "tags": [
       "certainty"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "subrepticiamente",
@@ -5025,7 +5478,8 @@
     "subcategory": "mental_states",
     "tags": [
       "manner"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "a rajatabla",
@@ -5036,7 +5490,8 @@
     "subcategory": "law",
     "tags": [
       "compliance"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "a sabiendas",
@@ -5047,7 +5502,8 @@
     "subcategory": "law",
     "tags": [
       "intentionality"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "motu proprio",
@@ -5058,7 +5514,8 @@
     "subcategory": "mental_states",
     "tags": [
       "volition"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "ipso facto",
@@ -5069,7 +5526,8 @@
     "subcategory": "law",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "garito",
@@ -5080,7 +5538,8 @@
     "subcategory": "stores",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "quincalla",
@@ -5091,7 +5550,8 @@
     "subcategory": "stores",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "tendero",
@@ -5102,7 +5562,8 @@
     "subcategory": "stores",
     "tags": [
       "traditional"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "fardo",
@@ -5113,7 +5574,8 @@
     "subcategory": "stores",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "gabela",
@@ -5124,7 +5586,8 @@
     "subcategory": "prices",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "hato",
@@ -5136,7 +5599,8 @@
     "tags": [
       "archaic",
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "zoco",
@@ -5148,7 +5612,8 @@
     "tags": [
       "cultural",
       "Arabic origin"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "trapero",
@@ -5159,7 +5624,8 @@
     "subcategory": "stores",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "abalorio",
@@ -5170,7 +5636,8 @@
     "subcategory": "stores",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "mantelería",
@@ -5181,7 +5648,8 @@
     "subcategory": "clothing",
     "tags": [
       "traditional"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "valija diplomática",
@@ -5193,7 +5661,8 @@
     "tags": [
       "diplomatic",
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "pregón",
@@ -5204,7 +5673,8 @@
     "subcategory": "postal",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "herbolario",
@@ -5215,7 +5685,8 @@
     "subcategory": "healthcare_services",
     "tags": [
       "traditional"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "lazareto",
@@ -5227,7 +5698,8 @@
     "tags": [
       "archaic",
       "historical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "monte de piedad",
@@ -5238,7 +5710,8 @@
     "subcategory": "banking",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "estafeta",
@@ -5249,7 +5722,8 @@
     "subcategory": "postal",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "almoneda",
@@ -5260,7 +5734,8 @@
     "subcategory": "banking",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "testaferro",
@@ -5271,7 +5746,8 @@
     "subcategory": "banking",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "agio",
@@ -5283,7 +5759,8 @@
     "tags": [
       "archaic",
       "finance"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "hospicio",
@@ -5294,7 +5771,8 @@
     "subcategory": "healthcare_services",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "balsámico",
@@ -5305,7 +5783,8 @@
     "subcategory": "healthcare_services",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "bergantín",
@@ -5317,7 +5796,8 @@
     "tags": [
       "maritime",
       "archaic"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "galeón",
@@ -5329,7 +5809,8 @@
     "tags": [
       "maritime",
       "historical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "esquife",
@@ -5341,7 +5822,8 @@
     "tags": [
       "maritime",
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "calesa",
@@ -5352,7 +5834,8 @@
     "subcategory": "transport",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "diligencia",
@@ -5364,7 +5847,8 @@
     "tags": [
       "archaic",
       "historical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "carromato",
@@ -5376,7 +5860,8 @@
     "tags": [
       "archaic",
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "carabela",
@@ -5388,7 +5873,8 @@
     "tags": [
       "maritime",
       "historical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "vado",
@@ -5399,7 +5885,8 @@
     "subcategory": "directions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "encrucijada",
@@ -5410,7 +5897,8 @@
     "subcategory": "directions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "ventorro",
@@ -5422,7 +5910,8 @@
     "tags": [
       "archaic",
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "posada",
@@ -5433,7 +5922,8 @@
     "subcategory": "accommodation",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "mesón",
@@ -5444,7 +5934,8 @@
     "subcategory": "accommodation",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "fondista",
@@ -5455,7 +5946,8 @@
     "subcategory": "accommodation",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "hidalgo",
@@ -5467,7 +5959,8 @@
     "tags": [
       "archaic",
       "historical"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "vástago",
@@ -5478,7 +5971,8 @@
     "subcategory": "basic_info",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "gentilhombre",
@@ -5489,7 +5983,8 @@
     "subcategory": "basic_info",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "criollo",
@@ -5501,7 +5996,8 @@
     "tags": [
       "historical",
       "Latin America"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "gabacho",
@@ -5513,7 +6009,8 @@
     "tags": [
       "colloquial",
       "pejorative"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "acta de defunción",
@@ -5524,7 +6021,8 @@
     "subcategory": "documents",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "carta de naturaleza",
@@ -5536,7 +6034,8 @@
     "tags": [
       "legal",
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "bigamia",
@@ -5547,7 +6046,8 @@
     "subcategory": "civil_status",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "connubio",
@@ -5559,7 +6059,8 @@
     "tags": [
       "literary",
       "archaic"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "morganático",
@@ -5571,7 +6072,8 @@
     "tags": [
       "archaic",
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "hereje",
@@ -5583,7 +6085,8 @@
     "tags": [
       "archaic",
       "religious"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "converso",
@@ -5594,7 +6097,8 @@
     "subcategory": "beliefs",
     "tags": [
       "historical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "renegado",
@@ -5605,7 +6109,8 @@
     "subcategory": "beliefs",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "libación",
@@ -5616,7 +6121,8 @@
     "subcategory": "beverages",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "elíxir",
@@ -5627,7 +6133,8 @@
     "subcategory": "beverages",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "brebaje",
@@ -5638,7 +6145,8 @@
     "subcategory": "beverages",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "guiso",
@@ -5649,7 +6157,8 @@
     "subcategory": "cooking",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "potaje",
@@ -5660,7 +6169,8 @@
     "subcategory": "cooking",
     "tags": [
       "traditional"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "ambrosía",
@@ -5672,7 +6182,8 @@
     "tags": [
       "literary",
       "mythological"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "matalotaje",
@@ -5684,7 +6195,8 @@
     "tags": [
       "archaic",
       "maritime"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "opíparo",
@@ -5695,7 +6207,8 @@
     "subcategory": "meals",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "fogón",
@@ -5706,7 +6219,8 @@
     "subcategory": "cooking",
     "tags": [
       "traditional"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "juglar",
@@ -5718,7 +6232,8 @@
     "tags": [
       "archaic",
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "trovador",
@@ -5730,7 +6245,8 @@
     "tags": [
       "archaic",
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "saltimbanqui",
@@ -5741,7 +6257,8 @@
     "subcategory": "entertainment",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "volatinero",
@@ -5752,7 +6269,8 @@
     "subcategory": "entertainment",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "palestra",
@@ -5764,7 +6282,8 @@
     "tags": [
       "literary",
       "classical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "pugilato",
@@ -5775,7 +6294,8 @@
     "subcategory": "sports",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "justa",
@@ -5787,7 +6307,8 @@
     "tags": [
       "archaic",
       "medieval"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "divertimento",
@@ -5799,7 +6320,8 @@
     "tags": [
       "music",
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "velatorio",
@@ -5810,7 +6332,8 @@
     "subcategory": "cultural_activities",
     "tags": [
       "cultural"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "rondalla",
@@ -5822,7 +6345,8 @@
     "tags": [
       "traditional",
       "Spain"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "aquelarre",
@@ -5834,7 +6358,8 @@
     "tags": [
       "literary",
       "mythological"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "trebejo",
@@ -5845,7 +6370,8 @@
     "subcategory": "games",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "tahúr",
@@ -5857,7 +6383,8 @@
     "tags": [
       "archaic",
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "naipe",
@@ -5868,7 +6395,8 @@
     "subcategory": "games",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "ayo",
@@ -5879,7 +6407,8 @@
     "subcategory": "institutions",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "escolástica",
@@ -5891,7 +6420,8 @@
     "tags": [
       "academic",
       "historical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "trivium",
@@ -5903,7 +6433,8 @@
     "tags": [
       "archaic",
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "quadrivium",
@@ -5915,7 +6446,8 @@
     "tags": [
       "archaic",
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "cartapacio",
@@ -5926,7 +6458,8 @@
     "subcategory": "classroom",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "autodidacta",
@@ -5937,7 +6470,8 @@
     "subcategory": "learning_process",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "epígono",
@@ -5948,7 +6482,8 @@
     "subcategory": "learning_process",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "prebendado",
@@ -5959,7 +6494,8 @@
     "subcategory": "professions",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "estajanovista",
@@ -5971,7 +6507,8 @@
     "tags": [
       "political",
       "archaic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "bracero",
@@ -5983,7 +6520,8 @@
     "tags": [
       "archaic",
       "Latin America"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "menestral",
@@ -5994,7 +6532,8 @@
     "subcategory": "professions",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "menestroso",
@@ -6005,7 +6544,8 @@
     "subcategory": "employment",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "latifundista",
@@ -6016,7 +6556,8 @@
     "subcategory": "professions",
     "tags": [
       "historical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "salubridad",
@@ -6027,7 +6568,8 @@
     "subcategory": "workplace",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "destajo",
@@ -6038,7 +6580,8 @@
     "subcategory": "employment",
     "tags": [
       "labor"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "encomendero",
@@ -6050,7 +6593,8 @@
     "tags": [
       "historical",
       "colonial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "gañán",
@@ -6062,7 +6606,8 @@
     "tags": [
       "archaic",
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "gaceta",
@@ -6073,7 +6618,8 @@
     "subcategory": "press",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "pregonero",
@@ -6084,7 +6630,8 @@
     "subcategory": "press",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "epístola",
@@ -6095,7 +6642,8 @@
     "subcategory": "mail",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "misiva",
@@ -6106,7 +6654,8 @@
     "subcategory": "mail",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "pliego",
@@ -6117,7 +6666,8 @@
     "subcategory": "mail",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "palíndromo",
@@ -6128,7 +6678,8 @@
     "subcategory": "internet",
     "tags": [
       "linguistic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "acólito mediático",
@@ -6139,7 +6690,8 @@
     "subcategory": "social_media",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "infoxicación",
@@ -6150,7 +6702,8 @@
     "subcategory": "social_media",
     "tags": [
       "neologism"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "panóptico",
@@ -6161,7 +6714,8 @@
     "subcategory": "internet",
     "tags": [
       "philosophical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "alquimia",
@@ -6173,7 +6727,8 @@
     "tags": [
       "archaic",
       "historical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "astrolabio",
@@ -6185,7 +6740,8 @@
     "tags": [
       "archaic",
       "historical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "retorta",
@@ -6197,7 +6753,8 @@
     "tags": [
       "archaic",
       "chemistry"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "crisol",
@@ -6208,7 +6765,8 @@
     "subcategory": "science",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "quintaesencia",
@@ -6220,7 +6778,8 @@
     "tags": [
       "literary",
       "philosophical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "bosón",
@@ -6231,7 +6790,8 @@
     "subcategory": "science",
     "tags": [
       "physics"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "fermión",
@@ -6242,7 +6802,8 @@
     "subcategory": "science",
     "tags": [
       "physics"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "topología",
@@ -6253,7 +6814,8 @@
     "subcategory": "mathematics",
     "tags": [
       "mathematics"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "fractal",
@@ -6264,7 +6826,8 @@
     "subcategory": "mathematics",
     "tags": [
       "mathematics"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "holístico",
@@ -6275,7 +6838,8 @@
     "subcategory": "science",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "alcabala",
@@ -6287,7 +6851,8 @@
     "tags": [
       "archaic",
       "historical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "diezmo",
@@ -6299,7 +6864,8 @@
     "tags": [
       "archaic",
       "religious"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "pugna mercantil",
@@ -6310,7 +6876,8 @@
     "subcategory": "commerce",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "agiotista",
@@ -6321,7 +6888,8 @@
     "subcategory": "money",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "granjería",
@@ -6332,7 +6900,8 @@
     "subcategory": "commerce",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "emporio",
@@ -6343,7 +6912,8 @@
     "subcategory": "commerce",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "hecatombe financiera",
@@ -6354,7 +6924,8 @@
     "subcategory": "economy",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "venalidad",
@@ -6365,7 +6936,8 @@
     "subcategory": "business",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "plutócrata",
@@ -6376,7 +6948,8 @@
     "subcategory": "business",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "mercenario",
@@ -6387,7 +6960,8 @@
     "subcategory": "business",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "estancia",
@@ -6399,7 +6973,8 @@
     "tags": [
       "literary",
       "Latin America"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "antecámara",
@@ -6410,7 +6985,8 @@
     "subcategory": "rooms",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "camaranchón",
@@ -6421,7 +6997,8 @@
     "subcategory": "rooms",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "ajimez",
@@ -6433,7 +7010,8 @@
     "tags": [
       "archaic",
       "Arabic origin"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "artesonado",
@@ -6445,7 +7023,8 @@
     "tags": [
       "architecture",
       "Arabic origin"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "mampostería",
@@ -6456,7 +7035,8 @@
     "subcategory": "domestic_activities",
     "tags": [
       "architecture"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "quincha",
@@ -6468,7 +7048,8 @@
     "tags": [
       "Latin America",
       "architecture"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "bohío",
@@ -6480,7 +7061,8 @@
     "tags": [
       "Latin America",
       "indigenous"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "tambo",
@@ -6492,7 +7074,8 @@
     "tags": [
       "Latin America",
       "indigenous"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "sangría",
@@ -6504,7 +7087,8 @@
     "tags": [
       "archaic",
       "medical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "cauterización",
@@ -6515,7 +7099,8 @@
     "subcategory": "medical_care",
     "tags": [
       "medical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "ungüento",
@@ -6526,7 +7111,8 @@
     "subcategory": "medical_care",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "miasma",
@@ -6538,7 +7124,8 @@
     "tags": [
       "archaic",
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "pestilencia",
@@ -6549,7 +7136,8 @@
     "subcategory": "illnesses",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "bubón",
@@ -6561,7 +7149,8 @@
     "tags": [
       "archaic",
       "medical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "letargo",
@@ -6572,7 +7161,8 @@
     "subcategory": "symptoms",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "ablución",
@@ -6584,7 +7174,8 @@
     "tags": [
       "literary",
       "religious"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "lustración",
@@ -6596,7 +7187,8 @@
     "tags": [
       "archaic",
       "religious"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "contristarse",
@@ -6608,7 +7200,8 @@
     "tags": [
       "literary",
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "embelesarse",
@@ -6619,7 +7212,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "arrobamiento",
@@ -6630,7 +7224,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "acrimonia",
@@ -6641,7 +7236,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "vilipendio",
@@ -6652,7 +7248,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "abyección",
@@ -6663,7 +7260,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "acedía",
@@ -6675,7 +7273,8 @@
     "tags": [
       "literary",
       "religious"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "contumacia",
@@ -6687,7 +7286,8 @@
     "tags": [
       "literary",
       "legal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "protervia",
@@ -6698,7 +7298,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "veleidad",
@@ -6709,7 +7310,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "displicencia",
@@ -6720,7 +7322,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "impávido",
@@ -6731,7 +7334,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "munícipe",
@@ -6742,7 +7346,8 @@
     "subcategory": "institutions",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "concejo",
@@ -6753,7 +7358,8 @@
     "subcategory": "institutions",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "escribano",
@@ -6764,7 +7370,8 @@
     "subcategory": "law",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "alguacil",
@@ -6775,7 +7382,8 @@
     "subcategory": "law",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "corregidor",
@@ -6787,7 +7395,8 @@
     "tags": [
       "archaic",
       "historical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "virrey",
@@ -6798,7 +7407,8 @@
     "subcategory": "politics",
     "tags": [
       "historical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "regidor",
@@ -6809,7 +7419,8 @@
     "subcategory": "politics",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "anatema",
@@ -6821,7 +7432,8 @@
     "tags": [
       "literary",
       "religious"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "edicto",
@@ -6832,7 +7444,8 @@
     "subcategory": "law",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "lesa majestad",
@@ -6844,7 +7457,8 @@
     "tags": [
       "legal",
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "rapsoda",
@@ -6856,7 +7470,8 @@
     "tags": [
       "literary",
       "classical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "endecasílabo",
@@ -6867,7 +7482,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "sinestesia",
@@ -6878,7 +7494,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "plañidera",
@@ -6889,7 +7506,8 @@
     "subcategory": "music",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "salmodia",
@@ -6901,7 +7519,8 @@
     "tags": [
       "religious",
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "cántico",
@@ -6913,7 +7532,8 @@
     "tags": [
       "literary",
       "religious"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "bajorrelieve",
@@ -6924,7 +7544,8 @@
     "subcategory": "visual_arts",
     "tags": [
       "art"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "retablo",
@@ -6936,7 +7557,8 @@
     "tags": [
       "art",
       "religious"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "daguerrotipo",
@@ -6947,7 +7569,8 @@
     "subcategory": "photography",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "cinematógrafo",
@@ -6958,7 +7581,8 @@
     "subcategory": "film",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "histrión",
@@ -6969,7 +7593,8 @@
     "subcategory": "theater",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "pantomima",
@@ -6980,7 +7605,8 @@
     "subcategory": "theater",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "ventisquero",
@@ -6991,7 +7617,8 @@
     "subcategory": "landscapes",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "páramo",
@@ -7002,7 +7629,8 @@
     "subcategory": "landscapes",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "turbera",
@@ -7013,7 +7641,8 @@
     "subcategory": "landscapes",
     "tags": [
       "geography"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "ciénaga",
@@ -7024,7 +7653,8 @@
     "subcategory": "landscapes",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "bálago",
@@ -7035,7 +7665,8 @@
     "subcategory": "plants",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "jara",
@@ -7047,7 +7678,8 @@
     "tags": [
       "botany",
       "Mediterranean"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "madroño",
@@ -7058,7 +7690,8 @@
     "subcategory": "plants",
     "tags": [
       "botany"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "berrocal",
@@ -7069,7 +7702,8 @@
     "subcategory": "landscapes",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "galerna",
@@ -7081,7 +7715,8 @@
     "tags": [
       "regional",
       "maritime"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "tramontana",
@@ -7092,7 +7727,8 @@
     "subcategory": "weather",
     "tags": [
       "regional"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "solano",
@@ -7103,7 +7739,8 @@
     "subcategory": "weather",
     "tags": [
       "regional"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "calima",
@@ -7114,7 +7751,8 @@
     "subcategory": "weather",
     "tags": [
       "regional"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "jabalí",
@@ -7125,7 +7763,8 @@
     "subcategory": "animals",
     "tags": [
       "zoology"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "apóstata",
@@ -7136,7 +7775,8 @@
     "subcategory": "religion",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "cenobita",
@@ -7147,7 +7787,8 @@
     "subcategory": "religion",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "anaconda",
@@ -7158,7 +7799,8 @@
     "subcategory": "religion",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "aporía",
@@ -7169,7 +7811,8 @@
     "subcategory": "philosophy",
     "tags": [
       "philosophy"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "nominalismo",
@@ -7180,7 +7823,8 @@
     "subcategory": "philosophy",
     "tags": [
       "philosophy"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "idolatría",
@@ -7191,7 +7835,8 @@
     "subcategory": "religion",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "beatificación",
@@ -7202,7 +7847,8 @@
     "subcategory": "religion",
     "tags": [
       "religious"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "concilio",
@@ -7213,7 +7859,8 @@
     "subcategory": "traditions",
     "tags": [
       "religious"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "encorvarse",
@@ -7224,7 +7871,8 @@
     "subcategory": "physical_actions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "retorcerse",
@@ -7235,7 +7883,8 @@
     "subcategory": "physical_actions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "postrar",
@@ -7246,7 +7895,8 @@
     "subcategory": "physical_actions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "trasijado",
@@ -7258,7 +7908,8 @@
     "tags": [
       "literary",
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "zambo",
@@ -7269,7 +7920,8 @@
     "subcategory": "physical_traits",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "bizco",
@@ -7280,7 +7932,8 @@
     "subcategory": "physical_traits",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "entrecano",
@@ -7291,7 +7944,8 @@
     "subcategory": "appearance",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "desgreñado",
@@ -7302,7 +7956,8 @@
     "subcategory": "appearance",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "hirsuto",
@@ -7313,7 +7968,8 @@
     "subcategory": "appearance",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "garboso",
@@ -7324,7 +7980,8 @@
     "subcategory": "appearance",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "mancebía",
@@ -7335,7 +7992,8 @@
     "subcategory": "social_life",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "cofradía",
@@ -7346,7 +8004,8 @@
     "subcategory": "social_life",
     "tags": [
       "traditional"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "galanteador",
@@ -7357,7 +8016,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "doncel",
@@ -7369,7 +8029,8 @@
     "tags": [
       "archaic",
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "doncella",
@@ -7381,7 +8042,8 @@
     "tags": [
       "archaic",
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "menosprecio",
@@ -7392,7 +8054,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "alcahuete",
@@ -7404,7 +8067,8 @@
     "tags": [
       "archaic",
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "compadrazgo",
@@ -7416,7 +8080,8 @@
     "tags": [
       "cultural",
       "Latin America"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "increpar",
@@ -7427,7 +8092,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "escarnecer",
@@ -7438,7 +8104,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "desdeñar",
@@ -7449,7 +8116,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "abjurar",
@@ -7460,7 +8128,8 @@
     "subcategory": "religion",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "exorcizar",
@@ -7471,7 +8140,8 @@
     "subcategory": "religion",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "peregrinar",
@@ -7482,7 +8152,8 @@
     "subcategory": "traditions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "apostatar",
@@ -7493,7 +8164,8 @@
     "subcategory": "religion",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "fustigar",
@@ -7504,7 +8176,8 @@
     "subcategory": "social_issues",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "vituperar",
@@ -7515,7 +8188,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "apostillar",
@@ -7526,7 +8200,8 @@
     "subcategory": "learning_process",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "paliar",
@@ -7537,7 +8212,8 @@
     "subcategory": "medical_care",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "arcano",
@@ -7548,7 +8224,8 @@
     "subcategory": "spirituality",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "enhiesto",
@@ -7559,7 +8236,8 @@
     "subcategory": "physical_traits",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "sedicioso",
@@ -7570,7 +8248,8 @@
     "subcategory": "politics",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "ubérrimo",
@@ -7581,7 +8260,8 @@
     "subcategory": "environment",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "prebostazgo",
@@ -7593,7 +8273,8 @@
     "tags": [
       "archaic",
       "institutional"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "curia",
@@ -7605,7 +8286,8 @@
     "tags": [
       "institutional",
       "religious"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "fedatario",
@@ -7617,7 +8299,8 @@
     "tags": [
       "legal",
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "otorgamiento",
@@ -7628,7 +8311,8 @@
     "subcategory": "legal_services",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "acta notarial",
@@ -7639,7 +8323,8 @@
     "subcategory": "legal_services",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "peritaje",
@@ -7650,7 +8335,8 @@
     "subcategory": "professional_services",
     "tags": [
       "technical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "aforar",
@@ -7661,7 +8347,8 @@
     "subcategory": "professional_services",
     "tags": [
       "technical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "preceptivo",
@@ -7673,7 +8360,8 @@
     "tags": [
       "legal",
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "vinculante",
@@ -7684,7 +8372,8 @@
     "subcategory": "regulations",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "homologar",
@@ -7695,7 +8384,8 @@
     "subcategory": "regulations",
     "tags": [
       "administrative"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "potestad",
@@ -7707,7 +8397,8 @@
     "tags": [
       "legal",
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "exhorto",
@@ -7718,7 +8409,8 @@
     "subcategory": "legal_services",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "nuncio",
@@ -7730,7 +8422,8 @@
     "tags": [
       "religious",
       "diplomatic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "legación",
@@ -7741,7 +8434,8 @@
     "subcategory": "diplomacy",
     "tags": [
       "diplomatic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "plenipotenciario",
@@ -7753,7 +8447,8 @@
     "tags": [
       "diplomatic",
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "cancillería",
@@ -7764,7 +8459,8 @@
     "subcategory": "diplomacy",
     "tags": [
       "institutional"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "salvoconducto",
@@ -7776,7 +8472,8 @@
     "tags": [
       "historical",
       "bureaucratic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "convalidar",
@@ -7787,7 +8484,8 @@
     "subcategory": "administration",
     "tags": [
       "bureaucratic"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "colegiatura",
@@ -7798,7 +8496,8 @@
     "subcategory": "professional_services",
     "tags": [
       "professional"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "albacea",
@@ -7809,7 +8508,8 @@
     "subcategory": "legal_services",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "otorgar escritura",
@@ -7821,7 +8521,8 @@
     "tags": [
       "legal",
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "actuario",
@@ -7833,7 +8534,8 @@
     "tags": [
       "legal",
       "financial"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "procuraduría",
@@ -7844,7 +8546,8 @@
     "subcategory": "legal_services",
     "tags": [
       "institutional"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "asesoría",
@@ -7855,7 +8558,8 @@
     "subcategory": "professional_services",
     "tags": [
       "professional"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "franquicia postal",
@@ -7866,7 +8570,8 @@
     "subcategory": "postal_services",
     "tags": [
       "administrative"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "buhonería",
@@ -7877,7 +8582,8 @@
     "subcategory": "trade",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "marchamo",
@@ -7888,7 +8594,8 @@
     "subcategory": "trade",
     "tags": [
       "commercial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "arancel",
@@ -7900,7 +8607,8 @@
     "tags": [
       "commercial",
       "economic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "estanco",
@@ -7911,7 +8619,8 @@
     "subcategory": "shops",
     "tags": [
       "cultural"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "tendejón",
@@ -7922,7 +8631,8 @@
     "subcategory": "shops",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "trapería",
@@ -7933,7 +8643,8 @@
     "subcategory": "shops",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "quincallería",
@@ -7942,7 +8653,8 @@
     "gender": "f",
     "category": "shopping",
     "subcategory": "shops",
-    "tags": []
+    "tags": [],
+    "cognate_type": "none"
   },
   {
     "word": "tasación",
@@ -7953,7 +8665,8 @@
     "subcategory": "commerce",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "expoliar",
@@ -7964,7 +8677,8 @@
     "subcategory": "commerce",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "regateo",
@@ -7973,7 +8687,8 @@
     "gender": "m",
     "category": "shopping",
     "subcategory": "commerce",
-    "tags": []
+    "tags": [],
+    "cognate_type": "none"
   },
   {
     "word": "alhaja",
@@ -7984,7 +8699,8 @@
     "subcategory": "luxury_goods",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "oropel",
@@ -7996,7 +8712,8 @@
     "tags": [
       "literary",
       "figurative"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "bisutería",
@@ -8005,7 +8722,8 @@
     "gender": "f",
     "category": "shopping",
     "subcategory": "goods",
-    "tags": []
+    "tags": [],
+    "cognate_type": "none"
   },
   {
     "word": "menaje",
@@ -8014,7 +8732,8 @@
     "gender": "m",
     "category": "shopping",
     "subcategory": "goods",
-    "tags": []
+    "tags": [],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "atrezo",
@@ -8025,7 +8744,8 @@
     "subcategory": "goods",
     "tags": [
       "theater"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "ajuar doméstico",
@@ -8036,7 +8756,8 @@
     "subcategory": "goods",
     "tags": [
       "traditional"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "mercadería",
@@ -8047,7 +8768,8 @@
     "subcategory": "commerce",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "porcelana",
@@ -8056,7 +8778,8 @@
     "gender": "f",
     "category": "shopping",
     "subcategory": "luxury_goods",
-    "tags": []
+    "tags": [],
+    "cognate_type": "transparent"
   },
   {
     "word": "loza",
@@ -8065,7 +8788,8 @@
     "gender": "f",
     "category": "shopping",
     "subcategory": "goods",
-    "tags": []
+    "tags": [],
+    "cognate_type": "none"
   },
   {
     "word": "singlar",
@@ -8076,7 +8800,8 @@
     "subcategory": "maritime",
     "tags": [
       "nautical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "barloventear",
@@ -8087,7 +8812,8 @@
     "subcategory": "maritime",
     "tags": [
       "nautical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "garete",
@@ -8099,7 +8825,8 @@
     "tags": [
       "nautical",
       "figurative"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "goleta",
@@ -8110,7 +8837,8 @@
     "subcategory": "maritime",
     "tags": [
       "nautical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "calado",
@@ -8121,7 +8849,8 @@
     "subcategory": "maritime",
     "tags": [
       "nautical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "eslora",
@@ -8132,7 +8861,8 @@
     "subcategory": "maritime",
     "tags": [
       "nautical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "velamen",
@@ -8143,7 +8873,8 @@
     "subcategory": "maritime",
     "tags": [
       "nautical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "correaje",
@@ -8154,7 +8885,8 @@
     "subcategory": "equestrian",
     "tags": [
       "traditional"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "estribo",
@@ -8163,7 +8895,8 @@
     "gender": "m",
     "category": "travel_transport",
     "subcategory": "equestrian",
-    "tags": []
+    "tags": [],
+    "cognate_type": "none"
   },
   {
     "word": "litera",
@@ -8172,7 +8905,8 @@
     "gender": "f",
     "category": "travel_transport",
     "subcategory": "accommodations",
-    "tags": []
+    "tags": [],
+    "cognate_type": "transparent"
   },
   {
     "word": "apeadero",
@@ -8181,7 +8915,8 @@
     "gender": "m",
     "category": "travel_transport",
     "subcategory": "rail",
-    "tags": []
+    "tags": [],
+    "cognate_type": "none"
   },
   {
     "word": "desvío",
@@ -8190,7 +8925,8 @@
     "gender": "m",
     "category": "travel_transport",
     "subcategory": "rail",
-    "tags": []
+    "tags": [],
+    "cognate_type": "none"
   },
   {
     "word": "trocha",
@@ -8199,7 +8935,8 @@
     "gender": "f",
     "category": "travel_transport",
     "subcategory": "roads",
-    "tags": []
+    "tags": [],
+    "cognate_type": "none"
   },
   {
     "word": "calzada",
@@ -8208,7 +8945,8 @@
     "gender": "f",
     "category": "travel_transport",
     "subcategory": "roads",
-    "tags": []
+    "tags": [],
+    "cognate_type": "none"
   },
   {
     "word": "atajo",
@@ -8217,7 +8955,8 @@
     "gender": "m",
     "category": "travel_transport",
     "subcategory": "roads",
-    "tags": []
+    "tags": [],
+    "cognate_type": "none"
   },
   {
     "word": "desfiladero",
@@ -8228,7 +8967,8 @@
     "subcategory": "geography",
     "tags": [
       "geography"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "fondeadero",
@@ -8239,7 +8979,8 @@
     "subcategory": "maritime",
     "tags": [
       "nautical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "peregrinaje",
@@ -8250,7 +8991,8 @@
     "subcategory": "travel",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "transterrar",
@@ -8261,7 +9003,8 @@
     "subcategory": "travel",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "itinerancia",
@@ -8272,7 +9015,8 @@
     "subcategory": "travel",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "trasbordo",
@@ -8281,7 +9025,8 @@
     "gender": "m",
     "category": "travel_transport",
     "subcategory": "travel",
-    "tags": []
+    "tags": [],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "recalar",
@@ -8292,7 +9037,8 @@
     "subcategory": "maritime",
     "tags": [
       "nautical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "hidalguía",
@@ -8303,7 +9049,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "gentilicio",
@@ -8314,7 +9061,8 @@
     "subcategory": "nationality",
     "tags": [
       "linguistic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "acrisolado",
@@ -8325,7 +9073,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "probo",
@@ -8336,7 +9085,8 @@
     "subcategory": "character",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "intachable",
@@ -8347,7 +9097,8 @@
     "subcategory": "character",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "misántropo",
@@ -8358,7 +9109,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "filántropo",
@@ -8369,7 +9121,8 @@
     "subcategory": "character",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "numen",
@@ -8380,7 +9133,8 @@
     "subcategory": "spirituality",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "recato",
@@ -8391,7 +9145,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "donaire",
@@ -8402,7 +9157,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "galanura",
@@ -8413,7 +9169,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "continente",
@@ -8424,7 +9181,8 @@
     "subcategory": "appearance",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "semblante",
@@ -8435,7 +9193,8 @@
     "subcategory": "appearance",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "estampa",
@@ -8444,7 +9203,8 @@
     "gender": "f",
     "category": "personal_identity",
     "subcategory": "appearance",
-    "tags": []
+    "tags": [],
+    "cognate_type": "none"
   },
   {
     "word": "primogenitura",
@@ -8456,7 +9216,8 @@
     "tags": [
       "legal",
       "historical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "matrilineal",
@@ -8467,7 +9228,8 @@
     "subcategory": "family",
     "tags": [
       "anthropological"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "enraizar",
@@ -8478,7 +9240,8 @@
     "subcategory": "origins",
     "tags": [
       "figurative"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "desarraigo",
@@ -8489,7 +9252,8 @@
     "subcategory": "origins",
     "tags": [
       "sociological"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "apátrida",
@@ -8500,7 +9264,8 @@
     "subcategory": "nationality",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "agraz",
@@ -8511,7 +9276,8 @@
     "subcategory": "ingredients",
     "tags": [
       "culinary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "aliño",
@@ -8520,7 +9286,8 @@
     "gender": "m",
     "category": "food_nutrition",
     "subcategory": "cooking",
-    "tags": []
+    "tags": [],
+    "cognate_type": "none"
   },
   {
     "word": "aderezo",
@@ -8529,7 +9296,8 @@
     "gender": "m",
     "category": "food_nutrition",
     "subcategory": "cooking",
-    "tags": []
+    "tags": [],
+    "cognate_type": "none"
   },
   {
     "word": "adobo",
@@ -8540,7 +9308,8 @@
     "subcategory": "cooking",
     "tags": [
       "culinary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "escabeche",
@@ -8551,7 +9320,8 @@
     "subcategory": "cooking",
     "tags": [
       "culinary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "majar",
@@ -8562,7 +9332,8 @@
     "subcategory": "cooking",
     "tags": [
       "culinary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "almirez",
@@ -8573,7 +9344,8 @@
     "subcategory": "utensils",
     "tags": [
       "traditional"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "olla podrida",
@@ -8585,7 +9357,8 @@
     "tags": [
       "traditional",
       "cultural"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "garapiña",
@@ -8596,7 +9369,8 @@
     "subcategory": "beverages",
     "tags": [
       "regional"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "alambique",
@@ -8607,7 +9381,8 @@
     "subcategory": "beverages",
     "tags": [
       "historical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "aguardiente",
@@ -8618,7 +9393,8 @@
     "subcategory": "beverages",
     "tags": [
       "cultural"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "orujo",
@@ -8629,7 +9405,8 @@
     "subcategory": "beverages",
     "tags": [
       "regional"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "almíbar",
@@ -8640,7 +9417,8 @@
     "subcategory": "ingredients",
     "tags": [
       "culinary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "requesón",
@@ -8651,7 +9429,8 @@
     "subcategory": "dairy",
     "tags": [
       "culinary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "cecina",
@@ -8662,7 +9441,8 @@
     "subcategory": "cured_meats",
     "tags": [
       "cultural"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "mojama",
@@ -8674,7 +9454,8 @@
     "tags": [
       "cultural",
       "regional"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "tasajo",
@@ -8685,7 +9466,8 @@
     "subcategory": "cured_meats",
     "tags": [
       "traditional"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "garnacha",
@@ -8696,7 +9478,8 @@
     "subcategory": "beverages",
     "tags": [
       "wine"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "verbena",
@@ -8707,7 +9490,8 @@
     "subcategory": "festivals",
     "tags": [
       "cultural"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "romería",
@@ -8719,7 +9503,8 @@
     "tags": [
       "cultural",
       "religious"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "tauromaquía",
@@ -8730,7 +9515,8 @@
     "subcategory": "cultural_events",
     "tags": [
       "cultural"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "florilegio",
@@ -8741,7 +9527,8 @@
     "subcategory": "reading",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "vademécum",
@@ -8752,7 +9539,8 @@
     "subcategory": "reading",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "libresco",
@@ -8763,7 +9551,8 @@
     "subcategory": "reading",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "coliseo",
@@ -8774,7 +9563,8 @@
     "subcategory": "venues",
     "tags": [
       "cultural"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "ateneo",
@@ -8785,7 +9575,8 @@
     "subcategory": "venues",
     "tags": [
       "cultural"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "cenáculo",
@@ -8796,7 +9587,8 @@
     "subcategory": "social_events",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "solazarse",
@@ -8807,7 +9599,8 @@
     "subcategory": "general",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "recrearse",
@@ -8818,7 +9611,8 @@
     "subcategory": "general",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "matiné",
@@ -8829,7 +9623,8 @@
     "subcategory": "cultural_events",
     "tags": [
       "gallicism"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "rotativa",
@@ -8840,7 +9635,8 @@
     "subcategory": "print_media",
     "tags": [
       "journalism"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "impronta mediática",
@@ -8851,7 +9647,8 @@
     "subcategory": "media_influence",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "corifeo",
@@ -8862,7 +9659,8 @@
     "subcategory": "rhetoric",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "arenga",
@@ -8873,7 +9671,8 @@
     "subcategory": "rhetoric",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "filípica",
@@ -8884,7 +9683,8 @@
     "subcategory": "rhetoric",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "invectiva",
@@ -8895,7 +9695,8 @@
     "subcategory": "rhetoric",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "difamar",
@@ -8906,7 +9707,8 @@
     "subcategory": "rhetoric",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "glosar",
@@ -8917,7 +9719,8 @@
     "subcategory": "writing",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "acotación",
@@ -8929,7 +9732,8 @@
     "tags": [
       "literary",
       "theater"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "colofón",
@@ -8940,7 +9744,8 @@
     "subcategory": "print_media",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "albur",
@@ -8952,7 +9757,8 @@
     "tags": [
       "colloquial",
       "Latin America"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "algarabía",
@@ -8963,7 +9769,8 @@
     "subcategory": "telephone",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "alevoso",
@@ -8974,7 +9781,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "almocafre",
@@ -8986,7 +9794,8 @@
     "tags": [
       "archaic",
       "agricultural"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "alquería",
@@ -8998,7 +9807,8 @@
     "tags": [
       "archaic",
       "Arabic origin"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "amaño",
@@ -9009,7 +9819,8 @@
     "subcategory": "politics",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "anacoreta",
@@ -9020,7 +9831,8 @@
     "subcategory": "religion",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "anfibología",
@@ -9031,7 +9843,8 @@
     "subcategory": "learning_process",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "antonomasia",
@@ -9042,7 +9855,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "aquerenciado",
@@ -9053,7 +9867,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "artilugio",
@@ -9064,7 +9879,8 @@
     "subcategory": "technology",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "averno",
@@ -9075,7 +9891,8 @@
     "subcategory": "spirituality",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "azogue",
@@ -9086,7 +9903,8 @@
     "subcategory": "science",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "badulaque",
@@ -9098,7 +9916,8 @@
     "tags": [
       "archaic",
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "baldío",
@@ -9109,7 +9928,8 @@
     "subcategory": "landscapes",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "bambolla",
@@ -9121,7 +9941,8 @@
     "tags": [
       "archaic",
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "barlovento",
@@ -9132,7 +9953,8 @@
     "subcategory": "weather",
     "tags": [
       "maritime"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "sotavento",
@@ -9143,7 +9965,8 @@
     "subcategory": "weather",
     "tags": [
       "maritime"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "batahola",
@@ -9154,7 +9977,8 @@
     "subcategory": "sensations",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "besamanos",
@@ -9165,7 +9989,8 @@
     "subcategory": "formality",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "birlibirloque",
@@ -9176,7 +10001,8 @@
     "subcategory": "games",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "cachivache",
@@ -9187,7 +10013,8 @@
     "subcategory": "household_objects",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "caletre",
@@ -9198,7 +10025,8 @@
     "subcategory": "mental_states",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "capcioso",
@@ -9209,7 +10037,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "caterva",
@@ -9220,7 +10049,8 @@
     "subcategory": "social_life",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "cencerrear",
@@ -9231,7 +10061,8 @@
     "subcategory": "sensations",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "circunloquio",
@@ -9242,7 +10073,8 @@
     "subcategory": "learning_process",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "coadyuvar",
@@ -9253,7 +10085,8 @@
     "subcategory": "tasks",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "cominero",
@@ -9264,7 +10097,8 @@
     "subcategory": "character",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "conciliábulo",
@@ -9275,7 +10109,8 @@
     "subcategory": "politics",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "conmiseración",
@@ -9286,7 +10121,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "consternación",
@@ -9297,7 +10133,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "coyunda",
@@ -9308,7 +10145,8 @@
     "subcategory": "family",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "chacota",
@@ -9319,7 +10157,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "debelación",
@@ -9330,7 +10169,8 @@
     "subcategory": "politics",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "deleznarse",
@@ -9341,7 +10181,8 @@
     "subcategory": "landscapes",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "demiurgo",
@@ -9352,7 +10193,8 @@
     "subcategory": "philosophy",
     "tags": [
       "philosophical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "denegar",
@@ -9363,7 +10205,8 @@
     "subcategory": "law",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "desagraviar",
@@ -9374,7 +10217,8 @@
     "subcategory": "law",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "desagüe",
@@ -9385,7 +10229,8 @@
     "subcategory": "household_objects",
     "tags": [
       "technical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "desaliño",
@@ -9396,7 +10241,8 @@
     "subcategory": "appearance",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "desbandada",
@@ -9407,7 +10253,8 @@
     "subcategory": "social_issues",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "despeñadero",
@@ -9418,7 +10265,8 @@
     "subcategory": "landscapes",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "despropósito",
@@ -9429,7 +10277,8 @@
     "subcategory": "mental_states",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "dilapidar",
@@ -9440,7 +10289,8 @@
     "subcategory": "money",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "egida",
@@ -9451,7 +10301,8 @@
     "subcategory": "politics",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "embeleco",
@@ -9462,7 +10313,8 @@
     "subcategory": "emotions",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "embuste",
@@ -9473,7 +10325,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "ensañamiento",
@@ -9484,7 +10337,8 @@
     "subcategory": "law",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "entresijo",
@@ -9495,7 +10349,8 @@
     "subcategory": "mental_states",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "esperpento",
@@ -9507,7 +10362,8 @@
     "tags": [
       "literary",
       "Spain"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "estameña",
@@ -9518,7 +10374,8 @@
     "subcategory": "clothing",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "estilete",
@@ -9529,7 +10386,8 @@
     "subcategory": "physical_actions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "execrar",
@@ -9540,7 +10398,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "expiación",
@@ -9551,7 +10410,8 @@
     "subcategory": "religion",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "facineroso",
@@ -9562,7 +10422,8 @@
     "subcategory": "law",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "faramalla",
@@ -9573,7 +10434,8 @@
     "subcategory": "character",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "feble",
@@ -9584,7 +10446,8 @@
     "subcategory": "physical_traits",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "fervor",
@@ -9595,7 +10458,8 @@
     "subcategory": "spirituality",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "filigrana",
@@ -9606,7 +10470,8 @@
     "subcategory": "visual_arts",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "garbo",
@@ -9617,7 +10482,8 @@
     "subcategory": "appearance",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "gazmoñería",
@@ -9628,7 +10494,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "gozne",
@@ -9639,7 +10506,8 @@
     "subcategory": "household_objects",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "granero",
@@ -9650,7 +10518,8 @@
     "subcategory": "cooking",
     "tags": [
       "agricultural"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "guadaña",
@@ -9661,7 +10530,8 @@
     "subcategory": "plants",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "guisa",
@@ -9672,7 +10542,8 @@
     "subcategory": "learning_process",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "hisopo",
@@ -9683,7 +10554,8 @@
     "subcategory": "traditions",
     "tags": [
       "religious"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "indómito",
@@ -9694,7 +10566,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "ínclito",
@@ -9705,7 +10578,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "infausto",
@@ -9716,7 +10590,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "insondable",
@@ -9727,7 +10602,8 @@
     "subcategory": "mental_states",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "ladino",
@@ -9739,7 +10615,8 @@
     "tags": [
       "literary",
       "Latin America"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "leguleyo",
@@ -9750,7 +10627,8 @@
     "subcategory": "law",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "levantisco",
@@ -9761,7 +10639,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "luctuoso",
@@ -9772,7 +10651,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "mampostero",
@@ -9783,7 +10663,8 @@
     "subcategory": "professions",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "menesteroso",
@@ -9794,7 +10675,8 @@
     "subcategory": "economy",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "merodear",
@@ -9805,7 +10687,8 @@
     "subcategory": "social_issues",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "morralla",
@@ -9816,7 +10699,8 @@
     "subcategory": "money",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "nefando",
@@ -9827,7 +10711,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "ofidio",
@@ -9839,7 +10724,8 @@
     "tags": [
       "zoology",
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "oquedad",
@@ -9850,7 +10736,8 @@
     "subcategory": "landscapes",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "paladín",
@@ -9861,7 +10748,8 @@
     "subcategory": "politics",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "palaciego",
@@ -9872,7 +10760,8 @@
     "subcategory": "politics",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "paroxismo",
@@ -9883,7 +10772,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "penitente",
@@ -9894,7 +10784,8 @@
     "subcategory": "religion",
     "tags": [
       "religious"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "prodigalidad",
@@ -9905,7 +10796,8 @@
     "subcategory": "money",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "prosélito",
@@ -9916,7 +10808,8 @@
     "subcategory": "religion",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "ralea",
@@ -9927,7 +10820,8 @@
     "subcategory": "social_life",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "rechifla",
@@ -9938,7 +10832,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "remilgo",
@@ -9949,7 +10844,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "retahíla",
@@ -9960,7 +10856,8 @@
     "subcategory": "press",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "ripio",
@@ -9971,7 +10868,8 @@
     "subcategory": "literature",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "sacrilegio",
@@ -9982,7 +10880,8 @@
     "subcategory": "religion",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "trapacería",
@@ -9993,7 +10892,8 @@
     "subcategory": "commerce",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "truculento",
@@ -10004,7 +10904,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "vejamen",
@@ -10015,7 +10916,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "veleidoso",
@@ -10026,7 +10928,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "venablo",
@@ -10037,7 +10940,8 @@
     "subcategory": "sports",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "zalamería",
@@ -10048,7 +10952,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "polimatía",
@@ -10059,7 +10964,8 @@
     "subcategory": "qualities",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "pedantería",
@@ -10070,7 +10976,8 @@
     "subcategory": "qualities",
     "tags": [
       "pejorative"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "diletantismo",
@@ -10081,7 +10988,8 @@
     "subcategory": "qualities",
     "tags": [
       "pejorative"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "adoctrinamiento",
@@ -10092,7 +11000,8 @@
     "subcategory": "pedagogy",
     "tags": [
       "pejorative"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "disertación",
@@ -10103,7 +11012,8 @@
     "subcategory": "academia",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "compendio",
@@ -10114,7 +11024,8 @@
     "subcategory": "texts",
     "tags": [
       "academic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "prontuario",
@@ -10125,7 +11036,8 @@
     "subcategory": "texts",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "trivio",
@@ -10137,7 +11049,8 @@
     "tags": [
       "medieval",
       "historical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "cuadrivio",
@@ -10149,7 +11062,8 @@
     "tags": [
       "medieval",
       "historical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "gremio",
@@ -10160,7 +11074,8 @@
     "subcategory": "organizations",
     "tags": [
       "historical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "alarife",
@@ -10172,7 +11087,8 @@
     "tags": [
       "historical",
       "arabic_origin"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "orfebre",
@@ -10183,7 +11099,8 @@
     "subcategory": "occupations",
     "tags": [
       "artisanal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "herrero",
@@ -10194,7 +11111,8 @@
     "subcategory": "occupations",
     "tags": [
       "traditional"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "curtidor",
@@ -10205,7 +11123,8 @@
     "subcategory": "occupations",
     "tags": [
       "traditional"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "boticario",
@@ -10216,7 +11135,8 @@
     "subcategory": "occupations",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "preboste",
@@ -10227,7 +11147,8 @@
     "subcategory": "positions",
     "tags": [
       "historical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "desempeñar un cargo",
@@ -10238,7 +11159,8 @@
     "subcategory": "professional",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "cesantía",
@@ -10249,7 +11171,8 @@
     "subcategory": "labor",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "estagiario",
@@ -10260,7 +11183,8 @@
     "subcategory": "positions",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "ahínco",
@@ -10271,7 +11195,8 @@
     "subcategory": "qualities",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "torreón",
@@ -10282,7 +11207,8 @@
     "subcategory": "historical_dwellings",
     "tags": [
       "architectural"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "atalaya",
@@ -10294,7 +11220,8 @@
     "tags": [
       "architectural",
       "arabic_origin"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "barbacana",
@@ -10305,7 +11232,8 @@
     "subcategory": "historical_dwellings",
     "tags": [
       "architectural"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "almena",
@@ -10316,7 +11244,8 @@
     "subcategory": "historical_dwellings",
     "tags": [
       "architectural"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "adarve",
@@ -10328,7 +11257,8 @@
     "tags": [
       "architectural",
       "arabic_origin"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "solar",
@@ -10339,7 +11269,8 @@
     "subcategory": "property",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "predio",
@@ -10350,7 +11281,8 @@
     "subcategory": "property",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "emparrado",
@@ -10361,7 +11293,8 @@
     "subcategory": "garden",
     "tags": [
       "traditional"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "alero",
@@ -10372,7 +11305,8 @@
     "subcategory": "architecture",
     "tags": [
       "architectural"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "ponzoña",
@@ -10383,7 +11317,8 @@
     "subcategory": "toxins",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "cuarentena",
@@ -10392,7 +11327,8 @@
     "gender": "f",
     "category": "health_hygiene",
     "subcategory": "public_health",
-    "tags": []
+    "tags": [],
+    "cognate_type": "none"
   },
   {
     "word": "pandemoniun",
@@ -10403,7 +11339,8 @@
     "subcategory": "public_health",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "pústula",
@@ -10414,7 +11351,8 @@
     "subcategory": "symptoms",
     "tags": [
       "medical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "gangrena",
@@ -10425,7 +11363,8 @@
     "subcategory": "conditions",
     "tags": [
       "medical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "destilación",
@@ -10436,7 +11375,8 @@
     "subcategory": "chemistry",
     "tags": [
       "scientific"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "sublimación",
@@ -10447,7 +11387,8 @@
     "subcategory": "chemistry",
     "tags": [
       "scientific"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "catálisis",
@@ -10458,7 +11399,8 @@
     "subcategory": "chemistry",
     "tags": [
       "scientific"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "amalgama",
@@ -10470,7 +11412,8 @@
     "tags": [
       "scientific",
       "figurative"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "espectroscopia",
@@ -10481,7 +11424,8 @@
     "subcategory": "physics",
     "tags": [
       "scientific"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "simbiosis",
@@ -10493,7 +11437,8 @@
     "tags": [
       "scientific",
       "figurative"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "endógeno",
@@ -10504,7 +11449,8 @@
     "subcategory": "biology",
     "tags": [
       "scientific"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "exógeno",
@@ -10515,7 +11461,8 @@
     "subcategory": "biology",
     "tags": [
       "scientific"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "estiaje",
@@ -10524,7 +11471,8 @@
     "gender": "m",
     "category": "geography_nature",
     "subcategory": "water_features",
-    "tags": []
+    "tags": [],
+    "cognate_type": "none"
   },
   {
     "word": "atolladero",
@@ -10535,7 +11483,8 @@
     "subcategory": "mental_states",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "baladronada",
@@ -10546,7 +11495,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "behetría",
@@ -10557,7 +11507,8 @@
     "subcategory": "politics",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "beligerancia",
@@ -10568,7 +11519,8 @@
     "subcategory": "politics",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "bienandanza",
@@ -10579,7 +11531,8 @@
     "subcategory": "emotions",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "bravuconada",
@@ -10590,7 +11543,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "cavilación",
@@ -10601,7 +11555,8 @@
     "subcategory": "mental_states",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "cetrino",
@@ -10612,7 +11567,8 @@
     "subcategory": "appearance",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "cisma",
@@ -10623,7 +11579,8 @@
     "subcategory": "religion",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "comitiva",
@@ -10634,7 +11591,8 @@
     "subcategory": "politics",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "confabulación",
@@ -10645,7 +11603,8 @@
     "subcategory": "politics",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "conspicuo",
@@ -10656,7 +11615,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "coplero",
@@ -10667,7 +11627,8 @@
     "subcategory": "literature",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "desaprensivo",
@@ -10678,7 +11639,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "desasosiego",
@@ -10689,7 +11651,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "empecinado",
@@ -10700,7 +11663,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "esquilmar",
@@ -10711,7 +11675,8 @@
     "subcategory": "environment",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "estólido",
@@ -10722,7 +11687,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "estrafalario",
@@ -10733,7 +11699,8 @@
     "subcategory": "appearance",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "filibustero",
@@ -10744,7 +11711,8 @@
     "subcategory": "politics",
     "tags": [
       "historical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "frondoso",
@@ -10755,7 +11723,8 @@
     "subcategory": "plants",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "gazmono",
@@ -10766,7 +11735,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "gregario",
@@ -10777,7 +11747,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "henchir",
@@ -10788,7 +11759,8 @@
     "subcategory": "cooking",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "holgazanería",
@@ -10799,7 +11771,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "incuria",
@@ -10810,7 +11783,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "insidioso",
@@ -10821,7 +11795,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "jactancioso",
@@ -10832,7 +11807,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "lacayo",
@@ -10843,7 +11819,8 @@
     "subcategory": "professions",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "magín",
@@ -10854,7 +11831,8 @@
     "subcategory": "mental_states",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "malandanza",
@@ -10865,7 +11843,8 @@
     "subcategory": "emotions",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "malograr",
@@ -10876,7 +11855,8 @@
     "subcategory": "tasks",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "melifluo",
@@ -10887,7 +11867,8 @@
     "subcategory": "sensations",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "menguado",
@@ -10898,7 +11879,8 @@
     "subcategory": "character",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "pandemónium",
@@ -10909,7 +11891,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "pernio",
@@ -10920,7 +11903,8 @@
     "subcategory": "household_objects",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "pertinacia",
@@ -10931,7 +11915,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "peyorativo",
@@ -10942,7 +11927,8 @@
     "subcategory": "learning_process",
     "tags": [
       "linguistic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "postrero",
@@ -10954,7 +11940,8 @@
     "tags": [
       "literary",
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "prestancia",
@@ -10965,7 +11952,8 @@
     "subcategory": "appearance",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "puerilidad",
@@ -10976,7 +11964,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "quebranto",
@@ -10987,7 +11976,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "quijotesco",
@@ -10998,7 +11988,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "quisquilloso",
@@ -11009,7 +12000,8 @@
     "subcategory": "character",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "reconcomio",
@@ -11020,7 +12012,8 @@
     "subcategory": "emotions",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "refractario",
@@ -11031,7 +12024,8 @@
     "subcategory": "science",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "socarrón",
@@ -11042,7 +12036,8 @@
     "subcategory": "character",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "soliviantar",
@@ -11053,7 +12048,8 @@
     "subcategory": "social_issues",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "temerario",
@@ -11064,7 +12060,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "tergiversar",
@@ -11075,7 +12072,8 @@
     "subcategory": "press",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "trapecista",
@@ -11086,7 +12084,8 @@
     "subcategory": "entertainment",
     "tags": [
       "entertainment"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "ufano",
@@ -11097,7 +12096,8 @@
     "subcategory": "emotions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "vesania",
@@ -11108,7 +12108,8 @@
     "subcategory": "illnesses",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "vetustez",
@@ -11119,7 +12120,8 @@
     "subcategory": "types",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "vilipendiar",
@@ -11130,7 +12132,8 @@
     "subcategory": "social_interactions",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "voluble",
@@ -11141,7 +12144,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "zafiedad",
@@ -11152,7 +12156,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "zagal",
@@ -11163,7 +12168,8 @@
     "subcategory": "professions",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "zahareño",
@@ -11174,7 +12180,8 @@
     "subcategory": "character",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "zamacuco",
@@ -11185,7 +12192,8 @@
     "subcategory": "character",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "zascandil",
@@ -11196,7 +12204,8 @@
     "subcategory": "character",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "zopenco",
@@ -11207,7 +12216,8 @@
     "subcategory": "character",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "zurra",
@@ -11218,7 +12228,8 @@
     "subcategory": "physical_actions",
     "tags": [
       "colloquial"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "curtir",
@@ -11229,7 +12240,8 @@
     "subcategory": "professions",
     "tags": [
       "traditional"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "enconarse",
@@ -11240,7 +12252,8 @@
     "subcategory": "symptoms",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "manumitir",
@@ -11252,7 +12265,8 @@
     "tags": [
       "archaic",
       "legal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "uncir",
@@ -11263,7 +12277,8 @@
     "subcategory": "animals",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "abrevar",
@@ -11274,7 +12289,8 @@
     "subcategory": "animals",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "majada",
@@ -11285,7 +12301,8 @@
     "subcategory": "landscapes",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "atavismo",
@@ -11296,7 +12313,8 @@
     "subcategory": "science",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "emoliente",
@@ -11307,7 +12325,8 @@
     "subcategory": "medical_care",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "insania",
@@ -11318,7 +12337,8 @@
     "subcategory": "illnesses",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "lánguido",
@@ -11329,7 +12349,8 @@
     "subcategory": "moods",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "palmípedo",
@@ -11340,7 +12361,8 @@
     "subcategory": "animals",
     "tags": [
       "zoology"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "rapsodia",
@@ -11351,7 +12373,8 @@
     "subcategory": "music",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "exvoto",
@@ -11362,7 +12385,8 @@
     "subcategory": "traditions",
     "tags": [
       "religious"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "epítome",
@@ -11373,7 +12397,8 @@
     "subcategory": "texts",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "glosa",
@@ -11384,7 +12409,8 @@
     "subcategory": "texts",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "liceo",
@@ -11395,7 +12421,8 @@
     "subcategory": "institutions",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "escribiente",
@@ -11406,7 +12433,8 @@
     "subcategory": "occupations",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "rufián",
@@ -11418,7 +12446,8 @@
     "tags": [
       "literary",
       "pejorative"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "alcazaba",
@@ -11430,7 +12459,8 @@
     "tags": [
       "architectural",
       "arabic_origin"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "caballeriza",
@@ -11441,7 +12471,8 @@
     "subcategory": "outbuildings",
     "tags": [
       "traditional"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "buhardilla",
@@ -11450,7 +12481,8 @@
     "gender": "f",
     "category": "housing",
     "subcategory": "rooms",
-    "tags": []
+    "tags": [],
+    "cognate_type": "none"
   },
   {
     "word": "escorbuto",
@@ -11461,7 +12493,8 @@
     "subcategory": "conditions",
     "tags": [
       "historical"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "tísico",
@@ -11472,7 +12505,8 @@
     "subcategory": "conditions",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "purgante",
@@ -11483,7 +12517,8 @@
     "subcategory": "remedies",
     "tags": [
       "archaic"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "alúmina",
@@ -11494,7 +12529,8 @@
     "subcategory": "chemistry",
     "tags": [
       "scientific"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "fermento",
@@ -11505,7 +12541,8 @@
     "subcategory": "biology",
     "tags": [
       "scientific"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "ósmosis",
@@ -11517,7 +12554,8 @@
     "tags": [
       "scientific",
       "figurative"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "precipitado",
@@ -11528,7 +12566,8 @@
     "subcategory": "chemistry",
     "tags": [
       "scientific"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "concubinato",
@@ -11539,7 +12578,8 @@
     "subcategory": "unions",
     "tags": [
       "legal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "esponsales",
@@ -11550,7 +12590,8 @@
     "subcategory": "unions",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "congraciarse",
@@ -11561,7 +12602,8 @@
     "subcategory": "social",
     "tags": [
       "formal"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "lisonja",
@@ -11572,7 +12614,8 @@
     "subcategory": "social",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "macilentos rasgos",
@@ -11583,7 +12626,8 @@
     "subcategory": "appearance",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "semi_transparent"
   },
   {
     "word": "lozano",
@@ -11594,7 +12638,8 @@
     "subcategory": "appearance",
     "tags": [
       "literary"
-    ]
+    ],
+    "cognate_type": "none"
   },
   {
     "word": "heterodoxia",
@@ -11605,7 +12650,8 @@
     "subcategory": "concepts",
     "tags": [
       "religious"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "heurística",
@@ -11616,7 +12662,8 @@
     "subcategory": "philosophy",
     "tags": [
       "philosophical"
-    ]
+    ],
+    "cognate_type": "transparent"
   },
   {
     "word": "tautología",
@@ -11627,6 +12674,7 @@
     "subcategory": "logic",
     "tags": [
       "philosophical"
-    ]
+    ],
+    "cognate_type": "transparent"
   }
 ]

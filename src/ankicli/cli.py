@@ -70,7 +70,8 @@ def practice(deck: str | None, count: int, direction: str, focus: str) -> None:
 @click.option("-t", "--topic", default=None, help="Grammar topic to quiz on")
 @click.option("-l", "--level", default="A1", type=click.Choice(["A1", "A2", "B1", "B2"]), help="CEFR level (default: A1)")
 @click.option("-n", "--count", default=5, help="Number of questions (default: 5)")
-def quiz(topic: str | None, level: str, count: int) -> None:
+@click.option("-s", "--size", default=None, type=click.Choice(["quick", "assessment", "comprehensive"]), help="Quiz size preset (overrides count)")
+def quiz(topic: str | None, level: str, count: int, size: str | None) -> None:
     """Start an interactive grammar quiz.
 
     Tests grammar knowledge with fill-in-the-blank, multiple choice,
@@ -79,7 +80,12 @@ def quiz(topic: str | None, level: str, count: int) -> None:
     """
     from .chat import run_chat
     import os
-    os.environ["_ANKICLI_QUIZ_ARGS"] = f"--level {level} --count {count}" + (f" --topic {topic}" if topic else "")
+    args = f"--level {level} --count {count}"
+    if size:
+        args += f" --size {size}"
+    if topic:
+        args += f" --topic {topic}"
+    os.environ["_ANKICLI_QUIZ_ARGS"] = args
     run_chat()
 
 
@@ -519,8 +525,9 @@ def cefr_status() -> None:
 @click.argument("level")
 @click.option("--unknown", is_flag=True, help="Show unknown words")
 def cefr_progress(level: str, unknown: bool) -> None:
-    """Show detailed progress for a specific CEFR level."""
+    """Show detailed progress for a specific CEFR level (U7 deep-dive)."""
     from .cefr import CEFRData, load_progress_cache, match_cards_to_cefr, save_progress_cache, format_progress_text
+    from .grammar_quiz import get_topic_mastery
 
     level = level.upper()
     if level not in ("A1", "A2", "B1", "B2", "C1", "C2"):
@@ -536,7 +543,23 @@ def cefr_progress(level: str, unknown: bool) -> None:
         progress = match_cards_to_cefr(client, cefr_data)
         save_progress_cache(progress)
 
-    console.print(format_progress_text(progress, level=level, show_unknown=unknown))
+    # U7: Rich deep-dive panel
+    lp = progress.get(level)
+    if lp:
+        from .chat import create_cefr_deep_dive_panel
+        grammar_mastery = get_topic_mastery()
+        # Convert LevelProgress object to dict for the panel
+        level_dict = {
+            "words_known": lp.words_known,
+            "words_total": lp.words_total,
+            "categories": {
+                name: {"known": cat.known, "total": cat.total, "percent": cat.percent}
+                for name, cat in lp.categories.items()
+            },
+        }
+        console.print(create_cefr_deep_dive_panel(level, level_dict, grammar_mastery))
+    else:
+        console.print(format_progress_text(progress, level=level, show_unknown=unknown))
 
 
 @cefr.command("suggest")
@@ -669,6 +692,85 @@ def daily(force: bool) -> None:
     console.print(f"[dim]English:[/dim] {english}")
     console.print(f"[dim]Level:[/dim] {challenge_level} | Category: {category}")
     console.print(f"\n[dim]Start a chat session to practice with this word![/dim]")
+
+
+@cli.command()
+@click.option("--detailed", is_flag=True, help="Show full progress dashboard with all sections")
+def progress(detailed: bool) -> None:
+    """Show progress dashboard with streaks, skills, and weak spots.
+
+    Shows study streaks, skills radar, and optionally time-based progress
+    and weak spots analysis.
+    """
+    from .progress_tracking import (
+        get_streaks_summary,
+        get_skills_radar,
+        get_progress_over_time,
+        get_weak_spots,
+        format_skills_radar_text,
+        format_progress_over_time_text,
+    )
+    from .learning_summary import load_summary
+    from .error_journal import get_error_patterns
+
+    # Streaks
+    streaks = get_streaks_summary()
+    console.print(f"\n[bold cyan]Study Streaks[/bold cyan]")
+    console.print(f"  Current streak: [bold]{streaks['current_streak']}[/bold] day(s)")
+    console.print(f"  Longest streak: {streaks['longest_streak']} day(s)")
+    console.print(f"  Active in last 30 days: {streaks['last_30_days_active']}")
+
+    # Last 7 days
+    days_line = "  Last 7 days: "
+    for day_str, active in streaks["last_7_days"].items():
+        days_line += "[green]##[/green]" if active else "[dim]..[/dim]"
+    console.print(days_line)
+
+    # Skills radar
+    learning_summary = load_summary()
+    quiz_results = learning_summary.get("quiz_results", [])
+    cefr_progress = None
+    try:
+        from .cefr import load_progress_cache
+        cefr_progress = load_progress_cache()
+    except Exception:
+        pass
+
+    collection_stats = None
+    try:
+        client = get_client()
+        collection_stats = client.get_collection_stats()
+    except Exception:
+        pass
+
+    radar = get_skills_radar(
+        collection_stats=collection_stats,
+        learning_summary=learning_summary,
+        error_journal_entries=get_error_patterns(),
+        quiz_results=quiz_results,
+        cefr_progress=cefr_progress,
+    )
+    console.print(f"\n{format_skills_radar_text(radar)}")
+
+    if detailed:
+        # Time-based progress
+        time_progress = get_progress_over_time(period="month")
+        console.print(f"\n{format_progress_over_time_text(time_progress)}")
+
+        # Weak spots
+        error_entries = get_error_patterns()
+        card_reviews = []
+        try:
+            card_reviews = client.get_card_reviews()
+        except Exception:
+            pass
+
+        weak = get_weak_spots(
+            quiz_results=quiz_results,
+            error_entries=error_entries,
+            card_reviews=card_reviews,
+        )
+        console.print(f"\n{weak['summary']}")
 
 
 def main() -> None:

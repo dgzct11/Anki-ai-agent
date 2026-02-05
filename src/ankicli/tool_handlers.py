@@ -125,16 +125,47 @@ def handle_get_collection_stats(anki: AnkiClient, tool_input: dict, **ctx) -> st
         f"Collection Overview:\n"
         f"Total decks: {stats.get('total_decks', 0)}\n"
         f"Total notes: {stats.get('total_notes', 0)}\n"
+        f"Total cards: {stats.get('total_cards', 0)}\n"
         f"Cards due today: {stats.get('total_due', 0)} "
         f"(New: {stats.get('total_new', 0)}, "
         f"Learning: {stats.get('total_learning', 0)}, "
         f"Review: {stats.get('total_review', 0)})\n"
+        f"\nCard breakdown:\n"
+        f"  Mature (interval >= 21 days): {stats.get('mature_count', 0)}\n"
+        f"  Learning: {stats.get('learning_count', 0)}\n"
+        f"  New/unseen: {stats.get('new_count', 0)}\n"
+        f"\nRetention rate: {stats.get('retention_rate', 0):.1f}%\n"
+        f"  Total reviews: {stats.get('total_reps', 0)}\n"
+        f"  Total lapses: {stats.get('total_lapses', 0)}\n"
     )
     if stats.get("decks"):
         result += "\nDecks with cards due:\n"
         for deck in stats["decks"]:
             if deck["due"] > 0:
                 result += f"- {deck['name']}: {deck['due']} due\n"
+
+    # Record progress snapshot and study activity
+    try:
+        from .progress_tracking import record_progress_snapshot, record_activity
+        cefr_levels = {}
+        try:
+            from .cefr import load_progress_cache
+            progress = load_progress_cache()
+            if progress:
+                for level_key in ("A1", "A2", "B1", "B2", "C1", "C2"):
+                    level_data = progress.get(level_key, {})
+                    cefr_levels[level_key] = level_data.get("percent", 0)
+        except Exception:
+            pass
+        record_progress_snapshot(
+            total_cards=stats.get("total_cards", 0),
+            cefr_levels=cefr_levels,
+            retention_rate=stats.get("retention_rate", 0),
+        )
+        record_activity()
+    except Exception:
+        pass
+
     return result
 
 
@@ -703,6 +734,13 @@ def handle_log_practice_session(anki: AnkiClient, tool_input: dict, **ctx) -> st
 
     save_summary(summary)
 
+    # Record study activity for streak tracking
+    try:
+        from .progress_tracking import record_activity
+        record_activity()
+    except Exception:
+        pass
+
     attempted = session_record["phrases_attempted"]
     correct = session_record["correct"]
     score = session_record["score_percent"]
@@ -725,8 +763,19 @@ def handle_start_grammar_quiz(anki: AnkiClient, tool_input: dict, **ctx) -> str:
 
     topic = tool_input["topic"]
     level = tool_input["level"]
-    count = min(tool_input.get("count", 5), 10)
     question_types = tool_input.get("question_types")
+
+    # P1: Multiple quiz sizes
+    QUIZ_SIZES = {
+        "quick": {"count": 10, "description": "Quick quiz (10 questions, 1 topic)"},
+        "assessment": {"count": 28, "description": "Assessment (28 questions, full CEFR level)"},
+        "comprehensive": {"count": 50, "description": "Comprehensive (50 questions, multi-level)"},
+    }
+    size = tool_input.get("size")
+    if size and size in QUIZ_SIZES:
+        count = QUIZ_SIZES[size]["count"]
+    else:
+        count = min(tool_input.get("count", 5), 50)
 
     # Get known vocabulary from the learning summary so Claude uses familiar words
     summary = load_summary()
@@ -840,12 +889,17 @@ def handle_log_quiz_results(anki: AnkiClient, tool_input: dict, **ctx) -> str:
 
     mastery = record_quiz_result(result)
 
+    # P2: Also record per-topic grammar scores
+    from .grammar_scores import record_topic_score
+    topic_score = record_topic_score(topic, level, attempted, correct)
+
     mastered_str = "MASTERED" if mastery["mastered"] else "not yet mastered"
     lines = [
         f"Quiz results logged for '{topic}' ({level}):",
         f"  Score: {correct}/{attempted} ({score:.0f}%)",
         f"  Status: {mastered_str} (avg: {mastery['avg_score']:.0f}%, threshold: {MASTERY_THRESHOLD:.0f}%)",
         f"  Total quizzes on this topic: {mastery['quizzed_count']}",
+        f"  Per-topic score: {topic_score.average_score:.0f}% [{topic_score.mastery_level}]",
     ]
     if weak_areas:
         lines.append(f"  Weak areas: {', '.join(weak_areas)}")
@@ -865,6 +919,13 @@ def handle_log_quiz_results(anki: AnkiClient, tool_input: dict, **ctx) -> str:
     })
     summary["quiz_results"] = summary["quiz_results"][-50:]
     save_summary(summary)
+
+    # Record study activity for streak tracking
+    try:
+        from .progress_tracking import record_activity
+        record_activity()
+    except Exception:
+        pass
 
     return "\n".join(lines)
 
@@ -1430,3 +1491,987 @@ def handle_sync_cefr_progress(anki: AnkiClient, tool_input: dict, **ctx) -> str:
     save_progress_cache(progress)
 
     return "CEFR progress rescanned and cached.\n\n" + format_progress_text(progress)
+
+
+# ---------------------------------------------------------------------------
+# Progress tracking: skills radar, streaks, time progress, weak spots
+# ---------------------------------------------------------------------------
+
+@handler("get_skills_radar")
+def handle_get_skills_radar(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    from .progress_tracking import get_skills_radar, format_skills_radar_text
+    from .learning_summary import load_summary
+    from .error_journal import get_error_patterns
+
+    # Gather data sources
+    collection_stats = None
+    try:
+        collection_stats = anki.get_collection_stats()
+    except Exception:
+        pass
+
+    learning_summary = load_summary()
+    quiz_results = learning_summary.get("quiz_results", [])
+
+    cefr_progress = None
+    try:
+        from .cefr import load_progress_cache
+        cefr_progress = load_progress_cache()
+    except Exception:
+        pass
+
+    radar = get_skills_radar(
+        collection_stats=collection_stats,
+        learning_summary=learning_summary,
+        error_journal_entries=get_error_patterns(),
+        quiz_results=quiz_results,
+        cefr_progress=cefr_progress,
+    )
+
+    # Record activity
+    try:
+        from .progress_tracking import record_activity
+        record_activity()
+    except Exception:
+        pass
+
+    return format_skills_radar_text(radar)
+
+
+@handler("get_progress_over_time")
+def handle_get_progress_over_time(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    from .progress_tracking import get_progress_over_time, format_progress_over_time_text
+
+    period = tool_input.get("period", "month")
+    progress = get_progress_over_time(period=period)
+    return format_progress_over_time_text(progress)
+
+
+@handler("get_weak_spots")
+def handle_get_weak_spots(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    from .progress_tracking import get_weak_spots
+    from .learning_summary import load_summary
+    from .error_journal import get_error_patterns
+
+    learning_summary = load_summary()
+    quiz_results = learning_summary.get("quiz_results", [])
+    error_entries = get_error_patterns()
+
+    card_reviews = []
+    try:
+        card_reviews = anki.get_card_reviews()
+    except Exception:
+        pass
+
+    result = get_weak_spots(
+        quiz_results=quiz_results,
+        error_entries=error_entries,
+        card_reviews=card_reviews,
+    )
+
+    return result["summary"]
+
+
+@handler("get_study_streaks")
+def handle_get_study_streaks(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    from .progress_tracking import get_streaks_summary
+
+    summary = get_streaks_summary()
+
+    lines = [
+        "Study Streaks",
+        "=" * 40,
+        f"  Current streak: {summary['current_streak']} day(s)",
+        f"  Longest streak: {summary['longest_streak']} day(s)",
+        f"  Total active days: {summary['total_active_days']}",
+        f"  Active in last 30 days: {summary['last_30_days_active']}",
+        "",
+        "  Last 7 days:",
+    ]
+
+    for day_str, active in summary["last_7_days"].items():
+        marker = "[##]" if active else "[  ]"
+        lines.append(f"    {day_str}: {marker}")
+
+    return "\n".join(lines)
+
+
+@handler("record_study_activity")
+def handle_record_study_activity(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    from datetime import date
+    from .progress_tracking import record_activity
+
+    activity_date = None
+    if tool_input.get("date"):
+        try:
+            activity_date = date.fromisoformat(tool_input["date"])
+        except ValueError:
+            return f"Invalid date format: {tool_input['date']}. Use YYYY-MM-DD."
+
+    result = record_activity(activity_date)
+    return (
+        f"Activity recorded for {result['date_recorded']}.\n"
+        f"Current streak: {result['current_streak']} day(s)\n"
+        f"Longest streak: {result['longest_streak']} day(s)\n"
+        f"Total active days: {result['total_active_days']}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Cognate features (C5, C6)
+# ---------------------------------------------------------------------------
+
+@handler("scan_cognates")
+def handle_scan_cognates(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    from .cefr import CEFRData
+    from .cognates import classify_words_by_cognate_type, format_cognate_scan_text
+
+    words = [w.lower().strip() for w in tool_input["words"]]
+
+    cefr_data = CEFRData()
+    cefr_data.load()
+
+    groups = classify_words_by_cognate_type(words, cefr_data)
+    return format_cognate_scan_text(groups)
+
+
+@handler("check_false_friend")
+def handle_check_false_friend(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    from .cognates import lookup_false_friend
+
+    word = tool_input["word"].lower().strip()
+    ff = lookup_false_friend(word)
+
+    if ff is None:
+        return f"'{word}' is NOT a known false friend. Safe to use normally."
+
+    return (
+        f"FALSE FRIEND DETECTED: {ff.spanish}\n"
+        f"  Looks like English: {ff.seems_like}\n"
+        f"  Actually means: {ff.actual_meaning}\n"
+        f"  Correct equivalent: {ff.english_equivalent}\n"
+        f"  Warning: {ff.warning}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# P9: Reading practice
+# ---------------------------------------------------------------------------
+
+@handler("start_reading_practice")
+def handle_start_reading_practice(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    deck_name = tool_input["deck_name"]
+    level = tool_input.get("level", "A2")
+    topic = tool_input.get("topic", "")
+
+    known_words: list[str] = []
+    due_words: list[str] = []
+    try:
+        import re
+        cards = anki.get_deck_cards(deck_name, limit=200)
+        for c in cards:
+            clean = re.sub(r'<[^>]+>', ' ', c.back).strip()
+            word = clean.split('\n')[0].split('<')[0].strip()[:40]
+            if word:
+                known_words.append(word)
+    except Exception:
+        pass
+
+    try:
+        import re as _re
+        due_cards = anki.get_due_cards(deck_name, limit=30)
+        for c in due_cards:
+            clean = _re.sub(r'<[^>]+>', ' ', c.back).strip()
+            word = clean.split('\n')[0].split('<')[0].strip()[:40]
+            if word:
+                due_words.append(word)
+    except Exception:
+        pass
+
+    known_sample = known_words[:40]
+    due_sample = due_words[:15]
+    topic_instruction = f" about '{topic}'" if topic else ""
+
+    lines = [
+        f"Reading practice session ready.",
+        f"Level: {level} | Deck: {deck_name}",
+        "",
+        "INSTRUCTIONS FOR READING PRACTICE:",
+        f"Generate a short paragraph (100-150 words) in Spanish at {level} level{topic_instruction}.",
+        "",
+        "VOCABULARY TO INCORPORATE:",
+        f"Known words (use these naturally): {', '.join(known_sample[:20]) if known_sample else 'general A1-A2 vocabulary'}",
+        f"Due for review (include some of these): {', '.join(due_sample[:10]) if due_sample else 'none'}",
+        "",
+        "RULES:",
+        "- Write a cohesive, interesting paragraph - NOT a list of sentences",
+        "- Use natural Spanish appropriate for the CEFR level",
+        "- Bold key vocabulary words using **word** markdown",
+        "- After the paragraph, provide a vocabulary glossary",
+        "- DO NOT ask comprehension questions or test the user",
+        "- DO NOT ask the user to translate anything",
+        "- This is READING ONLY - just exposure to vocabulary in context",
+        "- End with an encouraging message about the reading",
+        "",
+        "FORMAT: Present the text in a Rich panel with title 'READING PRACTICE'",
+    ]
+    return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# P2: Per-topic grammar scores
+# ---------------------------------------------------------------------------
+
+@handler("get_grammar_scores")
+def handle_get_grammar_scores(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    from .grammar_scores import format_grammar_scores_text
+    return format_grammar_scores_text()
+
+
+# ---------------------------------------------------------------------------
+# P11: Anki review integration - session due words
+# ---------------------------------------------------------------------------
+
+@handler("get_session_due_words")
+def handle_get_session_due_words(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    deck_name = tool_input["deck_name"]
+    session_words = tool_input.get("session_words", [])
+
+    if not session_words:
+        return "No session words provided."
+
+    try:
+        due_cards = anki.get_due_cards(deck_name, limit=200)
+    except Exception:
+        return "Could not fetch due cards from Anki."
+
+    if not due_cards:
+        return "No cards are due for review in this deck."
+
+    import re
+    due_word_map: dict[str, str] = {}
+    for card in due_cards:
+        clean_back = re.sub(r'<[^>]+>', ' ', card.back).strip().lower()
+        clean_front = re.sub(r'<[^>]+>', ' ', card.front).strip().lower()
+        for word in session_words:
+            word_lower = word.lower().strip()
+            if word_lower in clean_back or word_lower in clean_front:
+                due_word_map[word] = card.id
+
+    if not due_word_map:
+        return "None of the session words are due for Anki review today."
+
+    lines = [
+        f"Session words due for Anki review ({len(due_word_map)}):",
+        "",
+    ]
+    for word, card_id in sorted(due_word_map.items()):
+        lines.append(f"  - {word} (card ID: {card_id})")
+    lines.extend([
+        "",
+        "IMPORTANT: Ask the user if they want to mark these as reviewed.",
+        "DO NOT auto-mark. Wait for explicit confirmation.",
+        "If the user says yes, use mark_cards_reviewed with the card IDs.",
+    ])
+    return "\n".join(lines)
+
+
+@handler("mark_cards_reviewed")
+def handle_mark_cards_reviewed(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    card_ids = tool_input["card_ids"]
+    ease = tool_input.get("ease", 3)
+
+    if ease not in (1, 2, 3, 4):
+        return f"Invalid ease rating: {ease}. Must be 1 (Again), 2 (Hard), 3 (Good), or 4 (Easy)."
+
+    if not card_ids:
+        return "No card IDs provided."
+
+    succeeded = 0
+    failed = 0
+    for cid in card_ids:
+        try:
+            success = anki.answer_card(int(cid), ease)
+            if success:
+                succeeded += 1
+            else:
+                failed += 1
+        except Exception:
+            failed += 1
+
+    # Record study activity for streaks
+    try:
+        from .progress_tracking import record_activity
+        record_activity()
+    except Exception:
+        pass
+
+    ease_labels = {1: "Again", 2: "Hard", 3: "Good", 4: "Easy"}
+    ease_label = ease_labels.get(ease, str(ease))
+
+    if failed == 0:
+        return f"Marked {succeeded} card(s) as reviewed in Anki (ease: {ease_label})."
+    else:
+        return f"Marked {succeeded} card(s) as reviewed, {failed} failed (ease: {ease_label})."
+
+
+# ---------------------------------------------------------------------------
+# Micro-lesson generation (A5)
+# ---------------------------------------------------------------------------
+
+@handler("generate_micro_lesson")
+def handle_generate_micro_lesson(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    from .error_journal import get_error_patterns
+
+    error_type = tool_input["error_type"]
+    level = tool_input.get("level", "A2")
+
+    # Retrieve error data for context
+    patterns = get_error_patterns(min_count=1, limit=50)
+    target = None
+    for p in patterns:
+        if p.error_type == error_type:
+            target = p
+            break
+
+    if target is None:
+        return f"No error pattern found for '{error_type}'. Check get_error_patterns for available types."
+
+    if target.count < 3:
+        return (
+            f"'{error_type}' has only {target.count} occurrence(s). "
+            f"Micro-lessons are most effective with 3+ occurrences. "
+            f"Keep practicing and check back later."
+        )
+
+    # Build the user's actual mistakes as context
+    examples_text = ""
+    for ex in target.examples[-5:]:
+        inp = ex.get("input", "")
+        corr = ex.get("correction", "")
+        if inp:
+            examples_text += f"  - Wrote: \"{inp}\""
+            if corr:
+                examples_text += f" -> Correct: \"{corr}\""
+            examples_text += "\n"
+
+    assistant = ctx.get("assistant")
+    if not assistant:
+        return "Error: assistant context not available"
+
+    prompt = f"""Create a focused 2-3 minute micro-lesson for a Spanish learner at {level} level about: {error_type.replace('_', ' ')}
+
+The student has made this mistake {target.count} times. Here are their actual errors:
+{examples_text}
+
+Structure the lesson as:
+1. RULE: Name and explain the grammar rule clearly in 2-3 sentences
+2. EXAMPLES: Show 3 correct examples demonstrating the rule
+3. COMMON MISTAKES: Show 2-3 "wrong vs right" pairs using the student's actual errors above
+4. PRACTICE: Create 3 fill-in-the-blank exercises (provide the answer key separately)
+5. TIP: One memorable mnemonic or shortcut to remember the rule
+
+Return ONLY valid JSON:
+{{
+    "title": "lesson title",
+    "rule": "clear rule explanation",
+    "examples": ["example 1", "example 2", "example 3"],
+    "mistakes": [{{"wrong": "...", "right": "...", "explanation": "..."}}],
+    "practice": [{{"question": "fill in blank", "answer": "correct answer"}}],
+    "tip": "mnemonic or shortcut"
+}}"""
+
+    try:
+        response = assistant.client.messages.create(
+            model=assistant.config.subagent_model,
+            max_tokens=2048,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        raw_text = response.content[0].text.strip()
+
+        # Parse JSON
+        import json as _json
+        text = raw_text
+        if "```json" in text:
+            text = text.split("```json")[1].split("```")[0].strip()
+        elif "```" in text:
+            text = text.split("```")[1].split("```")[0].strip()
+
+        start = text.find("{")
+        end = text.rfind("}")
+        if start == -1 or end == -1:
+            return f"Micro-lesson for '{error_type}':\n\n{raw_text}"
+
+        lesson = _json.loads(text[start : end + 1])
+
+        lines = [
+            f"MICRO-LESSON: {lesson.get('title', error_type.replace('_', ' ').title())}",
+            f"Error pattern: {error_type} (seen {target.count}x)",
+            "=" * 50,
+            "",
+            "RULE:",
+            lesson.get("rule", ""),
+            "",
+            "CORRECT EXAMPLES:",
+        ]
+        for ex in lesson.get("examples", []):
+            lines.append(f"  {ex}")
+
+        lines.append("")
+        lines.append("COMMON MISTAKES (your actual errors):")
+        for m in lesson.get("mistakes", []):
+            lines.append(f"  WRONG: {m.get('wrong', '')}")
+            lines.append(f"  RIGHT: {m.get('right', '')}")
+            lines.append(f"  Why: {m.get('explanation', '')}")
+            lines.append("")
+
+        lines.append("PRACTICE:")
+        for i, p in enumerate(lesson.get("practice", []), 1):
+            lines.append(f"  {i}. {p.get('question', '')}")
+
+        lines.append("")
+        lines.append(f"TIP: {lesson.get('tip', '')}")
+        lines.append("")
+        lines.append("Present the practice questions to the user ONE AT A TIME.")
+        lines.append("After they complete the exercises, offer to create Anki cards for this grammar rule.")
+
+        lines.append("")
+        lines.append("ANSWER KEY (do NOT show to user until they answer):")
+        for i, p in enumerate(lesson.get("practice", []), 1):
+            lines.append(f"  {i}. {p.get('answer', '')}")
+
+        return "\n".join(lines)
+
+    except Exception as e:
+        return f"Error generating micro-lesson: {e}"
+
+
+# ---------------------------------------------------------------------------
+# Batch delegate (A6)
+# ---------------------------------------------------------------------------
+
+@handler("batch_delegate")
+def handle_batch_delegate(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    from .delegate import BatchDelegateProcessor
+
+    delegate_type = tool_input["delegate_type"]
+    items = tool_input["items"]
+    prompt_override = tool_input.get("prompt_override")
+    workers = min(tool_input.get("workers", 5), 10)
+
+    if not items:
+        return "No items to process."
+
+    assistant = ctx.get("assistant")
+    if not assistant:
+        return "Error: assistant context not available"
+
+    processor = BatchDelegateProcessor(
+        client=assistant.client,
+        model=assistant.config.subagent_model,
+        max_workers=workers,
+        rate_limit_delay=assistant.config.delegate_rate_limit_delay,
+    )
+
+    def progress_callback(event):
+        assistant._progress_queue.put({
+            "type": "delegate_progress",
+            "completed": event.completed,
+            "total": event.total,
+            "current_card": event.current_item,
+            "success": event.success,
+            "error": event.error,
+        })
+
+    results = processor.process_batch(
+        items=items,
+        delegate_type=delegate_type,
+        prompt_override=prompt_override,
+        progress_callback=progress_callback,
+    )
+
+    successes = [r for r in results if r.error is None]
+    errors = [r for r in results if r.error is not None]
+
+    import json as _json
+
+    lines = [
+        f"Batch delegate '{delegate_type}': {len(successes)}/{len(results)} succeeded",
+    ]
+
+    if successes:
+        lines.append("")
+        lines.append("Results:")
+        for r in successes:
+            lines.append(f"  {r.item}: {_json.dumps(r.result, ensure_ascii=False)}")
+
+    if errors:
+        lines.append("")
+        lines.append(f"Errors ({len(errors)}):")
+        for r in errors[:5]:
+            lines.append(f"  {r.item}: {r.error}")
+        if len(errors) > 5:
+            lines.append(f"  ... and {len(errors) - 5} more errors")
+
+    return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# Vocabulary Network handlers (V1, V3-V11)
+# ---------------------------------------------------------------------------
+
+@handler("update_word_network")
+def handle_update_word_network(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    """V1: Update vocabulary network after adding a card."""
+    from .word_network import WordNetwork, WordNode, WordConnection, \
+        ensure_default_disambiguation
+
+    network = WordNetwork()
+    network.load()
+    ensure_default_disambiguation(network)
+
+    word = tool_input["word"].lower().strip()
+
+    # Create or update the node
+    node = network.get_node(word)
+    if node is None:
+        node = WordNode(
+            word=word,
+            level=tool_input.get("level", ""),
+            pos=tool_input.get("pos", ""),
+            theme=tool_input.get("theme", ""),
+        )
+    else:
+        if tool_input.get("level"):
+            node.level = tool_input["level"]
+        if tool_input.get("pos"):
+            node.pos = tool_input["pos"]
+        if tool_input.get("theme"):
+            node.theme = tool_input["theme"]
+
+    if tool_input.get("family_root"):
+        node.family_root = tool_input["family_root"]
+    if tool_input.get("note_id"):
+        node.note_id = tool_input["note_id"]
+    node.in_deck = True
+
+    network.add_word(node)
+
+    # Add connections
+    connections_added = 0
+    for conn_data in tool_input.get("connections", []):
+        conn_type = conn_data["type"]
+        target = conn_data["target"].lower().strip()
+        strength = conn_data.get("strength", 1.0)
+        network.add_connection(word, target, conn_type, strength)
+        connections_added += 1
+
+    # Add collocations (V5)
+    collocations_added = 0
+    for coll_data in tool_input.get("collocations", []):
+        network.add_collocation(
+            word,
+            phrase=coll_data["phrase"],
+            translation=coll_data.get("translation", ""),
+        )
+        collocations_added += 1
+
+    network.save()
+
+    parts = [f"Network updated: '{word}'"]
+    if connections_added:
+        parts.append(f"{connections_added} connection(s)")
+    if collocations_added:
+        parts.append(f"{collocations_added} collocation(s)")
+    parts.append(f"Network size: {network.word_count} words")
+
+    return " | ".join(parts)
+
+
+@handler("show_word_connections")
+def handle_show_word_connections(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    """V1: Show all connections for a word."""
+    from .word_network import WordNetwork, ensure_default_disambiguation
+
+    network = WordNetwork()
+    network.load()
+    ensure_default_disambiguation(network)
+
+    word = tool_input["word"].lower().strip()
+    node = network.get_node(word)
+
+    if not node:
+        return f"'{word}' not found in the vocabulary network. Add it first with update_word_network."
+
+    lines = [
+        f"Word: {node.word}",
+        f"Level: {node.level or 'unknown'} | POS: {node.pos or 'unknown'} | Theme: {node.theme or 'unknown'}",
+        f"In deck: {'Yes' if node.in_deck else 'No'}",
+    ]
+
+    if node.family_root:
+        lines.append(f"Family root: {node.family_root}")
+
+    if node.connections:
+        lines.append(f"\nConnections ({len(node.connections)}):")
+        by_type: dict[str, list] = {}
+        for conn in node.connections:
+            by_type.setdefault(conn.connection_type, []).append(conn)
+        for conn_type, conns in sorted(by_type.items()):
+            words = ", ".join(c.target_word for c in conns)
+            lines.append(f"  {conn_type}: {words}")
+    else:
+        lines.append("\nNo connections yet.")
+
+    if node.collocations:
+        lines.append(f"\nCollocations ({len(node.collocations)}):")
+        for coll in node.collocations:
+            phrase = coll.get("phrase", "")
+            trans = coll.get("translation", "")
+            extra = f" = {trans}" if trans else ""
+            lines.append(f"  - {phrase}{extra}")
+
+    if node.disambiguation_group:
+        lines.append(f"\nDisambiguation group: {node.disambiguation_group}")
+
+    return "\n".join(lines)
+
+
+@handler("get_morphological_family")
+def handle_get_morphological_family(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    """V3: Find morphological relatives of a word."""
+    from .word_network import WordNetwork, get_morphological_family, \
+        ensure_default_disambiguation
+
+    network = WordNetwork()
+    network.load()
+    ensure_default_disambiguation(network)
+
+    word = tool_input["word"].lower().strip()
+    result = get_morphological_family(word, network)
+
+    lines = [f"Morphological family for '{word}':", ""]
+
+    if result["family"]:
+        for member in result["family"]:
+            tag = f"word::{member}"
+            cards = anki.search_cards(f'tag:"{tag}"', limit=1)
+            status = "KNOWN" if cards else "NEW"
+            lines.append(f"  [{status}] {member}")
+    else:
+        lines.append("  No morphological relatives found.")
+
+    if result["patterns_matched"]:
+        lines.append(f"\nPatterns: {', '.join(result['patterns_matched'][:5])}")
+
+    if result["network_family"]:
+        lines.append(f"Network family: {', '.join(result['network_family'])}")
+
+    new_words = []
+    for member in result["family"]:
+        tag = f"word::{member}"
+        cards = anki.search_cards(f'tag:"{tag}"', limit=1)
+        if not cards:
+            new_words.append(member)
+
+    if new_words:
+        lines.append(f"\n{len(new_words)} new word(s) to learn: {', '.join(new_words[:10])}")
+        lines.append("Want me to create Anki cards for any of these?")
+
+    return "\n".join(lines)
+
+
+@handler("get_disambiguation_practice")
+def handle_get_disambiguation_practice(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    """V4: Get a disambiguation practice exercise."""
+    from .word_network import WordNetwork, ensure_default_disambiguation
+
+    network = WordNetwork()
+    network.load()
+    ensure_default_disambiguation(network)
+
+    pair_id = tool_input["pair"]
+    pair = network._disambiguation.get(pair_id)
+
+    if not pair:
+        available = ", ".join(sorted(network._disambiguation.keys()))
+        return f"Pair '{pair_id}' not found. Available pairs: {available}"
+
+    words_str = " / ".join(pair.words)
+
+    lines = [
+        f"DISAMBIGUATION PRACTICE: {words_str}",
+        f"Pair: {pair.pair_id} | Category: {pair.category}",
+        f"Practice count: {pair.practice_count} | Errors: {pair.error_counts or 'none'}",
+        "",
+        "INSTRUCTIONS FOR DISAMBIGUATION PRACTICE:",
+        f"Generate 5 fill-in-the-blank sentences where the user must choose between: {words_str}",
+        "",
+        "For each sentence:",
+        f"1. Write a Spanish sentence with a blank where one of [{words_str}] should go",
+        "2. Provide the correct answer",
+        "3. Explain WHY that word is correct and why the others are wrong",
+        "",
+        "RULES:",
+        "- Present one sentence at a time",
+        "- Wait for the user's answer before revealing the correct one",
+        "- Keep score: correct/total",
+        "- After all 5, show summary and call log_disambiguation_result",
+        f"- Use log_disambiguation_result with pair_id='{pair_id}'",
+        "",
+        "START: Present the first sentence now.",
+    ]
+
+    return "\n".join(lines)
+
+
+@handler("show_disambiguation_pairs")
+def handle_show_disambiguation_pairs(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    """V4: List all disambiguation pairs with stats."""
+    from .word_network import WordNetwork, ensure_default_disambiguation
+
+    network = WordNetwork()
+    network.load()
+    ensure_default_disambiguation(network)
+
+    pairs = network.get_disambiguation_pairs()
+    if not pairs:
+        return "No disambiguation pairs configured."
+
+    lines = [f"Disambiguation Pairs ({len(pairs)}):", ""]
+
+    for pair in sorted(pairs, key=lambda p: p.pair_id):
+        words = " / ".join(pair.words)
+        practiced = f"practiced {pair.practice_count}x" if pair.practice_count else "not practiced"
+        errors = ""
+        if pair.error_counts:
+            err_parts = [f"{w}: {c}" for w, c in pair.error_counts.items()]
+            errors = f" | errors: {', '.join(err_parts)}"
+        lines.append(f"  {pair.pair_id}: {words} ({practiced}{errors})")
+
+    lines.append("")
+    lines.append("Use get_disambiguation_practice(pair='pair-id') to practice a pair.")
+
+    return "\n".join(lines)
+
+
+@handler("log_disambiguation_result")
+def handle_log_disambiguation_result(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    """V4: Log disambiguation practice results."""
+    from .word_network import WordNetwork, ensure_default_disambiguation
+
+    network = WordNetwork()
+    network.load()
+    ensure_default_disambiguation(network)
+
+    pair_id = tool_input["pair_id"]
+    correct = tool_input["correct"]
+    total = tool_input["total"]
+    confused_words = tool_input.get("confused_words", [])
+
+    pair = network._disambiguation.get(pair_id)
+    if not pair:
+        return f"Pair '{pair_id}' not found."
+
+    network.record_disambiguation_practice(pair_id)
+
+    for confused in confused_words:
+        network.record_disambiguation_error(pair_id, confused)
+
+    network.save()
+
+    score = (correct / total * 100) if total > 0 else 0
+    return (
+        f"Disambiguation results logged for '{pair_id}':\n"
+        f"  Score: {correct}/{total} ({score:.0f}%)\n"
+        f"  Total practices: {pair.practice_count}\n"
+        f"  Error counts: {pair.error_counts or 'none'}"
+    )
+
+
+@handler("get_semantic_field_progress")
+def handle_get_semantic_field_progress(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    """V9: Show vocabulary progress per semantic/thematic field."""
+    from .cefr import CEFRData
+
+    theme = tool_input.get("theme")
+
+    cefr_data = CEFRData()
+    cefr_data.load()
+
+    all_categories: dict[str, dict] = {}
+
+    for level_key in ("A1", "A2", "B1", "B2", "C1", "C2"):
+        words = cefr_data.get_words_for_level(level_key)
+        for w in words:
+            cat = w.category
+            if theme and cat.lower() != theme.lower():
+                continue
+            if cat not in all_categories:
+                all_categories[cat] = {"total": 0, "known": 0, "words": [], "known_words": []}
+            all_categories[cat]["total"] += 1
+            all_categories[cat]["words"].append(w.word)
+
+    for cat, data in all_categories.items():
+        for word_str in data["words"]:
+            tag = f"word::{word_str}"
+            cards = anki.search_cards(f'tag:"{tag}"', limit=1)
+            if cards:
+                data["known"] += 1
+                data["known_words"].append(word_str)
+
+    if not all_categories:
+        if theme:
+            return f"Theme '{theme}' not found in CEFR data."
+        return "No CEFR data available."
+
+    lines = []
+    if theme:
+        lines.append(f"Semantic Field Progress: {theme}")
+    else:
+        lines.append("Semantic Field Progress (all themes)")
+    lines.append("=" * 50)
+    lines.append("")
+
+    for cat in sorted(all_categories.keys()):
+        data = all_categories[cat]
+        total = data["total"]
+        known = data["known"]
+        pct = (known / total * 100) if total > 0 else 0
+        bar_len = 15
+        filled = int(bar_len * pct / 100)
+        bar = "#" * filled + "-" * (bar_len - filled)
+        lines.append(f"  {cat}: {known}/{total} [{bar}] {pct:.0f}%")
+
+    total_all = sum(d["total"] for d in all_categories.values())
+    known_all = sum(d["known"] for d in all_categories.values())
+    pct_all = (known_all / total_all * 100) if total_all > 0 else 0
+    lines.append(f"\n  Overall: {known_all}/{total_all} ({pct_all:.0f}%)")
+
+    if theme and len(all_categories) == 1:
+        cat_data = list(all_categories.values())[0]
+        unknown = [w for w in cat_data["words"] if w not in cat_data["known_words"]]
+        if unknown:
+            lines.append(f"\n  Unknown words ({len(unknown)}): {', '.join(unknown[:20])}")
+            if len(unknown) > 20:
+                lines.append(f"  ... and {len(unknown) - 20} more")
+
+    return "\n".join(lines)
+
+
+@handler("show_connection_map")
+def handle_show_connection_map(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    """V10: Display ASCII connection map for a word."""
+    from .word_network import WordNetwork, build_connection_map, \
+        ensure_default_disambiguation
+
+    network = WordNetwork()
+    network.load()
+    ensure_default_disambiguation(network)
+
+    word = tool_input["word"].lower().strip()
+    return build_connection_map(word, network)
+
+
+@handler("start_pair_review")
+def handle_start_pair_review(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    """V8: Start a pair-based review session."""
+    from .word_network import WordNetwork, ensure_default_disambiguation
+
+    network = WordNetwork()
+    network.load()
+    ensure_default_disambiguation(network)
+
+    pair_type = tool_input.get("pair_type", "all")
+    count = tool_input.get("count", 5)
+
+    pairs: list[tuple[str, str, str]] = []
+    seen: set[tuple[str, str]] = set()
+
+    for word_key, node in network._nodes.items():
+        for conn in node.connections:
+            if pair_type != "all" and conn.connection_type != pair_type:
+                continue
+            pair_key = tuple(sorted([word_key, conn.target_word]))
+            if pair_key not in seen:
+                seen.add(pair_key)
+                pairs.append((pair_key[0], pair_key[1], conn.connection_type))
+
+    if not pairs:
+        return f"No {pair_type} pairs found in the network. Add connections with update_word_network first."
+
+    import random
+    if len(pairs) > count:
+        pairs = random.sample(pairs, count)
+
+    lines = [
+        f"PAIR-BASED REVIEW: {len(pairs)} pair(s)",
+        f"Type filter: {pair_type}",
+        "",
+        "INSTRUCTIONS FOR PAIR REVIEW:",
+        "Present each pair together with their meanings and differences.",
+        "For each pair:",
+        "1. Show both words with their meanings",
+        "2. Explain the key difference",
+        "3. Give one sentence using each word",
+        "4. Ask the user to create a sentence distinguishing them",
+        "5. Provide feedback on the user's sentence",
+        "",
+        "PAIRS TO REVIEW:",
+    ]
+
+    for i, (w1, w2, conn_type) in enumerate(pairs, 1):
+        lines.append(f"  {i}. {w1} <-{conn_type}-> {w2}")
+
+    lines.append("")
+    lines.append("START: Present the first pair now.")
+
+    return "\n".join(lines)
+
+
+@handler("get_network_study_suggestions")
+def handle_get_network_study_suggestions(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    """V11: Get study suggestions based on network connections."""
+    from .word_network import WordNetwork, ensure_default_disambiguation
+
+    network = WordNetwork()
+    network.load()
+    ensure_default_disambiguation(network)
+
+    recently_reviewed = tool_input["recently_reviewed"]
+    limit = tool_input.get("limit", 5)
+
+    suggestions = network.get_network_suggestions(recently_reviewed, limit)
+
+    if not suggestions:
+        return (
+            "No network-based suggestions available. "
+            "The network needs more connections. Use update_word_network after adding cards."
+        )
+
+    lines = [
+        f"Network-based study suggestions ({len(suggestions)}):",
+        "",
+        "These words are connected to your recently reviewed words:",
+        "",
+    ]
+
+    for i, word in enumerate(suggestions, 1):
+        node = network.get_node(word)
+        level = node.level if node else "?"
+        theme = node.theme if node else "?"
+        connected_to = []
+        for reviewed in recently_reviewed:
+            reviewed_node = network.get_node(reviewed)
+            if reviewed_node:
+                for conn in reviewed_node.connections:
+                    if conn.target_word == word:
+                        connected_to.append(f"{reviewed} ({conn.connection_type})")
+                        break
+        conn_str = ", ".join(connected_to[:3]) if connected_to else "network"
+        lines.append(f"  {i}. {word} [{level}] ({theme}) -- via {conn_str}")
+
+    lines.append("")
+    lines.append("Study these to reinforce your vocabulary network.")
+
+    return "\n".join(lines)

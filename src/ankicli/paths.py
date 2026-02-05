@@ -28,6 +28,12 @@ CEFR_GRAMMAR_DIR = CEFR_DATA_DIR / "grammar"
 # CEFR progress cache
 CEFR_CACHE_FILE = DATA_DIR / "cefr_progress_cache.json"
 
+# Word network
+WORD_NETWORK_FILE = DATA_DIR / "word_network.json"
+
+# Disambiguation pairs
+DISAMBIGUATION_FILE = DATA_DIR / "disambiguation.json"
+
 # Error journal
 ERROR_JOURNAL_FILE = DATA_DIR / "error_journal.json"
 
@@ -36,6 +42,12 @@ DAILY_CHALLENGE_FILE = DATA_DIR / "daily_challenge.json"
 
 # Chat input history (prompt_toolkit)
 HISTORY_FILE = DATA_DIR / "chat_history"
+
+# Study streaks
+STREAKS_FILE = DATA_DIR / "streaks.json"
+
+# Time-based progress history
+PROGRESS_HISTORY_FILE = DATA_DIR / "progress_history.json"
 
 
 def ensure_data_dir() -> None:
