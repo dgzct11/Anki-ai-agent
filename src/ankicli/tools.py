@@ -1025,6 +1025,10 @@ ANKI_TOOLS = [
                 "per_card_ease": {
                     "type": "object",
                     "description": "Optional per-card ease overrides. Keys are card IDs (strings), values are ease ratings (1-4). Cards not listed here use the default ease."
+                },
+                "card_words": {
+                    "type": "object",
+                    "description": "Optional mapping of card ID (string) to the Spanish word on that card. Used for clearer confirmation messages."
                 }
             },
             "required": ["card_ids"]

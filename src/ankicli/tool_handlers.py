@@ -1809,6 +1809,7 @@ def handle_mark_cards_reviewed(anki: AnkiClient, tool_input: dict, **ctx) -> str
     card_ids = tool_input["card_ids"]
     default_ease = tool_input.get("ease", 3)
     per_card_ease = tool_input.get("per_card_ease", {})
+    card_words = tool_input.get("card_words", {})
 
     if default_ease not in (1, 2, 3, 4):
         return f"Invalid ease rating: {default_ease}. Must be 1 (Again), 2 (Hard), 3 (Good), or 4 (Easy)."
@@ -1829,7 +1830,8 @@ def handle_mark_cards_reviewed(anki: AnkiClient, tool_input: dict, **ctx) -> str
             success = anki.answer_card(int(cid), card_ease)
             if success:
                 succeeded += 1
-                details.append(f"  {cid}: {ease_labels.get(card_ease, '?')}")
+                word = card_words.get(str(cid), str(cid))
+                details.append(f"  {word}: {ease_labels.get(card_ease, '?')}")
             else:
                 failed += 1
         except Exception:

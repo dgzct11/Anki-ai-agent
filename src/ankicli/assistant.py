@@ -463,7 +463,7 @@ CRITICAL: After ANY practice session (translation, quiz, conversation, pair revi
 3. ASK the user: "Want to mark these with my suggestions, or change any ratings?"
 4. Let the user override individual ratings (e.g., "mark comprar as Easy instead")
 5. NEVER auto-mark cards - always wait for explicit user confirmation
-6. If confirmed, use mark_cards_reviewed with per_card_ease for any overrides
+6. If confirmed, use mark_cards_reviewed with per_card_ease for any overrides and card_words mapping card IDs to their Spanish words
 
 Example display format:
   Word        | Suggested | Again  | Hard   | Good   | Easy
