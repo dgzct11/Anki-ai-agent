@@ -388,7 +388,8 @@ class AnkiClient:
         """Estimate the next review intervals for each ease button.
 
         Uses cardsInfo to get current interval and ease factor, then
-        estimates what each button would do.
+        estimates what each button would do. Matches Anki's actual
+        scheduling behavior as closely as possible.
 
         Args:
             card_id: The card/note ID.
@@ -409,44 +410,75 @@ class AnkiClient:
         except (AnkiConnectError, IndexError):
             return {"again": "?", "hard": "?", "good": "?", "easy": "?"}
 
-        interval = info.get("interval", 0)  # current interval in days
+        interval = info.get("interval", 0)  # current interval in days (negative = seconds)
         factor = info.get("factor", 2500) / 1000  # ease factor (e.g., 2.5)
         card_type = info.get("type", 0)  # 0=new, 1=learning, 2=review, 3=relearn
 
-        def _format_interval(days: float) -> str:
-            if days < 1:
-                minutes = max(1, int(days * 24 * 60))
-                return f"{minutes} min"
-            elif days < 30:
-                d = max(1, round(days))
-                return f"{d} day{'s' if d != 1 else ''}"
-            elif days < 365:
-                m = round(days / 30)
-                return f"{m} month{'s' if m != 1 else ''}"
-            else:
-                y = round(days / 365, 1)
-                return f"{y} year{'s' if y != 1 else ''}"
-
         if card_type in (0, 1, 3):  # new, learning, or relearning
             return {
-                "again": "1 min",
+                "again": "<1 min",
                 "hard": "6 min",
                 "good": "10 min",
                 "easy": "4 days",
             }
 
         # Review card: estimate based on current interval and ease factor
-        again_ivl = max(1, interval * 0.1)  # lapse: ~10% of current
+        # Again: card lapses -> enters relearning (steps are in minutes, not days)
+        # Anki default relearn steps: [10 min]. The "new interval" after lapse
+        # is typically 0% of original (configurable), so the card restarts.
+        # The immediate next review is the first relearn step.
+        again_str = "10 min"
+
+        # Hard: interval * 1.2 (but at least current interval)
         hard_ivl = max(1, interval * 1.2)
+
+        # Good: interval * ease_factor
         good_ivl = max(1, interval * factor)
+
+        # Easy: interval * ease_factor * easy_bonus (default 1.3)
         easy_ivl = max(1, interval * factor * 1.3)
 
         return {
-            "again": _format_interval(again_ivl),
+            "again": again_str,
             "hard": _format_interval(hard_ivl),
             "good": _format_interval(good_ivl),
             "easy": _format_interval(easy_ivl),
         }
+
+
+def _format_interval(days: float) -> str:
+    """Format a day count as a human-readable interval string.
+
+    Handles Anki-style intervals including sub-minute, minute, day,
+    month, and year ranges.
+    """
+    if days < 0:
+        # Negative interval means seconds in Anki
+        seconds = abs(days)
+        if seconds < 60:
+            return "<1 min"
+        minutes = int(seconds / 60)
+        return f"{minutes} min"
+    elif days < 1.0 / 24 / 60:
+        # Less than 1 minute
+        return "<1 min"
+    elif days < 1.0 / 24:
+        # Less than 1 hour, show minutes
+        minutes = max(1, int(days * 24 * 60))
+        return f"{minutes} min"
+    elif days < 1:
+        # Less than 1 day, show hours
+        hours = max(1, round(days * 24))
+        return f"{hours} hour{'s' if hours != 1 else ''}"
+    elif days < 30:
+        d = max(1, round(days))
+        return f"{d} day{'s' if d != 1 else ''}"
+    elif days < 365:
+        m = max(1, round(days / 30))
+        return f"{m} month{'s' if m != 1 else ''}"
+    else:
+        y = round(days / 365, 1)
+        return f"{y} year{'s' if y != 1 else ''}"
 
     def answer_card(self, card_id: int, ease: int) -> bool:
         """Mark a card as reviewed in Anki with the given ease rating.
