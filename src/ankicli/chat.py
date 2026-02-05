@@ -31,6 +31,19 @@ from .learning_summary import (
     LEVEL_DESCRIPTIONS,
 )
 from .paths import DATA_DIR, HISTORY_FILE
+from .grammar_quiz import (
+    GRAMMAR_TOPICS,
+    QUESTION_TYPE_LABELS,
+    QuestionType,
+    get_topic_mastery,
+    get_quiz_history,
+)
+from .translation_practice import (
+    PracticeSession,
+    PracticeDirection,
+    FeedbackLevel,
+    feedback_to_ease,
+)
 
 # Style for prompt_toolkit
 PROMPT_STYLE = Style.from_dict({
@@ -223,6 +236,45 @@ def _summarize_tool_input(tool_name: str, input_data: dict) -> str:
     elif tool_name == "remove_tool_note":
         return f"[{input_data.get('tool_name', '')}]"
 
+    elif tool_name == "start_translation_practice":
+        deck = input_data.get("deck_name", "")
+        count = input_data.get("count", 10)
+        direction = input_data.get("direction", "en_to_es")
+        return f"deck='{deck}', {count}q, {direction}"
+
+    elif tool_name == "log_practice_session":
+        ptype = input_data.get("practice_type", "")
+        attempted = input_data.get("phrases_attempted", 0)
+        correct = input_data.get("correct", 0)
+        return f"{ptype}: {correct}/{attempted} correct"
+
+    elif tool_name == "start_grammar_quiz":
+        topic = input_data.get("topic", "")
+        level = input_data.get("level", "")
+        count = input_data.get("count", 5)
+        return f"'{topic}' ({level}), {count}q"
+
+    elif tool_name == "log_quiz_results":
+        topic = input_data.get("topic", "")
+        attempted = input_data.get("questions_attempted", 0)
+        correct = input_data.get("correct", 0)
+        return f"'{topic}': {correct}/{attempted} correct"
+
+    elif tool_name == "get_error_patterns":
+        return "listing error patterns"
+
+    elif tool_name == "log_error":
+        error_type = input_data.get("error_type", "")
+        example = input_data.get("example", "")
+        if len(example) > 30:
+            example = example[:30] + "..."
+        return f"{error_type}: '{example}'"
+
+    elif tool_name == "start_conversation_sim":
+        scenario = input_data.get("scenario", "")
+        level = input_data.get("level", "")
+        return f"'{scenario}' ({level})"
+
     # Default handling for other tools
     parts = []
     for key, value in input_data.items():
@@ -236,6 +288,1081 @@ def _summarize_tool_input(tool_name: str, input_data: dict) -> str:
         else:
             parts.append(f"{key}={value}")
     return ", ".join(parts[:3])  # Limit to 3 key params
+
+
+def create_practice_question_panel(
+    question_num: int,
+    total: int,
+    phrase: str,
+    direction: PracticeDirection,
+    is_due: bool,
+    difficulty: str,
+) -> Panel:
+    """Create a styled panel for a practice question."""
+    content = Text()
+    content.append(f"Question {question_num}/{total}", style="bold")
+    if difficulty == "harder":
+        content.append("  [HARDER]", style="bold magenta")
+    elif difficulty == "easier":
+        content.append("  [EASIER]", style="bold yellow")
+    content.append("\n\n")
+
+    if direction == PracticeDirection.EN_TO_ES:
+        content.append("Translate to Spanish:\n", style="dim")
+    else:
+        content.append("Translate to English:\n", style="dim")
+
+    content.append(f"  {phrase}", style="bold white")
+
+    if is_due:
+        content.append("\n\n")
+        content.append("  (due for Anki review)", style="dim italic")
+
+    return Panel(
+        content,
+        title="[bold bright_blue]TRANSLATE[/bold bright_blue]",
+        border_style="bright_blue",
+        padding=(1, 2),
+    )
+
+
+def create_practice_feedback_panel(
+    feedback_level: FeedbackLevel,
+    feedback_text: str,
+    scores: dict[str, int],
+) -> Panel:
+    """Create a styled feedback panel after answer evaluation."""
+    if feedback_level == FeedbackLevel.CORRECT:
+        border = "green"
+        title = "[bold green]CORRECT[/bold green]"
+        icon = "+"
+    elif feedback_level == FeedbackLevel.PARTIAL:
+        border = "yellow"
+        title = "[bold yellow]PARTIAL[/bold yellow]"
+        icon = "~"
+    else:
+        border = "red"
+        title = "[bold red]INCORRECT[/bold red]"
+        icon = "x"
+
+    content = Text()
+    content.append(f" {icon} ", style=f"bold {border}")
+    content.append(feedback_text)
+    content.append("\n\n")
+
+    # Score breakdown
+    content.append("Scores: ", style="bold dim")
+    score_parts = []
+    for label, score in scores.items():
+        if score >= 3:
+            style = "green"
+        elif score >= 2:
+            style = "yellow"
+        else:
+            style = "red"
+        score_parts.append((f"{label}:{score}/4", style))
+
+    for i, (text, style) in enumerate(score_parts):
+        if i > 0:
+            content.append("  ", style="dim")
+        content.append(text, style=style)
+
+    return Panel(
+        content,
+        title=title,
+        border_style=border,
+        padding=(0, 2),
+    )
+
+
+def create_practice_summary_panel(session: PracticeSession) -> Panel:
+    """Create a session summary panel."""
+    content = Text()
+
+    # Score bar
+    content.append("SCORE\n", style="bold")
+    score_pct = session.score_percent
+    bar_width = 30
+    filled = int(bar_width * score_pct / 100)
+    empty = bar_width - filled
+    bar = "\u2588" * filled + "\u2591" * empty
+
+    if score_pct >= 80:
+        color = "green"
+    elif score_pct >= 60:
+        color = "yellow"
+    else:
+        color = "red"
+
+    content.append("  [", style="dim")
+    content.append(bar, style=color)
+    content.append("] ", style="dim")
+    content.append(f"{score_pct:.0f}%\n\n", style=f"bold {color}")
+
+    # Counts
+    content.append(f"  Correct:   {session.correct_count}", style="green")
+    content.append(f"  Partial: {session.partial_count}", style="yellow")
+    content.append(f"  Wrong:   {session.incorrect_count}\n", style="red")
+
+    # Reviewed
+    reviewed = sum(1 for r in session.results if r.marked_reviewed)
+    if reviewed > 0:
+        content.append(f"  Anki reviews marked: {reviewed}\n", style="cyan")
+
+    # Weak words
+    weak = session.get_weak_words()
+    if weak:
+        content.append("\n")
+        content.append("  Words to review: ", style="bold dim")
+        content.append(", ".join(weak[:10]), style="yellow")
+        if len(weak) > 10:
+            content.append(f" (+{len(weak) - 10} more)", style="dim")
+
+    return Panel(
+        content,
+        title="[bold cyan]SESSION COMPLETE[/bold cyan]",
+        border_style="cyan",
+        box=box.DOUBLE,
+        padding=(1, 2),
+    )
+
+
+def create_practice_commands_panel() -> Panel:
+    """Create a small panel showing available practice commands."""
+    content = Text()
+    content.append("/skip", style="cyan")
+    content.append(" skip  ", style="dim")
+    content.append("/hint", style="cyan")
+    content.append(" hint  ", style="dim")
+    content.append("/score", style="cyan")
+    content.append(" scores  ", style="dim")
+    content.append("/quit", style="cyan")
+    content.append(" end session", style="dim")
+    return Panel(content, border_style="dim", box=box.ROUNDED, padding=(0, 1))
+
+
+def run_practice_loop(
+    console: Console,
+    assistant: AnkiAssistant,
+    session: PracticeSession,
+    prompt_session: PromptSession,
+) -> None:
+    """Run the interactive practice sub-loop.
+
+    This takes over the terminal with a question-answer-feedback cycle,
+    sending user translations through the assistant for Claude to evaluate.
+    """
+    console.print()
+    console.print(create_practice_commands_panel())
+    console.print()
+
+    while not session.is_finished:
+        card = session.current_card
+        if card is None:
+            break
+
+        # Determine the phrase to show
+        if session.direction == PracticeDirection.EN_TO_ES:
+            phrase = card.front
+        else:
+            phrase = card.back
+
+        # Show question panel
+        console.print(create_practice_question_panel(
+            question_num=session.current_index + 1,
+            total=session.total_questions,
+            phrase=phrase,
+            direction=session.direction,
+            is_due=card.is_due,
+            difficulty=session.difficulty_level,
+        ))
+
+        # Get user answer
+        try:
+            answer = prompt_session.prompt(
+                [("class:prompt", "Your translation: ")],
+            ).strip()
+        except (KeyboardInterrupt, EOFError):
+            answer = "/quit"
+
+        if not answer:
+            continue
+
+        # Handle practice commands
+        if answer.lower() == "/quit":
+            console.print("[dim]Ending practice session...[/dim]")
+            break
+
+        if answer.lower() == "/skip":
+            from .translation_practice import PracticeResult
+            session.record_result(PracticeResult(
+                card_id=card.card_id,
+                front=card.front,
+                back=card.back,
+                user_answer="(skipped)",
+                feedback_level=FeedbackLevel.INCORRECT,
+                feedback_text="Skipped",
+            ))
+            console.print("[dim]Skipped.[/dim]\n")
+            continue
+
+        if answer.lower() == "/score":
+            if session.results:
+                console.print(f"[bold]Current score:[/bold] {session.correct_count}/{session.questions_answered} correct ({session.score_percent:.0f}%)")
+            else:
+                console.print("[dim]No answers yet.[/dim]")
+            console.print()
+            continue
+
+        if answer.lower() == "/hint":
+            # Show first letters of the answer
+            if session.direction == PracticeDirection.EN_TO_ES:
+                hint_source = card.back
+            else:
+                hint_source = card.front
+            # Strip HTML for hint
+            import re
+            clean = re.sub(r'<[^>]+>', ' ', hint_source).strip()
+            # Show first 3 characters
+            hint = clean[:3] + "..." if len(clean) > 3 else clean
+            console.print(f"[dim]Hint: {hint}[/dim]\n")
+            continue
+
+        # Send answer to Claude for evaluation
+        # Build the evaluation prompt with the card data
+        if session.direction == PracticeDirection.EN_TO_ES:
+            eval_prompt = (
+                f"[PRACTICE MODE - EVALUATE TRANSLATION]\n"
+                f"Question {session.current_index + 1}/{session.total_questions}\n"
+                f"English phrase: {card.front}\n"
+                f"Expected Spanish (from card back): {card.back}\n"
+                f"User's translation: {answer}\n"
+                f"Difficulty: {session.difficulty_level}\n"
+                f"Card is due for review: {card.is_due}\n\n"
+                f"Evaluate the user's translation on these criteria (score each 0-4):\n"
+                f"1. Meaning - Does it convey the correct meaning?\n"
+                f"2. Grammar - Is it grammatically correct?\n"
+                f"3. Naturalness - Does it sound natural to a native speaker?\n"
+                f"4. Vocabulary - Did they use appropriate vocabulary?\n\n"
+                f"Give brief, encouraging feedback. If wrong, show the correct answer.\n"
+                f"If the card is due for Anki review, ask: 'This word is due for review. Mark as reviewed in Anki? (y/n)'"
+            )
+        else:
+            eval_prompt = (
+                f"[PRACTICE MODE - EVALUATE TRANSLATION]\n"
+                f"Question {session.current_index + 1}/{session.total_questions}\n"
+                f"Spanish phrase: {card.back}\n"
+                f"Expected English (from card front): {card.front}\n"
+                f"User's translation: {answer}\n"
+                f"Difficulty: {session.difficulty_level}\n"
+                f"Card is due for review: {card.is_due}\n\n"
+                f"Evaluate the user's translation (score each 0-4):\n"
+                f"1. Meaning  2. Grammar  3. Naturalness  4. Vocabulary\n\n"
+                f"Give brief, encouraging feedback.\n"
+                f"If the card is due for Anki review, ask: 'This word is due for review. Mark as reviewed in Anki? (y/n)'"
+            )
+
+        # Stream Claude's evaluation
+        response_text = ""
+        spinner_active = False
+        status_ctx = None
+
+        try:
+            for event in assistant.chat(eval_prompt):
+                if event["type"] == "text_delta":
+                    if not spinner_active:
+                        status_ctx = console.status("[cyan]Evaluating...[/cyan]", spinner="dots")
+                        status_ctx.start()
+                        spinner_active = True
+                    response_text += event["content"]
+                elif event["type"] == "tool_use":
+                    if spinner_active and status_ctx:
+                        status_ctx.stop()
+                        spinner_active = False
+                    console.print(create_tool_panel(event["name"], event["input"]))
+                elif event["type"] == "tool_result":
+                    console.print(create_result_panel(event["name"], event["result"]))
+                elif event["type"] == "context_status":
+                    pass  # Suppress context bar during practice
+
+            if spinner_active and status_ctx:
+                status_ctx.stop()
+        except Exception as e:
+            if spinner_active and status_ctx:
+                status_ctx.stop()
+            console.print(f"[red]Error during evaluation: {e}[/red]")
+            response_text = "Could not evaluate. Moving to next question."
+
+        # Parse Claude's evaluation from the response text
+        # Try to extract scores from the response
+        import re
+        meaning = grammar = naturalness = vocabulary = 2  # Default middle scores
+        feedback_level = FeedbackLevel.PARTIAL
+
+        # Look for score patterns like "Meaning: 4/4" or "meaning: 3"
+        score_patterns = [
+            (r'[Mm]eaning[:\s]+(\d)/4', 'meaning'),
+            (r'[Gg]rammar[:\s]+(\d)/4', 'grammar'),
+            (r'[Nn]aturalness[:\s]+(\d)/4', 'naturalness'),
+            (r'[Vv]ocabulary[:\s]+(\d)/4', 'vocabulary'),
+        ]
+        for pattern, key in score_patterns:
+            match = re.search(pattern, response_text)
+            if match:
+                val = int(match.group(1))
+                if key == 'meaning':
+                    meaning = val
+                elif key == 'grammar':
+                    grammar = val
+                elif key == 'naturalness':
+                    naturalness = val
+                elif key == 'vocabulary':
+                    vocabulary = val
+
+        # Determine feedback level from scores
+        total = meaning + grammar + naturalness + vocabulary
+        if total >= 14:
+            feedback_level = FeedbackLevel.CORRECT
+        elif total >= 8:
+            feedback_level = FeedbackLevel.PARTIAL
+        else:
+            feedback_level = FeedbackLevel.INCORRECT
+
+        # Show feedback panel
+        console.print()
+        console.print(create_practice_feedback_panel(
+            feedback_level=feedback_level,
+            feedback_text=response_text[:300] if len(response_text) > 300 else response_text,
+            scores={
+                "Meaning": meaning,
+                "Grammar": grammar,
+                "Natural": naturalness,
+                "Vocab": vocabulary,
+            },
+        ))
+
+        # Record result
+        from .translation_practice import PracticeResult
+        result = PracticeResult(
+            card_id=card.card_id,
+            front=card.front,
+            back=card.back,
+            user_answer=answer,
+            feedback_level=feedback_level,
+            feedback_text=response_text,
+            meaning_score=meaning,
+            grammar_score=grammar,
+            naturalness_score=naturalness,
+            vocabulary_score=vocabulary,
+            is_due_for_review=card.is_due,
+        )
+
+        # If card is due, ask about marking reviewed
+        if card.is_due:
+            try:
+                import re as _re
+                # Clean the word from the back field for display
+                clean_word = _re.sub(r'<[^>]+>', '', card.back).strip()[:40]
+                review_answer = prompt_session.prompt(
+                    [("class:prompt", f"Mark '{clean_word}' as reviewed in Anki? (y/n): ")],
+                ).strip().lower()
+
+                if review_answer in ("y", "yes"):
+                    ease = feedback_to_ease(feedback_level)
+                    try:
+                        success = assistant.anki.answer_card(int(card.card_id), ease)
+                        if success:
+                            result.marked_reviewed = True
+                            console.print("[green]Marked as reviewed in Anki.[/green]")
+                        else:
+                            console.print("[yellow]Could not mark card (AnkiConnect may not support answerCards).[/yellow]")
+                    except Exception as e:
+                        console.print(f"[yellow]Could not mark reviewed: {e}[/yellow]")
+                else:
+                    console.print("[dim]Skipped Anki review marking.[/dim]")
+            except (KeyboardInterrupt, EOFError):
+                pass
+
+        session.record_result(result)
+        console.print()
+
+    # Show session summary
+    if session.results:
+        console.print(create_practice_summary_panel(session))
+
+        # Log the session via Claude
+        summary = session.get_summary_dict()
+        log_prompt = (
+            f"[PRACTICE SESSION COMPLETE - LOG IT]\n"
+            f"Please call log_practice_session with these results:\n"
+            f"practice_type: translation\n"
+            f"direction: {summary['direction']}\n"
+            f"deck_name: {summary['deck_name']}\n"
+            f"phrases_attempted: {summary['total_questions']}\n"
+            f"correct: {summary['correct']}\n"
+            f"partial: {summary['partial']}\n"
+            f"incorrect: {summary['incorrect']}\n"
+            f"score_percent: {summary['score_percent']}\n"
+            f"weak_words: {summary['weak_words']}\n\n"
+            f"Also briefly summarize the practice session results to the user."
+        )
+
+        # Run the logging through the assistant
+        response_text = ""
+        try:
+            for event in assistant.chat(log_prompt):
+                if event["type"] == "text_delta":
+                    response_text += event["content"]
+                elif event["type"] == "tool_use":
+                    console.print(create_tool_panel(event["name"], event["input"]))
+                elif event["type"] == "tool_result":
+                    console.print(create_result_panel(event["name"], event["result"]))
+
+            if response_text.strip():
+                from rich.markdown import Markdown as Md
+                console.print("[bold cyan]Assistant:[/bold cyan]")
+                console.print(Md(response_text))
+        except Exception as e:
+            console.print(f"[yellow]Could not log session: {e}[/yellow]")
+
+    console.print()
+
+
+# ---------------------------------------------------------------------------
+# Grammar quiz UI
+# ---------------------------------------------------------------------------
+
+def create_quiz_topic_panel(level: str) -> Panel:
+    """Create a topic selection panel for the grammar quiz."""
+    topics = GRAMMAR_TOPICS.get(level, [])
+    mastery = get_topic_mastery()
+
+    content = Text()
+    content.append(f"Grammar Topics - {level}\n\n", style="bold")
+
+    for i, topic in enumerate(topics, 1):
+        topic_data = mastery.get(topic)
+        if topic_data and topic_data.get("mastered"):
+            status = "[mastered]"
+            style = "green"
+        elif topic_data:
+            avg = topic_data.get("avg_score", 0)
+            status = f"[{avg:.0f}%]"
+            style = "yellow"
+        else:
+            status = "[new]"
+            style = "dim"
+
+        # Recommend topics that haven't been mastered
+        recommend = ""
+        if not topic_data or not topic_data.get("mastered"):
+            if not topic_data or topic_data.get("quizzed_count", 0) == 0:
+                recommend = "  [recommended]"
+
+        content.append(f"  {i:2}. ", style="cyan")
+        content.append(f"{topic:<45}", style=style)
+        content.append(f" {status}", style=style)
+        if recommend:
+            content.append(recommend, style="bold magenta")
+        content.append("\n")
+
+    content.append("\n")
+    content.append("Enter a number, topic name, or 'back' to cancel.", style="dim")
+
+    return Panel(
+        content,
+        title="[bold bright_blue]GRAMMAR QUIZ[/bold bright_blue]",
+        border_style="bright_blue",
+        padding=(1, 2),
+    )
+
+
+def create_quiz_question_panel(
+    question_num: int,
+    total: int,
+    question_text: str,
+    question_type: str,
+    options: list[str] | None = None,
+    instruction: str = "",
+) -> Panel:
+    """Create a styled panel for a quiz question."""
+    type_label = QUESTION_TYPE_LABELS.get(
+        QuestionType(question_type) if question_type in [qt.value for qt in QuestionType] else QuestionType.FILL_IN_BLANK,
+        question_type.replace("_", " ").title(),
+    )
+
+    content = Text()
+    content.append(f"Question {question_num}/{total}", style="bold")
+    content.append(f"  [{type_label}]", style="bold magenta")
+    content.append("\n\n")
+
+    if instruction:
+        content.append(f"{instruction}\n\n", style="dim italic")
+
+    content.append(f"  {question_text}", style="bold white")
+
+    if options:
+        content.append("\n\n")
+        for opt in options:
+            content.append(f"  {opt}\n", style="white")
+
+    # Determine border color by question type
+    type_colors = {
+        "fill_in_blank": "bright_blue",
+        "multiple_choice": "cyan",
+        "conjugation": "magenta",
+        "error_correction": "yellow",
+        "sentence_transformation": "bright_green",
+    }
+    border = type_colors.get(question_type, "bright_blue")
+
+    return Panel(
+        content,
+        title=f"[bold {border}]QUIZ[/bold {border}]",
+        border_style=border,
+        padding=(1, 2),
+    )
+
+
+def create_quiz_feedback_panel(correct: bool, feedback: str, correct_answer: str, user_answer: str) -> Panel:
+    """Create a feedback panel after answering a quiz question."""
+    if correct:
+        border = "green"
+        title = "[bold green]CORRECT[/bold green]"
+        icon = "+"
+    else:
+        border = "red"
+        title = "[bold red]INCORRECT[/bold red]"
+        icon = "x"
+
+    content = Text()
+    content.append(f" {icon} ", style=f"bold {border}")
+
+    if not correct:
+        content.append("Your answer: ", style="dim")
+        content.append(f"{user_answer}\n", style="red")
+        content.append("  Correct answer: ", style="dim")
+        content.append(f"{correct_answer}\n\n", style="green")
+
+    content.append(feedback)
+
+    return Panel(
+        content,
+        title=title,
+        border_style=border,
+        padding=(0, 2),
+    )
+
+
+def create_quiz_summary_panel(
+    topic: str,
+    level: str,
+    correct: int,
+    total: int,
+    score: float,
+    type_breakdown: dict[str, dict],
+    weak_areas: list[str],
+    mastered: bool,
+) -> Panel:
+    """Create a summary panel after quiz completion."""
+    content = Text()
+
+    # Score bar
+    content.append("SCORE\n", style="bold")
+    bar_width = 30
+    filled = int(bar_width * score / 100)
+    empty = bar_width - filled
+    bar = "\u2588" * filled + "\u2591" * empty
+
+    if score >= 85:
+        color = "green"
+    elif score >= 60:
+        color = "yellow"
+    else:
+        color = "red"
+
+    content.append("  [", style="dim")
+    content.append(bar, style=color)
+    content.append("] ", style="dim")
+    content.append(f"{score:.0f}%", style=f"bold {color}")
+    content.append(f"  ({correct}/{total} correct)\n\n", style="dim")
+
+    # Mastery status
+    if mastered or score >= 85:
+        content.append("  MASTERED ", style="bold green")
+        content.append("This topic is now mastered!\n\n", style="green")
+    else:
+        content.append("  NOT YET MASTERED ", style="bold yellow")
+        content.append(f"Need 85% to master (got {score:.0f}%)\n\n", style="yellow")
+
+    # Type breakdown
+    if type_breakdown:
+        content.append("  BY TYPE\n", style="bold dim")
+        for qt, data in type_breakdown.items():
+            label = QUESTION_TYPE_LABELS.get(
+                QuestionType(qt) if qt in [q.value for q in QuestionType] else QuestionType.FILL_IN_BLANK,
+                qt.replace("_", " ").title(),
+            )
+            pct = data.get("score", 0)
+            ct = data.get("correct", 0)
+            tot = data.get("total", 0)
+            if pct >= 85:
+                style = "green"
+            elif pct >= 60:
+                style = "yellow"
+            else:
+                style = "red"
+            content.append(f"    {label:<30}", style="dim")
+            content.append(f"{ct}/{tot} ({pct:.0f}%)\n", style=style)
+        content.append("\n")
+
+    # Weak areas
+    if weak_areas:
+        content.append("  WEAK AREAS\n", style="bold dim")
+        for area in weak_areas:
+            content.append(f"    - {area}\n", style="yellow")
+
+    return Panel(
+        content,
+        title=f"[bold cyan]QUIZ COMPLETE: {topic} ({level})[/bold cyan]",
+        border_style="cyan",
+        box=box.DOUBLE,
+        padding=(1, 2),
+    )
+
+
+def create_quiz_commands_panel() -> Panel:
+    """Create a small panel showing available quiz commands."""
+    content = Text()
+    content.append("/skip", style="cyan")
+    content.append(" skip  ", style="dim")
+    content.append("/hint", style="cyan")
+    content.append(" hint  ", style="dim")
+    content.append("/score", style="cyan")
+    content.append(" scores  ", style="dim")
+    content.append("/quit", style="cyan")
+    content.append(" end quiz", style="dim")
+    return Panel(content, border_style="dim", box=box.ROUNDED, padding=(0, 1))
+
+
+def _get_quiz_answer(prompt_session: PromptSession, prompt_text: str) -> str:
+    """Get user input, handling interrupts."""
+    try:
+        return prompt_session.prompt(
+            [("class:prompt", prompt_text)],
+        ).strip()
+    except (KeyboardInterrupt, EOFError):
+        return "/quit"
+
+
+def run_quiz_loop(
+    console: Console,
+    assistant: AnkiAssistant,
+    prompt_session: PromptSession,
+) -> None:
+    """Run the interactive grammar quiz sub-loop."""
+    from .grammar_quiz import QuizSession, build_grading_prompt
+
+    quiz_session: QuizSession | None = getattr(assistant, "_quiz_session", None)
+
+    if quiz_session is None:
+        console.print("[yellow]No quiz session active.[/yellow]")
+        return
+
+    questions = quiz_session.questions
+    if not questions:
+        console.print("[yellow]No questions generated. Try again.[/yellow]")
+        return
+
+    console.print()
+    console.print(create_quiz_commands_panel())
+    console.print()
+
+    correct_count = 0
+    total_answered = 0
+    type_scores: dict[str, dict] = {}
+
+    for i, question in enumerate(questions):
+        # Show question panel
+        console.print(create_quiz_question_panel(
+            question_num=i + 1,
+            total=len(questions),
+            question_text=question.question_text,
+            question_type=question.question_type,
+            options=question.options if question.options else None,
+            instruction=question.instruction,
+        ))
+
+        # Choose prompt based on question type
+        if question.question_type == "conjugation":
+            prompt_text = "Conjugations (comma-separated): "
+        elif question.question_type == "multiple_choice":
+            prompt_text = "Your answer (A/B/C/D): "
+        else:
+            prompt_text = "Your answer: "
+
+        answer = _get_quiz_answer(prompt_session, prompt_text)
+
+        if not answer:
+            continue
+
+        # Handle quiz commands (with re-prompt loop)
+        while answer.lower() in ("/score", "/hint"):
+            if answer.lower() == "/score":
+                if total_answered > 0:
+                    pct = correct_count / total_answered * 100
+                    console.print(f"[bold]Current score:[/bold] {correct_count}/{total_answered} correct ({pct:.0f}%)")
+                else:
+                    console.print("[dim]No answers yet.[/dim]")
+                console.print()
+            elif answer.lower() == "/hint":
+                if question.hint:
+                    console.print(f"[dim]Hint: {question.hint}[/dim]")
+                else:
+                    hint = question.correct_answer[:3] + "..." if len(question.correct_answer) > 3 else question.correct_answer
+                    console.print(f"[dim]Hint: starts with '{hint}'[/dim]")
+                console.print()
+            answer = _get_quiz_answer(prompt_session, prompt_text)
+
+        if answer.lower() == "/quit":
+            console.print("[dim]Ending quiz...[/dim]")
+            break
+
+        if answer.lower() == "/skip":
+            total_answered += 1
+            console.print("[dim]Skipped.[/dim]\n")
+            continue
+
+        # Grade the answer via Claude
+        grading_prompt = build_grading_prompt(question, answer)
+
+        try:
+            grade_result = assistant.client.messages.create(
+                model=assistant.config.subagent_model,
+                max_tokens=500,
+                messages=[{"role": "user", "content": grading_prompt}],
+            )
+            grade_response = grade_result.content[0].text
+        except Exception as e:
+            grade_response = f'{{"correct": false, "score": 0.0, "feedback": "Could not grade: {e}"}}'
+
+        # Parse grading result
+        import json as _json
+        is_correct = False
+        score = 0.0
+        feedback = ""
+
+        try:
+            resp_text = grade_response.strip()
+            if "```json" in resp_text:
+                resp_text = resp_text.split("```json")[1].split("```")[0].strip()
+            elif "```" in resp_text:
+                resp_text = resp_text.split("```")[1].split("```")[0].strip()
+
+            start = resp_text.find("{")
+            end = resp_text.rfind("}")
+            if start != -1 and end != -1:
+                grade_data = _json.loads(resp_text[start : end + 1])
+                is_correct = grade_data.get("correct", False)
+                score = grade_data.get("score", 1.0 if is_correct else 0.0)
+                feedback = grade_data.get("feedback", "")
+        except (_json.JSONDecodeError, ValueError):
+            is_correct = answer.strip().lower() == question.correct_answer.strip().lower()
+            score = 1.0 if is_correct else 0.0
+            feedback = "Correct!" if is_correct else f"The correct answer is: {question.correct_answer}"
+
+        total_answered += 1
+        if is_correct or score >= 0.8:
+            correct_count += 1
+
+        # Track by type
+        qt = question.question_type
+        if qt not in type_scores:
+            type_scores[qt] = {"total": 0, "correct": 0}
+        type_scores[qt]["total"] += 1
+        if is_correct or score >= 0.8:
+            type_scores[qt]["correct"] += 1
+
+        # Show feedback
+        console.print()
+        console.print(create_quiz_feedback_panel(
+            correct=is_correct,
+            feedback=feedback,
+            correct_answer=question.correct_answer,
+            user_answer=answer,
+        ))
+        console.print()
+
+    # Compute final scores
+    final_score = correct_count / total_answered * 100 if total_answered > 0 else 0.0
+
+    type_breakdown = {}
+    for qt, data in type_scores.items():
+        total = data["total"]
+        correct = data["correct"]
+        type_breakdown[qt] = {
+            "total": total,
+            "correct": correct,
+            "score": correct / total * 100 if total > 0 else 0,
+        }
+
+    weak_areas = []
+    if final_score < 85:
+        weak_areas.append(quiz_session.topic)
+
+    mastered = final_score >= 85
+
+    # Show summary
+    if total_answered > 0:
+        console.print(create_quiz_summary_panel(
+            topic=quiz_session.topic,
+            level=quiz_session.cefr_level,
+            correct=correct_count,
+            total=total_answered,
+            score=final_score,
+            type_breakdown=type_breakdown,
+            weak_areas=weak_areas,
+            mastered=mastered,
+        ))
+
+        # Log results via Claude
+        log_prompt = (
+            f"[QUIZ SESSION COMPLETE - LOG RESULTS]\n"
+            f"Please call log_quiz_results with:\n"
+            f"topic: {quiz_session.topic}\n"
+            f"level: {quiz_session.cefr_level}\n"
+            f"questions_attempted: {total_answered}\n"
+            f"correct: {correct_count}\n"
+            f"weak_areas: {weak_areas}\n\n"
+        )
+        if final_score < 85:
+            log_prompt += (
+                f"The user scored {final_score:.0f}% which is below the 85% mastery threshold.\n"
+                f"After logging, offer to create Anki flashcards for the grammar concepts they struggled with.\n"
+                f"Suggest specific card ideas based on '{quiz_session.topic}' at {quiz_session.cefr_level} level."
+            )
+        else:
+            log_prompt += "The user mastered this topic! Congratulate them and suggest what to study next."
+
+        response_text = ""
+        try:
+            for event in assistant.chat(log_prompt):
+                if event["type"] == "text_delta":
+                    response_text += event["content"]
+                elif event["type"] == "tool_use":
+                    console.print(create_tool_panel(event["name"], event["input"]))
+                elif event["type"] == "tool_result":
+                    console.print(create_result_panel(event["name"], event["result"]))
+
+            if response_text.strip():
+                console.print("[bold cyan]Assistant:[/bold cyan]")
+                console.print(Markdown(response_text))
+        except Exception as e:
+            console.print(f"[yellow]Could not log quiz results: {e}[/yellow]")
+
+    console.print()
+
+
+# ---------------------------------------------------------------------------
+# Conversation simulation UI
+# ---------------------------------------------------------------------------
+
+def create_conversation_scenario_panel(
+    scenario: str,
+    level: str,
+    character: str,
+) -> Panel:
+    """Create a panel showing the conversation scenario."""
+    content = Text()
+    content.append("CONVERSATION SIMULATION\n\n", style="bold")
+    content.append("Scenario: ", style="dim")
+    content.append(f"{scenario}\n", style="bold white")
+    content.append("Character: ", style="dim")
+    content.append(f"{character}\n", style="bold white")
+    content.append("Level: ", style="dim")
+    content.append(f"{level}\n\n", style="bold white")
+    content.append("Speak in Spanish! Type ", style="dim")
+    content.append("/quit", style="cyan")
+    content.append(" to end the conversation.", style="dim")
+
+    return Panel(
+        content,
+        title="[bold bright_green]CONVERSE[/bold bright_green]",
+        border_style="bright_green",
+        padding=(1, 2),
+    )
+
+
+def create_conversation_commands_panel() -> Panel:
+    """Create a small panel showing available conversation commands."""
+    content = Text()
+    content.append("/hint", style="cyan")
+    content.append(" vocabulary help  ", style="dim")
+    content.append("/vocab", style="cyan")
+    content.append(" new words  ", style="dim")
+    content.append("/quit", style="cyan")
+    content.append(" end conversation", style="dim")
+    return Panel(content, border_style="dim", box=box.ROUNDED, padding=(0, 1))
+
+
+def run_conversation_loop(
+    console: Console,
+    assistant: AnkiAssistant,
+    sim_data: dict,
+    prompt_session: PromptSession,
+) -> None:
+    """Run the interactive conversation simulation sub-loop."""
+    console.print()
+    console.print(create_conversation_scenario_panel(
+        scenario=sim_data["scenario"],
+        level=sim_data["level"],
+        character=sim_data["character"],
+    ))
+    console.print(create_conversation_commands_panel())
+    console.print()
+
+    turn_count = 0
+    new_vocab: list[str] = []
+
+    while True:
+        # Get user input
+        try:
+            user_input = prompt_session.prompt(
+                [("class:prompt", "Tu: ")],
+            ).strip()
+        except (KeyboardInterrupt, EOFError):
+            user_input = "/quit"
+
+        if not user_input:
+            continue
+
+        if user_input.lower() == "/quit":
+            console.print("[dim]Ending conversation...[/dim]")
+            break
+
+        if user_input.lower() == "/hint":
+            hint_prompt = (
+                f"[CONVERSATION MODE - VOCABULARY HELP]\n"
+                f"The user needs help with vocabulary for this scenario: {sim_data['scenario']}.\n"
+                f"Level: {sim_data['level']}.\n"
+                f"Give 5-8 useful Spanish phrases/words for this situation with translations."
+            )
+            response_text = ""
+            try:
+                for event in assistant.chat(hint_prompt):
+                    if event["type"] == "text_delta":
+                        response_text += event["content"]
+                if response_text.strip():
+                    console.print("[bold cyan]Vocabulary help:[/bold cyan]")
+                    console.print(Markdown(response_text))
+            except Exception as e:
+                console.print(f"[yellow]Error: {e}[/yellow]")
+            console.print()
+            continue
+
+        if user_input.lower() == "/vocab":
+            if new_vocab:
+                console.print("[bold]New vocabulary this session:[/bold]")
+                for word in new_vocab:
+                    console.print(f"  - {word}", style="cyan")
+            else:
+                console.print("[dim]No new vocabulary recorded yet.[/dim]")
+            console.print()
+            continue
+
+        turn_count += 1
+
+        # Send to Claude in conversation mode
+        conv_prompt = (
+            f"[CONVERSATION MODE - TURN {turn_count}]\n"
+            f"Scenario: {sim_data['scenario']} | Level: {sim_data['level']} | "
+            f"Character: {sim_data['character']}\n\n"
+            f"User says (in Spanish): {user_input}\n\n"
+            f"Respond in character. Stay in Spanish. "
+            f"If the user made a mistake, correct it gently in-character. "
+            f"If you notice a recurring error pattern, call log_error. "
+            f"Keep your response to 2-4 sentences."
+        )
+
+        response_text = ""
+        spinner_active = False
+        status_ctx = None
+
+        try:
+            for event in assistant.chat(conv_prompt):
+                if event["type"] == "text_delta":
+                    if not spinner_active:
+                        status_ctx = console.status("[cyan]...[/cyan]", spinner="dots")
+                        status_ctx.start()
+                        spinner_active = True
+                    response_text += event["content"]
+                elif event["type"] == "tool_use":
+                    if spinner_active and status_ctx:
+                        status_ctx.stop()
+                        spinner_active = False
+                    # Show tool calls briefly (log_error calls are expected)
+                    if event["name"] != "log_error":
+                        console.print(create_tool_panel(event["name"], event["input"]))
+                elif event["type"] == "tool_result":
+                    if event["name"] != "log_error":
+                        console.print(create_result_panel(event["name"], event["result"]))
+                elif event["type"] == "context_status":
+                    pass  # Suppress context bar during conversation
+
+            if spinner_active and status_ctx:
+                status_ctx.stop()
+        except Exception as e:
+            if spinner_active and status_ctx:
+                status_ctx.stop()
+            console.print(f"[red]Error: {e}[/red]")
+            response_text = "Lo siento, hubo un error. Continuemos..."
+
+        if response_text.strip():
+            # Show character's response in a styled panel
+            char_label = sim_data["character"].split(",")[0].strip()[:30]
+            console.print(Panel(
+                Markdown(response_text),
+                title=f"[bold bright_green]{char_label}[/bold bright_green]",
+                border_style="bright_green",
+                padding=(0, 2),
+            ))
+        console.print()
+
+    # End of conversation - ask Claude to summarize
+    if turn_count > 0:
+        summary_prompt = (
+            f"[CONVERSATION MODE - SESSION COMPLETE]\n"
+            f"The conversation simulation has ended after {turn_count} turns.\n"
+            f"Scenario: {sim_data['scenario']} | Level: {sim_data['level']}\n\n"
+            f"Please:\n"
+            f"1. Summarize the user's performance (grammar, vocabulary, fluency)\n"
+            f"2. Call log_practice_session with practice_type='conversation', "
+            f"phrases_attempted={turn_count}, and your assessment of correct/partial/incorrect turns\n"
+            f"3. If you noticed new vocabulary the user could learn, offer to create Anki cards\n"
+            f"4. Check get_error_patterns to see if this session reinforced any known weak areas"
+        )
+
+        response_text = ""
+        try:
+            for event in assistant.chat(summary_prompt):
+                if event["type"] == "text_delta":
+                    response_text += event["content"]
+                elif event["type"] == "tool_use":
+                    console.print(create_tool_panel(event["name"], event["input"]))
+                elif event["type"] == "tool_result":
+                    console.print(create_result_panel(event["name"], event["result"]))
+
+            if response_text.strip():
+                console.print("[bold cyan]Assistant:[/bold cyan]")
+                console.print(Markdown(response_text))
+        except Exception as e:
+            console.print(f"[yellow]Could not summarize conversation: {e}[/yellow]")
+
+    # Clean up
+    if hasattr(assistant, "_conversation_sim"):
+        assistant._conversation_sim = None
+
+    console.print()
 
 
 def run_chat():
@@ -260,22 +1387,54 @@ def run_chat():
 
     model_specs = get_model_specs(assistant.model)
     console.print()
-    console.print(Panel(
-        "[bold]Anki Assistant[/bold]\n\n"
-        "Chat with Claude to manage your Anki flashcards.\n"
-        f"Model: [bold green]{model_specs['name']}[/bold green] [dim]({assistant.model})[/dim]\n\n"
-        "Commands:\n"
-        "  [cyan]history[/cyan]  - Show recent chat history\n"
-        "  [cyan]progress[/cyan] - Show learning progress summary\n"
-        "  [cyan]status[/cyan]   - Show context usage\n"
-        "  [cyan]model[/cyan]    - Show or change the Claude model\n"
-        "  [cyan]notes[/cyan]    - Show saved preferences\n"
-        "  [cyan]compact[/cyan]  - Summarize history to free context\n"
-        "  [cyan]clear[/cyan]    - Reset conversation\n"
-        "  [cyan]new[/cyan]      - Start fresh (discard history)\n"
-        "  [cyan]exit[/cyan]     - Quit",
-        border_style="cyan",
-    ))
+
+    # Build welcome dashboard
+    welcome_text = Text()
+    welcome_text.append("ANKI ASSISTANT\n", style="bold cyan")
+    welcome_text.append(f"Model: {model_specs['name']}", style="green")
+    welcome_text.append(f"  ({assistant.model})", style="dim")
+    welcome_text.justify = "center"
+
+    console.print(Panel(welcome_text, border_style="cyan", box=box.DOUBLE))
+
+    # CEFR progress summary
+    summary = load_summary()
+    levels_data = summary.get("levels", {})
+    total_cards = summary.get("total_cards_added", 0)
+
+    if total_cards > 0:
+        progress_text = Text()
+        progress_text.append("  PROGRESS  ", style="bold")
+        progress_text.append(f"{total_cards} cards total\n", style="dim")
+        for level in ["A1", "A2", "B1", "B2"]:
+            data = levels_data.get(level, {})
+            coverage = data.get("estimated_coverage", 0)
+            vocab_count = len(data.get("what_i_know", {}).get("vocabulary", []))
+            desc = LEVEL_DESCRIPTIONS.get(level, "")
+            progress_text.append(f"  {level} {desc:<20}", style="bold")
+            bar = create_progress_bar(coverage, 100, bar_width=15)
+            progress_text.append_text(bar)
+            if vocab_count > 0:
+                progress_text.append(f"  {vocab_count} words", style="dim")
+            progress_text.append("\n")
+        console.print(progress_text)
+
+    # Commands table
+    cmd_table = Table(show_header=False, box=None, padding=(0, 2))
+    cmd_table.add_column(style="cyan", min_width=10)
+    cmd_table.add_column(style="dim")
+    cmd_table.add_row("history", "Show recent chat history")
+    cmd_table.add_row("progress", "Show learning dashboard")
+    cmd_table.add_row("status", "Show context usage")
+    cmd_table.add_row("model", "Show or change Claude model")
+    cmd_table.add_row("notes", "Show saved preferences")
+    cmd_table.add_row("compact", "Summarize history to free context")
+    cmd_table.add_row("practice", "Start translation practice")
+    cmd_table.add_row("quiz", "Start grammar quiz")
+    cmd_table.add_row("converse", "Start conversation simulation")
+    cmd_table.add_row("clear/new", "Reset conversation")
+    cmd_table.add_row("exit", "Quit")
+    console.print(Panel(cmd_table, title="[bold dim]Commands[/bold dim]", border_style="dim", box=box.ROUNDED))
     console.print()
 
     # Try to load previous conversation
@@ -439,6 +1598,412 @@ def run_chat():
                             f"[green]Switched to {specs['name']}[/green] [dim]({new_model_id})[/dim]\n"
                             f"  Context: {specs['context_window']:,} | Max output: {specs['max_output_tokens']:,}"
                         )
+                console.print()
+                continue
+
+            if user_input.lower().startswith("practice"):
+                # Parse practice command: practice [deck] [--count N] [--direction DIR] [--focus SOURCE]
+                parts = user_input.strip().split()
+                deck_name = None
+                count = 10
+                direction = "en_to_es"
+                card_source = "mixed"
+
+                # Simple argument parsing
+                i = 1
+                while i < len(parts):
+                    if parts[i] == "--count" and i + 1 < len(parts):
+                        try:
+                            count = int(parts[i + 1])
+                        except ValueError:
+                            pass
+                        i += 2
+                    elif parts[i] == "--direction" and i + 1 < len(parts):
+                        direction = parts[i + 1]
+                        i += 2
+                    elif parts[i] == "--focus" and i + 1 < len(parts):
+                        card_source = parts[i + 1]
+                        i += 2
+                    elif not parts[i].startswith("--"):
+                        deck_name = parts[i]
+                        i += 1
+                    else:
+                        i += 1
+
+                if not deck_name:
+                    # Ask Claude to pick a deck via natural language
+                    console.print("[dim]Starting practice session via AI...[/dim]")
+                    # Fall through to let Claude handle "start a practice session"
+                    user_input = "Start a translation practice session. Use the main Spanish deck, 10 questions, English to Spanish, mixed cards."
+                else:
+                    # Start practice directly
+                    console.print(f"[dim]Starting practice: deck={deck_name}, count={count}, direction={direction}[/dim]")
+                    console.print()
+
+                    # Trigger via the assistant so Claude can manage the session
+                    user_input = (
+                        f"Start a translation practice session from deck '{deck_name}' "
+                        f"with {count} questions, direction {direction}, card source {card_source}."
+                    )
+
+                # Send to assistant and check if practice session was started
+                response_text = ""
+                full_response = ""
+                context_status = None
+                spinner_active = False
+                status_ctx = None
+                tool_calls = []
+                delegate_progress = None
+                delegate_task = None
+
+                try:
+                    for event in assistant.chat(user_input):
+                        if event["type"] == "text_delta":
+                            if not spinner_active:
+                                status_ctx = console.status("[cyan]Setting up practice...[/cyan]", spinner="dots")
+                                status_ctx.start()
+                                spinner_active = True
+                            response_text += event["content"]
+                            full_response += event["content"]
+                        elif event["type"] == "tool_use":
+                            if spinner_active and status_ctx:
+                                status_ctx.stop()
+                                spinner_active = False
+                                if response_text.strip():
+                                    console.print("[bold cyan]Assistant:[/bold cyan]")
+                                    console.print(Markdown(response_text))
+                                response_text = ""
+                            console.print()
+                            console.print(create_tool_panel(event["name"], event["input"]))
+                            tool_summary = _summarize_tool_input(event["name"], event["input"])
+                            tool_calls.append({"name": event["name"], "summary": tool_summary})
+                        elif event["type"] == "tool_result":
+                            console.print(create_result_panel(event["name"], event["result"]))
+                            console.print()
+                        elif event["type"] == "context_status":
+                            context_status = event["status"]
+
+                    if spinner_active and status_ctx:
+                        status_ctx.stop()
+                    if response_text.strip():
+                        console.print("[bold cyan]Assistant:[/bold cyan]")
+                        console.print(Markdown(response_text))
+
+                    # Check if a practice session was created on the assistant
+                    practice_session = getattr(assistant, "_practice_session", None)
+                    if practice_session and not practice_session.is_finished:
+                        run_practice_loop(console, assistant, practice_session, session)
+                        # Clean up
+                        assistant._practice_session = None
+                    elif not practice_session:
+                        console.print("[yellow]Could not start practice session. Try specifying a deck name.[/yellow]")
+
+                    if context_status:
+                        console.print(create_context_bar(context_status))
+
+                    add_exchange(user_input, full_response, tool_calls if tool_calls else None)
+
+                except Exception as e:
+                    if spinner_active and status_ctx:
+                        status_ctx.stop()
+                    console.print(f"\n[red]Error: {e}[/red]")
+
+                console.print()
+                continue
+
+            if user_input.lower().startswith("quiz"):
+                # Parse quiz command: quiz [--level LEVEL] [--topic TOPIC] [--count N]
+                parts = user_input.strip().split()
+                level = None
+                topic = None
+                count = 5
+
+                idx = 1
+                while idx < len(parts):
+                    if parts[idx] == "--level" and idx + 1 < len(parts):
+                        level = parts[idx + 1].upper()
+                        idx += 2
+                    elif parts[idx] == "--topic" and idx + 1 < len(parts):
+                        # Collect remaining as topic
+                        topic = " ".join(parts[idx + 1:])
+                        break
+                    elif parts[idx] == "--count" and idx + 1 < len(parts):
+                        try:
+                            count = int(parts[idx + 1])
+                        except ValueError:
+                            pass
+                        idx += 2
+                    else:
+                        idx += 1
+
+                # Default level
+                if not level:
+                    level = "A1"
+
+                # If no topic specified, show topic selection
+                if not topic:
+                    console.print(create_quiz_topic_panel(level))
+                    try:
+                        choice = session.prompt(
+                            [("class:prompt", f"Select topic ({level}): ")],
+                        ).strip()
+                    except (KeyboardInterrupt, EOFError):
+                        console.print()
+                        continue
+
+                    if choice.lower() in ("back", "cancel", ""):
+                        console.print()
+                        continue
+
+                    topics = GRAMMAR_TOPICS.get(level, [])
+                    if choice.isdigit():
+                        idx_choice = int(choice) - 1
+                        if 0 <= idx_choice < len(topics):
+                            topic = topics[idx_choice]
+                        else:
+                            console.print(f"[red]Invalid choice. Pick 1-{len(topics)}.[/red]")
+                            console.print()
+                            continue
+                    else:
+                        # Try to match by name
+                        matched = [t for t in topics if choice.lower() in t.lower()]
+                        if len(matched) == 1:
+                            topic = matched[0]
+                        elif len(matched) > 1:
+                            console.print(f"[yellow]Ambiguous match: {', '.join(matched[:3])}[/yellow]")
+                            console.print()
+                            continue
+                        else:
+                            topic = choice  # Use as-is
+
+                console.print(f"[dim]Starting grammar quiz: {topic} ({level}), {count} questions...[/dim]")
+                console.print()
+
+                # Send to assistant to trigger the start_grammar_quiz tool
+                quiz_prompt = (
+                    f"Start a grammar quiz on '{topic}' at {level} level with {count} questions. "
+                    f"Use the start_grammar_quiz tool."
+                )
+
+                response_text = ""
+                full_response = ""
+                context_status = None
+                spinner_active = False
+                status_ctx = None
+                tool_calls = []
+
+                try:
+                    for event in assistant.chat(quiz_prompt):
+                        if event["type"] == "text_delta":
+                            if not spinner_active:
+                                status_ctx = console.status("[cyan]Generating quiz...[/cyan]", spinner="dots")
+                                status_ctx.start()
+                                spinner_active = True
+                            response_text += event["content"]
+                            full_response += event["content"]
+                        elif event["type"] == "tool_use":
+                            if spinner_active and status_ctx:
+                                status_ctx.stop()
+                                spinner_active = False
+                                if response_text.strip():
+                                    console.print("[bold cyan]Assistant:[/bold cyan]")
+                                    console.print(Markdown(response_text))
+                                response_text = ""
+                            console.print()
+                            console.print(create_tool_panel(event["name"], event["input"]))
+                            tool_summary = _summarize_tool_input(event["name"], event["input"])
+                            tool_calls.append({"name": event["name"], "summary": tool_summary})
+                        elif event["type"] == "tool_result":
+                            console.print(create_result_panel(event["name"], event["result"]))
+                            console.print()
+                        elif event["type"] == "context_status":
+                            context_status = event["status"]
+
+                    if spinner_active and status_ctx:
+                        status_ctx.stop()
+                    if response_text.strip():
+                        console.print("[bold cyan]Assistant:[/bold cyan]")
+                        console.print(Markdown(response_text))
+
+                    # Check if a quiz session was created
+                    quiz_session = getattr(assistant, "_quiz_session", None)
+                    if quiz_session and quiz_session.questions:
+                        run_quiz_loop(console, assistant, session)
+                        assistant._quiz_session = None
+                    elif not quiz_session:
+                        console.print("[yellow]Could not start quiz. Try again.[/yellow]")
+
+                    if context_status:
+                        console.print(create_context_bar(context_status))
+
+                    add_exchange(quiz_prompt, full_response, tool_calls if tool_calls else None)
+
+                except Exception as e:
+                    if spinner_active and status_ctx:
+                        status_ctx.stop()
+                    console.print(f"\n[red]Error: {e}[/red]")
+
+                console.print()
+                continue
+
+            if user_input.lower().startswith("converse"):
+                # Parse converse command: converse [--level LEVEL] [--scenario SCENARIO]
+                parts = user_input.strip().split()
+                level = None
+                scenario = None
+                character = None
+
+                idx = 1
+                while idx < len(parts):
+                    if parts[idx] == "--level" and idx + 1 < len(parts):
+                        level = parts[idx + 1].upper()
+                        idx += 2
+                    elif parts[idx] == "--scenario" and idx + 1 < len(parts):
+                        # Collect remaining as scenario
+                        scenario = " ".join(parts[idx + 1:])
+                        break
+                    elif parts[idx] == "--character" and idx + 1 < len(parts):
+                        character = " ".join(parts[idx + 1:])
+                        break
+                    else:
+                        idx += 1
+
+                # Default level
+                if not level:
+                    level = "B1"
+
+                # If no scenario, show options
+                if not scenario:
+                    scenarios_by_level = {
+                        "A2": ["ordering_food", "asking_directions", "hotel_checkin", "shopping"],
+                        "B1": ["job_interview", "doctor_visit", "phone_call", "apartment_rental"],
+                        "B2": ["debate", "negotiation", "complaint", "storytelling"],
+                    }
+                    available = scenarios_by_level.get(level, scenarios_by_level["B1"])
+
+                    scenario_panel_content = Text()
+                    scenario_panel_content.append(f"Conversation Scenarios - {level}\n\n", style="bold")
+                    for i, sc in enumerate(available, 1):
+                        label = sc.replace("_", " ").title()
+                        scenario_panel_content.append(f"  {i}. ", style="cyan")
+                        scenario_panel_content.append(f"{label}\n", style="white")
+                    scenario_panel_content.append("\n")
+                    scenario_panel_content.append("Enter a number, scenario name, or 'back' to cancel.", style="dim")
+
+                    console.print(Panel(
+                        scenario_panel_content,
+                        title="[bold bright_green]CONVERSATION SIMULATION[/bold bright_green]",
+                        border_style="bright_green",
+                        padding=(1, 2),
+                    ))
+
+                    try:
+                        choice = session.prompt(
+                            [("class:prompt", f"Select scenario ({level}): ")],
+                        ).strip()
+                    except (KeyboardInterrupt, EOFError):
+                        console.print()
+                        continue
+
+                    if choice.lower() in ("back", "cancel", ""):
+                        console.print()
+                        continue
+
+                    if choice.isdigit():
+                        idx_choice = int(choice) - 1
+                        if 0 <= idx_choice < len(available):
+                            scenario = available[idx_choice]
+                        else:
+                            console.print(f"[red]Invalid choice. Pick 1-{len(available)}.[/red]")
+                            console.print()
+                            continue
+                    else:
+                        # Try to match by name
+                        matched = [s for s in available if choice.lower().replace(" ", "_") in s]
+                        if len(matched) == 1:
+                            scenario = matched[0]
+                        elif len(matched) > 1:
+                            console.print(f"[yellow]Ambiguous: {', '.join(matched[:3])}[/yellow]")
+                            console.print()
+                            continue
+                        else:
+                            scenario = choice  # Custom scenario
+
+                console.print(f"[dim]Starting conversation: {scenario} ({level})...[/dim]")
+                console.print()
+
+                # Send to assistant to trigger start_conversation_sim
+                converse_prompt = (
+                    f"Start a conversation simulation with scenario '{scenario}' at {level} level."
+                )
+                if character:
+                    converse_prompt += f" Play the character: {character}."
+                converse_prompt += " Use the start_conversation_sim tool."
+
+                response_text = ""
+                full_response = ""
+                context_status = None
+                spinner_active = False
+                status_ctx = None
+                tool_calls = []
+
+                try:
+                    for event in assistant.chat(converse_prompt):
+                        if event["type"] == "text_delta":
+                            if not spinner_active:
+                                status_ctx = console.status("[cyan]Setting up conversation...[/cyan]", spinner="dots")
+                                status_ctx.start()
+                                spinner_active = True
+                            response_text += event["content"]
+                            full_response += event["content"]
+                        elif event["type"] == "tool_use":
+                            if spinner_active and status_ctx:
+                                status_ctx.stop()
+                                spinner_active = False
+                                if response_text.strip():
+                                    console.print("[bold cyan]Assistant:[/bold cyan]")
+                                    console.print(Markdown(response_text))
+                                response_text = ""
+                            console.print()
+                            console.print(create_tool_panel(event["name"], event["input"]))
+                            tool_summary = _summarize_tool_input(event["name"], event["input"])
+                            tool_calls.append({"name": event["name"], "summary": tool_summary})
+                        elif event["type"] == "tool_result":
+                            console.print(create_result_panel(event["name"], event["result"]))
+                            console.print()
+                        elif event["type"] == "context_status":
+                            context_status = event["status"]
+
+                    if spinner_active and status_ctx:
+                        status_ctx.stop()
+
+                    # Show Claude's opening lines (in-character greeting)
+                    if response_text.strip():
+                        char_label = (character or scenario.replace("_", " ")).split(",")[0].strip()[:30]
+                        console.print(Panel(
+                            Markdown(response_text),
+                            title=f"[bold bright_green]{char_label}[/bold bright_green]",
+                            border_style="bright_green",
+                            padding=(0, 2),
+                        ))
+
+                    # Check if a conversation sim was created
+                    sim_data = getattr(assistant, "_conversation_sim", None)
+                    if sim_data:
+                        run_conversation_loop(console, assistant, sim_data, session)
+                    else:
+                        console.print("[yellow]Could not start conversation. Try again.[/yellow]")
+
+                    if context_status:
+                        console.print(create_context_bar(context_status))
+
+                    add_exchange(converse_prompt, full_response, tool_calls if tool_calls else None)
+
+                except Exception as e:
+                    if spinner_active and status_ctx:
+                        status_ctx.stop()
+                    console.print(f"\n[red]Error: {e}[/red]")
+
                 console.print()
                 continue
 

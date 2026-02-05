@@ -1,0 +1,26 @@
+{
+  "version": "1.0.0",
+  "generated": "2026-02-05",
+  "source": "Generated based on Instituto Cervantes Plan Curricular del Instituto Cervantes and CEFR standards",
+  "language": "es",
+  "target_language": "en",
+  "levels": ["A1", "A2", "B1", "B2", "C1", "C2"],
+  "vocabulary_counts": {
+    "A1": 500,
+    "A2": 800,
+    "B1": 1200,
+    "B2": 1500,
+    "C1": 1500,
+    "C2": 1000
+  },
+  "grammar_counts": {
+    "A1": 15,
+    "A2": 25,
+    "B1": 30,
+    "B2": 30,
+    "C1": 25,
+    "C2": 15
+  },
+  "theme_count": 20,
+  "notes": "Word counts are per-level (new words introduced at that level, not cumulative). Vocabulary is organized by the 20 thematic categories from the Plan Curricular del Instituto Cervantes."
+}

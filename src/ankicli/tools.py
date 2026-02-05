@@ -505,6 +505,110 @@ ANKI_TOOLS = [
         }
     },
     {
+        "name": "set_tool_note",
+        "description": "Save a user preference/note that modifies how a tool behaves. Use 'general' as tool_name for preferences that apply to all card creation (e.g., 'use informal Spanish', 'include 3 examples instead of 5'). Use specific tool names like 'add_card' or 'add_multiple_cards' for tool-specific preferences. Proactively offer to save preferences when the user expresses a preference.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "tool_name": {
+                    "type": "string",
+                    "description": "Tool name to attach the note to, or 'general' for global preferences. Examples: 'general', 'add_card', 'add_multiple_cards'"
+                },
+                "note": {
+                    "type": "string",
+                    "description": "The preference/instruction to save. Be specific and actionable. Example: 'Use Latin American Spanish. Include 3 example sentences instead of 5. Use informal tu form.'"
+                }
+            },
+            "required": ["tool_name", "note"]
+        }
+    },
+    {
+        "name": "get_tool_notes",
+        "description": "List all saved user preferences/tool notes. Shows what preferences are currently active.",
+        "input_schema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+        }
+    },
+    {
+        "name": "remove_tool_note",
+        "description": "Remove a saved user preference/tool note.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "tool_name": {
+                    "type": "string",
+                    "description": "Tool name whose note to remove, or 'general'"
+                }
+            },
+            "required": ["tool_name"]
+        }
+    },
+    {
+        "name": "start_grammar_quiz",
+        "description": "Start an interactive grammar quiz session. Claude generates questions dynamically based on the topic and CEFR level. The quiz runs in the chat with Rich-formatted panels for each question. After the quiz, offers to create Anki cards for weak areas.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "topic": {
+                    "type": "string",
+                    "description": "Grammar topic to quiz on (e.g., 'Preterite tense - regular verbs', 'Ser vs Estar'). Use get_learning_summary to see grammar gaps."
+                },
+                "level": {
+                    "type": "string",
+                    "enum": ["A1", "A2", "B1", "B2"],
+                    "description": "CEFR level for question difficulty"
+                },
+                "count": {
+                    "type": "integer",
+                    "description": "Number of questions (default: 5, max: 10)"
+                },
+                "question_types": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": ["fill_in_blank", "multiple_choice", "conjugation", "error_correction", "sentence_transformation"]
+                    },
+                    "description": "Question types to include (default: all types)"
+                }
+            },
+            "required": ["topic", "level"]
+        }
+    },
+    {
+        "name": "log_quiz_results",
+        "description": "Log the results of a completed grammar quiz session. Updates mastery tracking for the grammar topic. Called automatically after a quiz, but can also be called manually.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "topic": {
+                    "type": "string",
+                    "description": "Grammar topic that was quizzed"
+                },
+                "level": {
+                    "type": "string",
+                    "enum": ["A1", "A2", "B1", "B2"],
+                    "description": "CEFR level of the quiz"
+                },
+                "questions_attempted": {
+                    "type": "integer",
+                    "description": "Number of questions attempted"
+                },
+                "correct": {
+                    "type": "integer",
+                    "description": "Number of correct answers"
+                },
+                "weak_areas": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Grammar areas the user struggled with"
+                }
+            },
+            "required": ["topic", "level", "questions_attempted", "correct"]
+        }
+    },
+    {
         "name": "all_cards_delegate",
         "description": "Process ALL cards in a deck using parallel sub-agents. Each card is sent to a Claude sub-agent with your prompt. Use for bulk operations like formatting, adding examples, fixing content. Shows progress bar.",
         "input_schema": {
@@ -559,6 +663,292 @@ ANKI_TOOLS = [
                 }
             },
             "required": ["note_ids", "prompt"]
+        }
+    },
+    {
+        "name": "start_translation_practice",
+        "description": "Start a translation practice session using cards from an Anki deck. Claude presents phrases in one language and the user translates to the other. Evaluates meaning, grammar, naturalness, and vocabulary. Can also mark due cards as reviewed in Anki (with user confirmation).",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "deck_name": {
+                    "type": "string",
+                    "description": "Name of the Anki deck to practice from"
+                },
+                "count": {
+                    "type": "integer",
+                    "description": "Number of questions in the session (default: 10)"
+                },
+                "direction": {
+                    "type": "string",
+                    "enum": ["en_to_es", "es_to_en"],
+                    "description": "Translation direction (default: en_to_es)"
+                },
+                "card_source": {
+                    "type": "string",
+                    "enum": ["due", "new", "mixed", "all"],
+                    "description": "Which cards to use: 'due' for review cards, 'new' for unseen, 'mixed' for both, 'all' for any (default: mixed)"
+                }
+            },
+            "required": ["deck_name"]
+        }
+    },
+    {
+        "name": "log_practice_session",
+        "description": "Log a completed practice session to the learning summary for long-term tracking. Call this after a practice session ends.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "practice_type": {
+                    "type": "string",
+                    "enum": ["translation", "grammar_quiz"],
+                    "description": "Type of practice session"
+                },
+                "direction": {
+                    "type": "string",
+                    "description": "Translation direction used (en_to_es or es_to_en)"
+                },
+                "deck_name": {
+                    "type": "string",
+                    "description": "Deck practiced from"
+                },
+                "phrases_attempted": {
+                    "type": "integer",
+                    "description": "Total phrases attempted"
+                },
+                "correct": {
+                    "type": "integer",
+                    "description": "Number correct"
+                },
+                "partial": {
+                    "type": "integer",
+                    "description": "Number partially correct"
+                },
+                "incorrect": {
+                    "type": "integer",
+                    "description": "Number incorrect"
+                },
+                "score_percent": {
+                    "type": "number",
+                    "description": "Overall score percentage"
+                },
+                "weak_words": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Words the user struggled with"
+                },
+                "common_errors": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Common error patterns observed (e.g., 'gender agreement', 'ser vs estar')"
+                },
+                "topics": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Topics covered in this session"
+                }
+            },
+            "required": ["practice_type", "phrases_attempted", "correct"]
+        }
+    },
+    {
+        "name": "get_cefr_progress",
+        "description": "Get concrete CEFR vocabulary progress showing exactly how many words you know at each level (e.g., '142/500 A1 words'). Matches your Anki cards against official CEFR word lists. Shows per-category breakdown.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "level": {
+                    "type": "string",
+                    "enum": ["A1", "A2", "B1", "B2", "C1", "C2"],
+                    "description": "Specific CEFR level to show (omit for all levels)"
+                },
+                "category": {
+                    "type": "string",
+                    "description": "Filter by theme category (e.g., 'food_nutrition', 'travel_transport')"
+                },
+                "show_unknown": {
+                    "type": "boolean",
+                    "description": "Include list of unknown words (default: false)"
+                },
+                "deck_name": {
+                    "type": "string",
+                    "description": "Deck to scan (omit to scan all decks)"
+                }
+            },
+            "required": []
+        }
+    },
+    {
+        "name": "get_cefr_suggestions",
+        "description": "Get personalized suggestions for what words to learn next based on CEFR gaps. Prioritizes lowest incomplete level and weakest categories.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "level": {
+                    "type": "string",
+                    "enum": ["A1", "A2", "B1", "B2", "C1", "C2"],
+                    "description": "Specific level to get suggestions for (omit to auto-detect)"
+                },
+                "count": {
+                    "type": "integer",
+                    "description": "Number of suggestions (default: 10)"
+                },
+                "deck_name": {
+                    "type": "string",
+                    "description": "Deck to check against (omit for all decks)"
+                }
+            },
+            "required": []
+        }
+    },
+    {
+        "name": "sync_cefr_progress",
+        "description": "Full rescan of Anki cards against CEFR word lists. Updates the cached progress data. Use after bulk card changes or when progress seems stale.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "deck_name": {
+                    "type": "string",
+                    "description": "Deck to scan (omit to scan all decks)"
+                }
+            },
+            "required": []
+        }
+    },
+    {
+        "name": "get_error_patterns",
+        "description": "Get the user's recurring error patterns from the error journal. Shows which mistakes they make most often (gender agreement, ser vs estar, accent marks, etc.). Use this to tailor practice sessions and provide targeted feedback.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "min_count": {
+                    "type": "integer",
+                    "description": "Minimum occurrences to include (default: 1)"
+                },
+                "limit": {
+                    "type": "integer",
+                    "description": "Maximum entries to return (default: 20)"
+                }
+            },
+            "required": []
+        }
+    },
+    {
+        "name": "log_error",
+        "description": "Log a mistake the user made during practice or quiz. Call this when you notice a recurring error pattern (gender agreement, verb conjugation, ser vs estar, accent marks, etc.). This builds a persistent error journal so you can track improvement over time.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "error_type": {
+                    "type": "string",
+                    "description": "Category of error. Use consistent snake_case labels: gender_agreement, ser_vs_estar, accent_missing, verb_conjugation, word_order, preposition_choice, article_usage, subjunctive_needed, preterite_vs_imperfect, false_friend, spelling, etc."
+                },
+                "example": {
+                    "type": "string",
+                    "description": "The user's incorrect text"
+                },
+                "correction": {
+                    "type": "string",
+                    "description": "The correct version"
+                },
+                "context": {
+                    "type": "string",
+                    "description": "Where the error occurred (e.g., 'translation_practice', 'grammar_quiz', 'conversation')"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Tags like CEFR level or grammar category (e.g., ['grammar', 'A2'])"
+                }
+            },
+            "required": ["error_type", "example"]
+        }
+    },
+    {
+        "name": "get_daily_challenge",
+        "description": "Get the daily challenge (word of the day). Picks a new word from CEFR gap areas, presents it with examples, and offers a quick translation exercise. Only generates one challenge per day unless force=true. Call this at the start of each session.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "force": {
+                    "type": "boolean",
+                    "description": "Generate a new challenge even if today's was already presented (default: false)"
+                }
+            },
+            "required": []
+        }
+    },
+    {
+        "name": "get_study_suggestion",
+        "description": "Get a personalized study suggestion based on deck stats, CEFR progress, error patterns, and recent quiz results. Use this on session start or when the user asks what to study. Analyzes cards due, weakest CEFR areas, recurring errors, and quiz performance to recommend the most impactful activity.",
+        "input_schema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+        }
+    },
+    {
+        "name": "get_related_words",
+        "description": "Find semantically related words in CEFR lists for a given Spanish word. Shows words from the same category, subcategory, and with shared tags. Indicates which the user already knows and which are new. Use when adding a word to suggest building a vocabulary network.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "word": {
+                    "type": "string",
+                    "description": "Spanish word to find related words for (lowercase, infinitive for verbs)"
+                },
+                "limit": {
+                    "type": "integer",
+                    "description": "Maximum related words to return (default: 10)"
+                }
+            },
+            "required": ["word"]
+        }
+    },
+    {
+        "name": "generate_contexts",
+        "description": "Generate contextual example sentences for a Spanish word/phrase. Claude creates natural sentences in different contexts (conversation, formal, narrative, email, academic). Can be used to enrich existing Anki cards with more examples.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "word": {
+                    "type": "string",
+                    "description": "Spanish word or phrase to generate contexts for"
+                },
+                "context_type": {
+                    "type": "string",
+                    "enum": ["conversation", "formal", "narrative", "email", "academic"],
+                    "description": "Type of context for the sentences (default: conversation)"
+                },
+                "count": {
+                    "type": "integer",
+                    "description": "Number of sentences to generate (default: 5)"
+                }
+            },
+            "required": ["word"]
+        }
+    },
+    {
+        "name": "start_conversation_sim",
+        "description": "Start a conversation simulation where Claude role-plays a character (waiter, doctor, colleague, etc.) and the user responds in Spanish. Scenarios are tied to CEFR levels. After the conversation, offers to create Anki cards for new vocabulary encountered.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "scenario": {
+                    "type": "string",
+                    "description": "The conversation scenario. A2: ordering_food, asking_directions, hotel_checkin, shopping. B1: job_interview, doctor_visit, phone_call, apartment_rental. B2: debate, negotiation, complaint, storytelling. Or any custom scenario description."
+                },
+                "level": {
+                    "type": "string",
+                    "enum": ["A2", "B1", "B2"],
+                    "description": "CEFR level for vocabulary and grammar complexity"
+                },
+                "character": {
+                    "type": "string",
+                    "description": "The character Claude plays (e.g., 'waiter at a tapas bar', 'doctor', 'job interviewer', 'landlord'). If omitted, a default character is chosen based on the scenario."
+                }
+            },
+            "required": ["scenario", "level"]
         }
     }
 ]

@@ -1,0 +1,272 @@
+[
+  {
+    "id": "b2_subjunctive_adjective_clauses",
+    "concept": "Subjunctive in adjective (relative) clauses",
+    "category": "verb_moods",
+    "description": "Use subjunctive when the antecedent is indefinite, nonexistent, or hypothetical. Busco un apartamento que tenga balcón (I'm looking for an apartment that has a balcony - may not exist). Compare with indicative for known: Tengo un apartamento que tiene balcón.",
+    "key_verbs": ["buscar", "necesitar", "querer", "haber"],
+    "common_errors": ["Using indicative for hypothetical antecedents", "Using subjunctive when the antecedent is known/definite"],
+    "practice_patterns": ["Busco a alguien que ___ (hablar) japonés.", "No hay nadie que ___ (poder) ayudarme.", "Tengo un amigo que ___ (saber) cocinar. (indicative)"]
+  },
+  {
+    "id": "b2_subjunctive_concession",
+    "concept": "Subjunctive in concessive clauses",
+    "category": "verb_moods",
+    "description": "Concessive conjunctions with subjunctive for hypothetical concessions: aunque (even if), a pesar de que (despite), por mucho que (no matter how much), por más que (however much), si bien (although). Also: sea lo que sea, pase lo que pase (whatever happens).",
+    "key_verbs": [],
+    "common_errors": ["Not recognizing when concession is hypothetical vs factual", "Forgetting subjunctive after por mucho/más que"],
+    "practice_patterns": ["Por mucho que ___ (estudiar), no apruebo.", "A pesar de que ___ (llover), saldremos.", "Sea lo que ___ (ser), no me importa."]
+  },
+  {
+    "id": "b2_pluperfect_subjunctive",
+    "concept": "Pluperfect subjunctive",
+    "category": "verb_moods",
+    "description": "Hubiera/hubiese + past participle. Used in hypothetical past conditions: Si hubiera sabido, habría venido. After ojalá for impossible past wishes: Ojalá hubiera estudiado más. After como si for past: Habla como si hubiera estado allí.",
+    "key_verbs": ["haber"],
+    "common_errors": ["Using imperfect subjunctive instead of pluperfect for past hypotheticals", "Confusing hubiera with habría in si clauses"],
+    "practice_patterns": ["Si yo ___ ___ (haber/saber), te lo habría dicho.", "Ojalá ___ ___ (haber/estudiar) más en la universidad.", "Habla como si ___ ___ (haber/vivir) allí."]
+  },
+  {
+    "id": "b2_si_clauses_all_types",
+    "concept": "Si clauses - all three types",
+    "category": "sentence_structure",
+    "description": "Type 1 (real): Si + present, present/future/imperative. Type 2 (hypothetical present): Si + imperfect subjunctive, conditional. Type 3 (impossible past): Si + pluperfect subjunctive, conditional perfect. Mixed: Si hubiera estudiado, ahora sabría (past condition, present result).",
+    "key_verbs": [],
+    "common_errors": ["Mixing tenses incorrectly between clauses", "Using conditional/future in the si clause", "Not recognizing mixed conditional types"],
+    "practice_patterns": ["Si ___ (tener - yo) dinero, viajaría. (type 2)", "Si ___ ___ (haber/llegar) a tiempo, no habría perdido el tren. (type 3)", "Si ___ ___ (haber/estudiar), ahora ___ (saber) más. (mixed)"]
+  },
+  {
+    "id": "b2_passive_voice_ser",
+    "concept": "Passive voice with ser + past participle",
+    "category": "passive_voice",
+    "description": "Ser + past participle (+ por agent). La casa fue construida por mi abuelo. Past participle agrees in gender and number with subject. Less common than passive se in Spanish. Used in formal/written contexts and when agent is important.",
+    "key_verbs": ["ser"],
+    "common_errors": ["Past participle not agreeing with subject", "Overusing ser passive (prefer se passive in informal Spanish)", "Confusing ser passive with estar + participle (state)"],
+    "practice_patterns": ["El libro ___ ___ (ser/escribir) por Cervantes.", "Las cartas ___ ___ (ser/enviar) ayer.", "La decisión ___ ___ (ser/tomar) por el director."]
+  },
+  {
+    "id": "b2_estar_participle_resultant",
+    "concept": "Estar + past participle (resultant state)",
+    "category": "passive_voice",
+    "description": "Estar + past participle describes the state resulting from an action. La puerta está cerrada (result of being closed). Compare: La puerta fue cerrada por Juan (action). La puerta está abierta vs La puerta fue abierta. Participle agrees with subject.",
+    "key_verbs": ["estar"],
+    "common_errors": ["Confusing with ser passive (action vs state)", "Forgetting agreement: Las ventanas están abiertas"],
+    "practice_patterns": ["La tienda ___ (ser/estar) cerrada los domingos. (state)", "El trabajo ya ___ (ser/estar) terminado.", "Los platos ___ (ser/estar) rotos."]
+  },
+  {
+    "id": "b2_reported_speech_advanced",
+    "concept": "Reported speech - advanced transformations",
+    "category": "reported_speech",
+    "description": "Full tense backshift table: present->imperfect, preterite/present perfect->pluperfect, future->conditional, conditional->conditional (no change), imperfect->imperfect/pluperfect. Time shifts: hoy->ese día, mañana->al día siguiente, ayer->el día anterior, aquí->allí.",
+    "key_verbs": ["decir", "comentar", "afirmar", "negar", "asegurar", "confesar"],
+    "common_errors": ["Not shifting all tenses consistently", "Forgetting to change demonstratives and adverbs of place/time"],
+    "practice_patterns": ["'Vendré mañana' -> Dijo que ___ al día siguiente.", "'He terminado' -> Dijo que ___ ___.", "'Estoy aquí' -> Dijo que ___ allí."]
+  },
+  {
+    "id": "b2_subjunctive_value_judgment",
+    "concept": "Subjunctive after value judgments and opinions",
+    "category": "verb_moods",
+    "description": "Subjunctive after negative opinions/beliefs and value judgments about someone else: No creo que sea verdad. Es absurdo/ridículo/increíble/injusto que... Está bien/mal que... Merece la pena que... Es hora de que...",
+    "key_verbs": [],
+    "common_errors": ["Using indicative after negative opinions", "Forgetting subjunctive after 'es hora de que'"],
+    "practice_patterns": ["No me parece justo que ellos ___ (ganar) más.", "Es ridículo que ___ (tener) que esperar tanto.", "Ya es hora de que ___ (hacer) algo al respecto."]
+  },
+  {
+    "id": "b2_lo_neuter_article",
+    "concept": "Neuter article 'lo' - uses",
+    "category": "articles_determiners",
+    "description": "Lo + adjective = 'the ... thing/part': lo bueno (the good thing), lo importante (the important thing), lo mejor/peor. Lo + de = 'the matter of': lo de ayer (the matter of yesterday). Lo que = 'what/that which': Lo que dijo es verdad. Lo + adjective + que = emphasis: No sabes lo difícil que es.",
+    "key_verbs": [],
+    "common_errors": ["Confusing lo with el (lo is neuter, never with nouns)", "Using el instead of lo before adjectives used as abstract nouns"],
+    "practice_patterns": ["___ mejor es descansar. (lo/el)", "No sabes ___ difícil que es. (lo/el)", "___ que me preocupa es el resultado. (lo/el)"]
+  },
+  {
+    "id": "b2_subjunctive_negative_triggers",
+    "concept": "Subjunctive after negative and indefinite expressions",
+    "category": "verb_moods",
+    "description": "Subjunctive after: no es que (it's not that), no porque (not because), sin que (without), a menos que/a no ser que (unless), en caso de que (in case), con tal de que (provided that), siempre que/siempre y cuando (as long as).",
+    "key_verbs": [],
+    "common_errors": ["Using indicative after 'no es que'", "Confusing 'a menos que' (subjunctive) with 'a menos de' (infinitive)"],
+    "practice_patterns": ["No es que no ___ (querer) ir, es que no puedo.", "Iré a menos que ___ (llover).", "Te presto el coche con tal de que ___ (tener) cuidado."]
+  },
+  {
+    "id": "b2_infinitive_constructions",
+    "concept": "Advanced infinitive constructions",
+    "category": "sentence_structure",
+    "description": "Al + infinitive = upon/when: Al llegar, llamé (Upon arriving, I called). De + infinitive = if (formal conditional): De haberlo sabido, habría venido. Con + infinitive = by (means): Con estudiar más, aprobarás. Sin + infinitive = without: Sin decir nada, se fue.",
+    "key_verbs": [],
+    "common_errors": ["Translating English gerund (-ing) to Spanish gerund instead of infinitive", "Not recognizing de + infinitive as conditional"],
+    "practice_patterns": ["___ llegar a casa, me acosté. (al/de)", "___ haberlo sabido, no habría venido. (al/de)", "___ estudiar más, aprobarás. (con/sin)"]
+  },
+  {
+    "id": "b2_haber_existential_tenses",
+    "concept": "Haber (existential) across tenses",
+    "category": "verb_tenses",
+    "description": "Hay (present), había (imperfect), hubo (preterite), habrá (future), habría (conditional), haya (present subjunctive), hubiera (past subjunctive). Always 3rd singular regardless of what follows. Había muchas personas (NOT habían).",
+    "key_verbs": ["haber"],
+    "common_errors": ["Making haber agree with the noun (habían -> había)", "Using hay in past tense instead of había/hubo"],
+    "practice_patterns": ["Ayer ___ un accidente. (hubo/habían)", "Mañana ___ una fiesta. (habrá/habría)", "No creo que ___ tiempo. (haya/hay)"]
+  },
+  {
+    "id": "b2_subjunctive_temporal_conjunctions",
+    "concept": "Subjunctive with temporal conjunctions (future reference)",
+    "category": "connectors",
+    "description": "Subjunctive after temporal conjunctions for future: cuando, en cuanto, tan pronto como, después de que, hasta que, mientras (as long as). BUT indicative for habitual/past: Cuando llego, siempre como (habitual). Cuando llegué, comí (past).",
+    "key_verbs": [],
+    "common_errors": ["Using subjunctive for habitual actions after cuando", "Using indicative for future events after temporal conjunctions"],
+    "practice_patterns": ["Cuando ___ (terminar) el trabajo, iré a casa. (future)", "Cuando ___ (terminar) el trabajo, iba a casa. (habitual past)", "En cuanto ___ (saber) algo, te llamo."]
+  },
+  {
+    "id": "b2_prepositions_verbs",
+    "concept": "Verbs with fixed prepositions",
+    "category": "prepositions",
+    "description": "Common verb+preposition combos: pensar en (think about), soñar con (dream about), depender de (depend on), insistir en (insist on), acordarse de (remember), olvidarse de (forget), tratar de (try to), dejar de (stop), acabar de (have just), ir a (going to), empezar a (start to).",
+    "key_verbs": ["pensar", "soñar", "depender", "insistir", "acordarse", "tratar", "dejar", "acabar"],
+    "common_errors": ["Using wrong preposition based on English translation", "Omitting the preposition entirely", "Confusing pensar en (think about) with pensar de (think of/opinion)"],
+    "practice_patterns": ["Sueño ___ viajar a Japón. (con/en)", "Depende ___ ti. (de/en)", "Acabo ___ llegar. (de/a)"]
+  },
+  {
+    "id": "b2_relative_clauses_prepositions",
+    "concept": "Relative clauses with prepositions",
+    "category": "relative_clauses",
+    "description": "Preposition + article + que/cual: La casa en la que vivo. El amigo con el que fui. Also: preposition + quien (people only): La persona con quien hablé. For possession: cuyo/cuya/cuyos/cuyas (whose). Lo cual for commenting on entire clause.",
+    "key_verbs": [],
+    "common_errors": ["Omitting preposition in relative clause", "Wrong article agreement with el/la que", "Cuyo agrees with the thing possessed, not the possessor"],
+    "practice_patterns": ["La empresa ___ la ___ trabajo es grande. (en/que)", "El chico ___ hermana conoces es mi vecino. (cuyo/cuya)", "Llegó tarde, ___ cual me molestó. (lo/el)"]
+  },
+  {
+    "id": "b2_subjunctive_como_que",
+    "concept": "Subjunctive after como and que in threats/warnings",
+    "category": "verb_moods",
+    "description": "Como + subjunctive for warnings: Como no estudies, suspenderás (If you don't study, you'll fail). Que + subjunctive for indirect commands: Que venga él (Let him come). Que te mejores (Get well). These are common in spoken Spanish.",
+    "key_verbs": [],
+    "common_errors": ["Not recognizing como + subjunctive as conditional/warning", "Confusing with como + indicative (since/as)"],
+    "practice_patterns": ["Como no ___ (llegar) a tiempo, te vas solo.", "¡Que ___ (pasar) un buen día!", "Como ___ (volver) a hacerlo, me enfado."]
+  },
+  {
+    "id": "b2_periphrases_verbal",
+    "concept": "Verbal periphrases (perífrasis verbales)",
+    "category": "verb_tenses",
+    "description": "Obligation: tener que + inf, deber + inf, haber de + inf, hay que + inf. Aspect: estar a punto de (about to), acabar de (just), ponerse a (start suddenly), echarse a (burst into), dejar de (stop), volver a (do again), seguir + gerund (keep doing), llevar + gerund (been doing).",
+    "key_verbs": ["tener", "deber", "estar", "acabar", "ponerse", "dejar", "volver", "seguir", "llevar"],
+    "common_errors": ["Confusing deber (obligation) with deber de (probability)", "Using wrong preposition: ponerse a, echarse a, dejar de"],
+    "practice_patterns": ["___ ___ llover. (estar a punto de)", "Acabo ___ llegar. (de/a)", "Vuelve ___ intentarlo. (a/de)"]
+  },
+  {
+    "id": "b2_subjunctive_ojala",
+    "concept": "Ojalá with different tenses",
+    "category": "verb_moods",
+    "description": "Ojalá + present subjunctive: wish about present/future (may or may not come true). Ojalá llueva mañana. Ojalá + imperfect subjunctive: unlikely wish about present. Ojalá pudiera ir. Ojalá + pluperfect subjunctive: impossible wish about past. Ojalá hubiera ido.",
+    "key_verbs": [],
+    "common_errors": ["Using indicative after ojalá", "Not choosing the right tense for the temporal reference"],
+    "practice_patterns": ["Ojalá ___ (hacer) buen tiempo mañana. (possible)", "Ojalá ___ (poder) ir contigo. (unlikely present)", "Ojalá ___ ___ (haber/estudiar) más. (impossible past)"]
+  },
+  {
+    "id": "b2_indicative_subjunctive_contrast",
+    "concept": "Indicative vs subjunctive - systematic contrast",
+    "category": "verb_moods",
+    "description": "Indicative: facts, certainty, known information (creo que, es verdad que, sé que, es obvio que). Subjunctive: uncertainty, desire, emotion, unreality (no creo que, es posible que, quiero que, me alegra que). The same conjunction can take either depending on certainty.",
+    "key_verbs": [],
+    "common_errors": ["Over-generalizing subjunctive rules", "Not recognizing that some triggers are flexible (quizás + indicative = more likely)"],
+    "practice_patterns": ["Creo que ___ (ser) verdad. (indicative)", "No creo que ___ (ser) verdad. (subjunctive)", "Quizás ___ (venir) mañana. (either, depends on likelihood)"]
+  },
+  {
+    "id": "b2_nominalizations",
+    "concept": "Nominalization with el/lo + infinitive/adjective",
+    "category": "sentence_structure",
+    "description": "El + infinitive = the act of: El correr es saludable. Lo + adjective = the ... aspect: Lo interesante del libro. El/la/los/las + adjective = the one(s): el rojo (the red one), las grandes (the big ones). El de/la de = the one belonging to: el de María.",
+    "key_verbs": [],
+    "common_errors": ["Using 'el' instead of 'lo' with adjectives for abstract concepts", "Forgetting agreement in 'el/la/los/las + adjective'"],
+    "practice_patterns": ["___ mejor es descansar. (lo/el)", "Dame ___ rojo. (el/lo)", "___ de María es más grande. (el/lo)"]
+  },
+  {
+    "id": "b2_subjunctive_purpose_manner",
+    "concept": "Subjunctive in manner and purpose clauses",
+    "category": "verb_moods",
+    "description": "Purpose: para que, a fin de que, con el fin de que + subjunctive (when subjects differ). Manner: de modo/manera que + subjunctive (so that - purpose), de modo/manera que + indicative (so - result). Como + subjunctive = if/should.",
+    "key_verbs": [],
+    "common_errors": ["Not distinguishing purpose (subjunctive) from result (indicative) with de modo que", "Using indicative after para que"],
+    "practice_patterns": ["Hablo alto de modo que todos ___ (oír). (purpose)", "Habló alto, de modo que todos ___ (oír). (result)", "Hazlo como ___ (querer). (manner - however you want)"]
+  },
+  {
+    "id": "b2_absolute_constructions",
+    "concept": "Absolute participle constructions",
+    "category": "sentence_structure",
+    "description": "Past participle at the start of a sentence to express 'once/after something was done': Terminada la cena, salimos. Dicho esto, se fue. Visto el resultado, cambiamos de plan. Participle agrees with its noun. Often formal/literary but used in everyday elevated register.",
+    "key_verbs": [],
+    "common_errors": ["Forgetting participle agreement", "Using gerund instead of past participle for completed prior action"],
+    "practice_patterns": ["___ (terminar) la clase, fuimos a casa.", "___ (decir) esto, se sentó.", "Una vez ___ (resolver) el problema, continuamos."]
+  },
+  {
+    "id": "b2_future_conjecture",
+    "concept": "Future and conditional for conjecture/probability",
+    "category": "verb_tenses",
+    "description": "Future tense for present conjecture: ¿Qué hora será? (I wonder what time it is). Serán las diez (It's probably ten). Conditional for past conjecture: ¿Qué hora sería? (I wonder what time it was). Tendría unos 30 años (He was probably about 30).",
+    "key_verbs": [],
+    "common_errors": ["Not recognizing future/conditional used for probability", "Overusing this in formal writing (prefer supongo que, probablemente)"],
+    "practice_patterns": ["¿Dónde ___ (estar) María? (I wonder where she is)", "¿Cuántos años ___ (tener) él entonces? (I wonder how old he was)", "___ (ser) las once cuando llegó. (probably was)"]
+  },
+  {
+    "id": "b2_emphatic_structures",
+    "concept": "Emphatic and focusing structures",
+    "category": "sentence_structure",
+    "description": "Cleft sentences: Es María la que llamó (It was María who called). Lo que quiero es descansar (What I want is to rest). Fronting/topicalization: A María la vi ayer (María, I saw her yesterday). Emphatic sí: Yo sí fui (I DID go). Sí que es difícil.",
+    "key_verbs": [],
+    "common_errors": ["Forgetting redundant pronoun in topicalization", "Wrong relative pronoun in cleft sentences"],
+    "practice_patterns": ["___ María ___ que llamó. (es/la)", "___ que quiero ___ descansar. (lo/es)", "A María ___ ___ ayer. (la/vi)"]
+  },
+  {
+    "id": "b2_pronominal_verbs_meaning_change",
+    "concept": "Pronominal verbs with meaning change",
+    "category": "pronouns",
+    "description": "Many verbs change meaning with reflexive pronoun: ir (go) vs irse (leave), dormir (sleep) vs dormirse (fall asleep), poner (put) vs ponerse (put on/become), quedar (remain) vs quedarse (stay), acordar (agree) vs acordarse (remember), parecer (seem) vs parecerse (resemble).",
+    "key_verbs": ["ir/irse", "dormir/dormirse", "poner/ponerse", "quedar/quedarse", "acordar/acordarse", "parecer/parecerse"],
+    "common_errors": ["Not recognizing meaning changes", "Forgetting reflexive pronoun changes meaning entirely"],
+    "practice_patterns": ["Me ___ (ir) a las ocho. (leave)", "Se ___ (dormir) en el sofá. (fall asleep)", "Te ___ (parecer) a tu madre. (resemble)"]
+  },
+  {
+    "id": "b2_subjunctive_adverbial_clauses",
+    "concept": "Subjunctive in adverbial clauses - systematic review",
+    "category": "verb_moods",
+    "description": "Always subjunctive: antes de que, para que, sin que, a menos que, con tal de que, en caso de que. Always indicative (past): desde que, ya que, puesto que. Variable (future=subj, past/habitual=indic): cuando, hasta que, después de que, en cuanto, mientras, aunque.",
+    "key_verbs": [],
+    "common_errors": ["Using indicative after 'always subjunctive' conjunctions", "Using subjunctive after 'always indicative' conjunctions"],
+    "practice_patterns": ["Antes de que tú ___ (llegar), llamé a María.", "Ya que ___ (estar) aquí, ayúdame.", "Cuando ___ (poder), ven a visitarme."]
+  },
+  {
+    "id": "b2_por_para_advanced",
+    "concept": "Por vs para - advanced distinctions",
+    "category": "prepositions",
+    "description": "Por: on behalf of (hablar por alguien), per/rate (dos veces por semana), remaining to do (queda mucho por hacer), in exchange for (gracias por), approximation (por aquí), oath (por Dios). Para: for considering (para ser principiante), opinion (para mí), about to (estar para).",
+    "key_verbs": [],
+    "common_errors": ["Confusing 'for' in 'thankful for' (por) vs 'a gift for' (para)", "Por in passive agent (fue escrito por) vs para for recipient"],
+    "practice_patterns": ["Gracias ___ tu ayuda. (por/para)", "___ ser principiante, habla muy bien. (por/para)", "Queda mucho ___ hacer. (por/para)"]
+  },
+  {
+    "id": "b2_diminutives_augmentatives",
+    "concept": "Diminutives and augmentatives",
+    "category": "sentence_structure",
+    "description": "Diminutives: -ito/a (casita, perrito), -illo/a (chiquillo), -ico/a (ratico - regional). Can express smallness, endearment, or softening. Augmentatives: -ón/a (grandón), -azo/a (cochazo - great car), -ote/a (grandote). Can express large size, admiration, or pejorative.",
+    "key_verbs": [],
+    "common_errors": ["Not adapting the word before adding suffix (café->cafecito, not caféito)", "Misinterpreting pragmatic meaning (not always literal smallness)"],
+    "practice_patterns": ["Un momento -> un ___. (momentito)", "Un perro grande -> un ___. (perrote/perrazo)", "Dame un poco -> dame un ___. (poquito)"]
+  },
+  {
+    "id": "b2_como_si_all_tenses",
+    "concept": "Como si + subjunctive (all temporal references)",
+    "category": "sentence_structure",
+    "description": "Como si (as if) always requires past subjunctive. Present comparison: Habla como si fuera español (as if he were Spanish - imperfect subjunctive). Past comparison: Habló como si hubiera estado allí (as if he had been there - pluperfect subjunctive). Never indicative after como si.",
+    "key_verbs": [],
+    "common_errors": ["Using present subjunctive after como si", "Using indicative after como si"],
+    "practice_patterns": ["Actúa como si ___ (saber) todo.", "Habló como si ___ ___ (haber/ver) el accidente.", "Me mira como si yo ___ (ser) invisible."]
+  },
+  {
+    "id": "b2_subjunctive_perhaps_expressions",
+    "concept": "Subjunctive with expressions of possibility",
+    "category": "verb_moods",
+    "description": "Quizás/Tal vez/Acaso + subjunctive (less certain) or indicative (more certain). Posiblemente/Probablemente + subjunctive (formal) or indicative. Puede que + subjunctive always. A lo mejor + indicative always. The choice signals speaker's degree of certainty.",
+    "key_verbs": [],
+    "common_errors": ["Using subjunctive after a lo mejor (always indicative)", "Using indicative after puede que (always subjunctive)", "Not recognizing the certainty gradient"],
+    "practice_patterns": ["Quizás ___ (venir) mañana. (subjunctive = less sure)", "A lo mejor ___ (venir) mañana. (indicative always)", "Puede que ___ (llover) esta tarde. (subjunctive always)"]
+  }
+]

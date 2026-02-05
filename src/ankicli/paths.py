@@ -20,12 +20,19 @@ SUMMARY_FILE = DATA_DIR / "learning_summary.json"
 # Progress tracking
 PROGRESS_FILE = DATA_DIR / "progress.json"
 
-# CEFR data
-CEFR_DATA_DIR = Path(__file__).parent / "data"
-CEFR_SPANISH_FILE = CEFR_DATA_DIR / "cefr_spanish.json"
+# CEFR data (bundled with package)
+CEFR_DATA_DIR = Path(__file__).parent / "data" / "cefr"
+CEFR_VOCAB_DIR = CEFR_DATA_DIR / "vocabulary"
+CEFR_GRAMMAR_DIR = CEFR_DATA_DIR / "grammar"
 
 # CEFR progress cache
 CEFR_CACHE_FILE = DATA_DIR / "cefr_progress_cache.json"
+
+# Error journal
+ERROR_JOURNAL_FILE = DATA_DIR / "error_journal.json"
+
+# Daily challenge state
+DAILY_CHALLENGE_FILE = DATA_DIR / "daily_challenge.json"
 
 # Chat input history (prompt_toolkit)
 HISTORY_FILE = DATA_DIR / "chat_history"

@@ -9,7 +9,7 @@ from rich.table import Table
 
 from . import __version__
 from .client import AnkiClient, AnkiConnectError, ConnectionError
-from .config import CLAUDE_MODELS, get_model_specs, load_config, save_config
+from .config import CLAUDE_MODELS, get_model_specs, load_config, save_config, format_tool_notes_display
 
 console = Console()
 
@@ -44,6 +44,64 @@ def chat() -> None:
     Requires ANTHROPIC_API_KEY environment variable.
     """
     from .chat import run_chat
+    run_chat()
+
+
+@cli.command()
+@click.argument("deck", required=False)
+@click.option("-n", "--count", default=10, help="Number of questions (default: 10)")
+@click.option("-d", "--direction", default="en_to_es", type=click.Choice(["en_to_es", "es_to_en"]), help="Translation direction")
+@click.option("-f", "--focus", default="mixed", type=click.Choice(["due", "new", "mixed", "all"]), help="Card source")
+def practice(deck: str | None, count: int, direction: str, focus: str) -> None:
+    """Start a translation practice session.
+
+    Practice translating phrases from your Anki deck.
+    If DECK is not specified, starts the chat and asks which deck to use.
+    """
+    from .chat import run_chat
+    # We start the chat UI which handles the practice command
+    # by simulating the "practice" command input
+    import os
+    os.environ["_ANKICLI_PRACTICE_ARGS"] = f"{deck or ''} --count {count} --direction {direction} --focus {focus}"
+    run_chat()
+
+
+@cli.command()
+@click.option("-t", "--topic", default=None, help="Grammar topic to quiz on")
+@click.option("-l", "--level", default="A1", type=click.Choice(["A1", "A2", "B1", "B2"]), help="CEFR level (default: A1)")
+@click.option("-n", "--count", default=5, help="Number of questions (default: 5)")
+def quiz(topic: str | None, level: str, count: int) -> None:
+    """Start an interactive grammar quiz.
+
+    Tests grammar knowledge with fill-in-the-blank, multiple choice,
+    conjugation, error correction, and sentence transformation questions.
+    If TOPIC is not specified, shows a topic selection menu.
+    """
+    from .chat import run_chat
+    import os
+    os.environ["_ANKICLI_QUIZ_ARGS"] = f"--level {level} --count {count}" + (f" --topic {topic}" if topic else "")
+    run_chat()
+
+
+@cli.command()
+@click.option("-s", "--scenario", default=None, help="Conversation scenario (e.g., ordering_food, job_interview)")
+@click.option("-l", "--level", default="B1", type=click.Choice(["A2", "B1", "B2"]), help="CEFR level (default: B1)")
+@click.option("-c", "--character", default=None, help="Character for Claude to play")
+def converse(scenario: str | None, level: str, character: str | None) -> None:
+    """Start a conversation simulation.
+
+    Practice speaking Spanish in a role-play scenario where Claude
+    plays a character (waiter, doctor, interviewer, etc.).
+    If SCENARIO is not specified, shows a scenario selection menu.
+    """
+    from .chat import run_chat
+    import os
+    args = f"--level {level}"
+    if scenario:
+        args += f" --scenario {scenario}"
+    if character:
+        args += f" --character {character}"
+    os.environ["_ANKICLI_CONVERSE_ARGS"] = args
     run_chat()
 
 
@@ -362,6 +420,255 @@ def cards(deck: str, limit: int) -> None:
 
     console.print(table)
     console.print(f"\n[dim]Showing {len(card_list)} card(s)[/dim]")
+
+
+@cli.group()
+def notes() -> None:
+    """Manage saved preferences (tool notes).
+
+    Without a subcommand, shows all saved preferences.
+    """
+    pass
+
+
+@notes.command("list")
+def notes_list() -> None:
+    """Show all saved preferences."""
+    config = load_config()
+    console.print(format_tool_notes_display(config))
+
+
+@notes.command("set")
+@click.argument("tool_name")
+@click.argument("note")
+def notes_set(tool_name: str, note: str) -> None:
+    """Set a preference for a tool.
+
+    TOOL_NAME is the tool to attach the note to (or 'general' for global preferences).
+    NOTE is the preference text.
+    """
+    config = load_config()
+    config.tool_notes[tool_name] = note
+    save_config(config)
+    console.print(f"[green]Preference saved for '{tool_name}':[/green] {note}")
+
+
+@notes.command("remove")
+@click.argument("tool_name")
+def notes_remove(tool_name: str) -> None:
+    """Remove a saved preference.
+
+    TOOL_NAME is the tool whose preference to remove (or 'general').
+    """
+    config = load_config()
+    if tool_name in config.tool_notes:
+        del config.tool_notes[tool_name]
+        save_config(config)
+        console.print(f"[green]Preference removed for '{tool_name}'.[/green]")
+    else:
+        console.print(f"[yellow]No preference found for '{tool_name}'.[/yellow]")
+        sys.exit(1)
+
+
+@notes.command("clear")
+def notes_clear() -> None:
+    """Clear all saved preferences."""
+    config = load_config()
+    if not config.tool_notes:
+        console.print("[dim]No preferences to clear.[/dim]")
+        return
+    count = len(config.tool_notes)
+    config.tool_notes.clear()
+    save_config(config)
+    console.print(f"[green]Cleared {count} preference(s).[/green]")
+
+
+@cli.group()
+def cefr() -> None:
+    """CEFR vocabulary progress tracking.
+
+    Track your Spanish vocabulary against official CEFR level word lists.
+    """
+    pass
+
+
+@cefr.command("status")
+def cefr_status() -> None:
+    """Show CEFR progress overview for all levels."""
+    from .cefr import CEFRData, load_progress_cache, match_cards_to_cefr, save_progress_cache, format_progress_text
+
+    cefr_data = CEFRData()
+    cefr_data.load()
+
+    level_counts = cefr_data.get_level_counts()
+    if not any(level_counts.values()):
+        console.print("[yellow]No CEFR data files found. Run the data generation task first.[/yellow]")
+        return
+
+    progress = load_progress_cache()
+    if progress is None:
+        console.print("[dim]No cached progress. Scanning cards...[/dim]")
+        client = get_client()
+        progress = match_cards_to_cefr(client, cefr_data)
+        save_progress_cache(progress)
+
+    console.print(format_progress_text(progress))
+
+
+@cefr.command("progress")
+@click.argument("level")
+@click.option("--unknown", is_flag=True, help="Show unknown words")
+def cefr_progress(level: str, unknown: bool) -> None:
+    """Show detailed progress for a specific CEFR level."""
+    from .cefr import CEFRData, load_progress_cache, match_cards_to_cefr, save_progress_cache, format_progress_text
+
+    level = level.upper()
+    if level not in ("A1", "A2", "B1", "B2", "C1", "C2"):
+        console.print(f"[red]Invalid level: {level}. Use A1, A2, B1, B2, C1, or C2.[/red]")
+        return
+
+    cefr_data = CEFRData()
+    cefr_data.load()
+
+    progress = load_progress_cache()
+    if progress is None:
+        client = get_client()
+        progress = match_cards_to_cefr(client, cefr_data)
+        save_progress_cache(progress)
+
+    console.print(format_progress_text(progress, level=level, show_unknown=unknown))
+
+
+@cefr.command("suggest")
+@click.option("-l", "--level", help="CEFR level (auto-detect if omitted)")
+@click.option("-n", "--count", default=10, help="Number of suggestions")
+def cefr_suggest(level: str | None, count: int) -> None:
+    """Suggest words to learn next based on CEFR gaps."""
+    from .cefr import CEFRData, load_progress_cache, match_cards_to_cefr, save_progress_cache, get_suggestions, format_suggestions_text
+
+    cefr_data = CEFRData()
+    cefr_data.load()
+
+    progress = load_progress_cache()
+    if progress is None:
+        client = get_client()
+        progress = match_cards_to_cefr(client, cefr_data)
+        save_progress_cache(progress)
+
+    suggestions = get_suggestions(cefr_data, progress, level=level, count=count)
+    console.print(format_suggestions_text(suggestions))
+
+
+@cefr.command("scan")
+@click.option("-d", "--deck", help="Deck to scan (all decks if omitted)")
+def cefr_scan(deck: str | None) -> None:
+    """Rescan Anki cards against CEFR word lists."""
+    from .cefr import CEFRData, match_cards_to_cefr, save_progress_cache, invalidate_cache, format_progress_text
+
+    client = get_client()
+    cefr_data = CEFRData()
+    cefr_data.load()
+
+    with console.status("Scanning cards against CEFR lists..."):
+        invalidate_cache()
+        progress = match_cards_to_cefr(client, cefr_data, deck)
+        save_progress_cache(progress)
+
+    console.print("[green]Scan complete.[/green]\n")
+    console.print(format_progress_text(progress))
+
+
+@cli.command()
+def errors() -> None:
+    """Show recurring error patterns from practice sessions."""
+    from .error_journal import get_error_patterns, format_error_patterns_text
+
+    patterns = get_error_patterns(min_count=1, limit=20)
+    console.print(format_error_patterns_text(patterns))
+
+
+@cli.command()
+@click.option("--force", is_flag=True, help="Generate a new challenge even if today's was already done")
+def daily(force: bool) -> None:
+    """Show the daily word challenge.
+
+    Picks a word from your CEFR gap areas and presents a mini exercise.
+    """
+    import json as _json
+    import random
+    from datetime import date
+    from .paths import DAILY_CHALLENGE_FILE, ensure_data_dir
+    from .cefr import CEFRData, load_progress_cache, match_cards_to_cefr, save_progress_cache
+
+    today = date.today().isoformat()
+
+    ensure_data_dir()
+    state = {}
+    if DAILY_CHALLENGE_FILE.exists():
+        try:
+            with open(DAILY_CHALLENGE_FILE) as f:
+                state = _json.load(f)
+        except (ValueError, IOError):
+            state = {}
+
+    if state.get("date") == today and not force:
+        console.print(f"[bold cyan]Word of the Day:[/bold cyan] {state.get('word', '?')}")
+        console.print(f"[dim]English:[/dim] {state.get('english', '?')}")
+        console.print(f"[dim]Level:[/dim] {state.get('level', '?')} | Category: {state.get('category', '?')}")
+        console.print("\n[dim]Use --force to generate a new challenge.[/dim]")
+        return
+
+    cefr_data = CEFRData()
+    cefr_data.load()
+
+    progress = load_progress_cache()
+    if progress is None:
+        client = get_client()
+        progress = match_cards_to_cefr(client, cefr_data)
+        save_progress_cache(progress)
+
+    challenge_word = None
+    challenge_level = None
+    for level_key in ("A1", "A2", "B1", "B2", "C1", "C2"):
+        level_data = progress.get(level_key, {})
+        unknown = level_data.get("unknown_words", [])
+        if unknown:
+            yesterday_word = state.get("word", "")
+            candidates = [w for w in unknown if w != yesterday_word]
+            if not candidates:
+                candidates = unknown
+            challenge_word = random.choice(candidates[:20])
+            challenge_level = level_key
+            break
+
+    if challenge_word is None:
+        console.print("[green]You know all CEFR words! No daily challenge needed.[/green]")
+        return
+
+    word_info = cefr_data._word_index.get(challenge_word)
+    english = ""
+    category = ""
+    if word_info:
+        _, cefr_word = word_info
+        english = cefr_word.english
+        category = cefr_word.category
+
+    state = {
+        "date": today,
+        "word": challenge_word,
+        "english": english,
+        "level": challenge_level,
+        "category": category,
+        "completed": False,
+    }
+    with open(DAILY_CHALLENGE_FILE, "w") as f:
+        _json.dump(state, f, indent=2, ensure_ascii=False)
+
+    console.print(f"\n[bold cyan]Daily Challenge - {today}[/bold cyan]")
+    console.print(f"[bold]Word of the Day:[/bold] [green]{challenge_word}[/green]")
+    console.print(f"[dim]English:[/dim] {english}")
+    console.print(f"[dim]Level:[/dim] {challenge_level} | Category: {category}")
+    console.print(f"\n[dim]Start a chat session to practice with this word![/dim]")
 
 
 def main() -> None:

@@ -1,0 +1,137 @@
+[
+  {
+    "id": "a1_present_regular_ar",
+    "concept": "Present tense - regular -ar verbs",
+    "category": "verb_tenses",
+    "description": "Regular verbs ending in -ar conjugated in the present tense: -o, -as, -a, -amos, -áis, -an. Used for habitual actions, general truths, and current states.",
+    "key_verbs": ["hablar", "trabajar", "estudiar", "cocinar", "comprar", "caminar"],
+    "common_errors": ["Forgetting to drop the -ar before adding endings", "Confusing -as (tú) with -a (él/ella)"],
+    "practice_patterns": ["Yo ___ (hablar) español.", "Ella ___ (estudiar) mucho.", "Nosotros ___ (trabajar) en una oficina."]
+  },
+  {
+    "id": "a1_present_regular_er",
+    "concept": "Present tense - regular -er verbs",
+    "category": "verb_tenses",
+    "description": "Regular verbs ending in -er conjugated in the present tense: -o, -es, -e, -emos, -éis, -en.",
+    "key_verbs": ["comer", "beber", "leer", "correr", "vender", "responder"],
+    "common_errors": ["Mixing up -er and -ir endings", "Forgetting the accent on some forms"],
+    "practice_patterns": ["Yo ___ (comer) a las dos.", "Tú ___ (beber) agua.", "Ellos ___ (leer) el periódico."]
+  },
+  {
+    "id": "a1_present_regular_ir",
+    "concept": "Present tense - regular -ir verbs",
+    "category": "verb_tenses",
+    "description": "Regular verbs ending in -ir conjugated in the present tense: -o, -es, -e, -imos, -ís, -en. Note: -er and -ir share most endings except nosotros and vosotros.",
+    "key_verbs": ["vivir", "escribir", "abrir", "recibir", "subir"],
+    "common_errors": ["Confusing -ir endings with -er endings in nosotros/vosotros forms"],
+    "practice_patterns": ["Yo ___ (vivir) en Madrid.", "Ella ___ (escribir) una carta.", "Nosotros ___ (abrir) la puerta."]
+  },
+  {
+    "id": "a1_ser_estar_basic",
+    "concept": "Ser vs Estar - basic distinction",
+    "category": "verb_tenses",
+    "description": "Ser for permanent characteristics (nationality, profession, personality, origin, time, material). Estar for temporary states (emotions, locations, conditions, weather feelings). Both mean 'to be' but are not interchangeable.",
+    "key_verbs": ["ser", "estar"],
+    "common_errors": ["Using ser for location (should be estar)", "Using estar for nationality (should be ser)", "Confusing 'soy aburrido' (I'm boring) with 'estoy aburrido' (I'm bored)"],
+    "practice_patterns": ["Yo ___ (ser/estar) de México.", "Ella ___ (ser/estar) contenta.", "El libro ___ (ser/estar) en la mesa."]
+  },
+  {
+    "id": "a1_irregular_tener",
+    "concept": "Irregular verb: tener (to have)",
+    "category": "verb_tenses",
+    "description": "Tener is irregular: tengo, tienes, tiene, tenemos, tenéis, tienen. Also used in expressions: tener hambre, tener sed, tener frío, tener calor, tener miedo, tener sueño, tener X años.",
+    "key_verbs": ["tener"],
+    "common_errors": ["Saying 'soy X años' instead of 'tengo X años'", "Forgetting go-ending in yo form: tengo"],
+    "practice_patterns": ["Yo ___ (tener) veinte años.", "Ella ___ (tener) hambre.", "Nosotros ___ (tener) dos gatos."]
+  },
+  {
+    "id": "a1_irregular_ir",
+    "concept": "Irregular verb: ir (to go)",
+    "category": "verb_tenses",
+    "description": "Ir is highly irregular: voy, vas, va, vamos, vais, van. Always followed by 'a' + destination or infinitive (ir a + infinitive = near future).",
+    "key_verbs": ["ir"],
+    "common_errors": ["Forgetting 'a' after ir", "Confusing ir with irse (to leave)"],
+    "practice_patterns": ["Yo ___ (ir) al supermercado.", "Nosotros ___ (ir) a la playa.", "¿Tú ___ (ir) a estudiar?"]
+  },
+  {
+    "id": "a1_irregular_hacer",
+    "concept": "Irregular verb: hacer (to do/make)",
+    "category": "verb_tenses",
+    "description": "Hacer is irregular: hago, haces, hace, hacemos, hacéis, hacen. Also used for weather: hace calor, hace frío, hace sol, hace viento.",
+    "key_verbs": ["hacer"],
+    "common_errors": ["Forgetting the irregular yo form 'hago'", "Using ser/estar for weather instead of hacer"],
+    "practice_patterns": ["¿Qué ___ (hacer) tú?", "Hoy ___ (hacer) mucho calor.", "Yo ___ (hacer) la comida."]
+  },
+  {
+    "id": "a1_gender_agreement",
+    "concept": "Gender and number agreement",
+    "category": "noun_adjective",
+    "description": "Nouns in Spanish are masculine or feminine. Adjectives must agree in gender and number with the noun they modify. General rules: -o = masculine, -a = feminine. Plurals: add -s after vowel, -es after consonant.",
+    "key_verbs": [],
+    "common_errors": ["Using masculine adjective with feminine noun", "Forgetting to make adjective plural", "Exceptions like 'el problema' (masculine despite -a ending)"],
+    "practice_patterns": ["La casa es ___. (bonito/bonita)", "Los libros son ___. (nuevo/nuevos)", "Las chicas están ___. (cansado/cansadas)"]
+  },
+  {
+    "id": "a1_articles",
+    "concept": "Definite and indefinite articles",
+    "category": "noun_adjective",
+    "description": "Definite: el, la, los, las (the). Indefinite: un, una, unos, unas (a/an/some). Articles must agree in gender and number with their noun. Use 'el' before feminine nouns starting with stressed 'a': el agua, el águila.",
+    "key_verbs": [],
+    "common_errors": ["Confusing el/la with masculine/feminine nouns", "Overusing articles (Spanish uses them more than English in some cases)"],
+    "practice_patterns": ["___ (el/la) casa es grande.", "___ (un/una) estudiante pregunta.", "Me gustan ___ (los/las) películas."]
+  },
+  {
+    "id": "a1_question_formation",
+    "concept": "Basic question formation",
+    "category": "sentence_structure",
+    "description": "Questions can be formed by: 1) Inversion: ¿Hablas español? 2) Question words: ¿Qué?, ¿Quién?, ¿Dónde?, ¿Cuándo?, ¿Cómo?, ¿Por qué?, ¿Cuánto?, ¿Cuál? All questions use ¿...? punctuation.",
+    "key_verbs": [],
+    "common_errors": ["Forgetting the opening question mark ¿", "Wrong question word (cuál vs qué)", "Incorrect inversion after question words"],
+    "practice_patterns": ["¿___ te llamas?", "¿___ vives?", "¿___ es tu color favorito?"]
+  },
+  {
+    "id": "a1_negation",
+    "concept": "Negation with no",
+    "category": "sentence_structure",
+    "description": "Place 'no' directly before the conjugated verb to make a sentence negative. Double negatives are standard in Spanish: No tengo nada, No voy nunca, No conozco a nadie.",
+    "key_verbs": [],
+    "common_errors": ["Placing no after the verb", "Avoiding double negatives (they're correct in Spanish)"],
+    "practice_patterns": ["Yo ___ hablo francés. (no)", "Ella ___ ___ tiene. (no/nada)", "No voy ___. (never)"]
+  },
+  {
+    "id": "a1_gustar_construction",
+    "concept": "Gustar and similar verbs",
+    "category": "verb_tenses",
+    "description": "Gustar literally means 'to please'. Structure: indirect object pronoun + gusta/gustan + subject. Me gusta el café (Coffee pleases me = I like coffee). Use gusta + singular/infinitive, gustan + plural.",
+    "key_verbs": ["gustar", "encantar", "interesar", "doler"],
+    "common_errors": ["Saying 'yo gusto' instead of 'me gusta'", "Using gusta with plural nouns (should be gustan)"],
+    "practice_patterns": ["Me ___ (gustar) la música.", "¿Te ___ (gustar) los deportes?", "Nos ___ (encantar) las vacaciones."]
+  },
+  {
+    "id": "a1_possessives",
+    "concept": "Possessive adjectives",
+    "category": "noun_adjective",
+    "description": "Unstressed possessives before the noun: mi(s), tu(s), su(s), nuestro/a(s), vuestro/a(s), su(s). They agree in number with the thing possessed, not the possessor. Nuestro/vuestro also agree in gender.",
+    "key_verbs": [],
+    "common_errors": ["Confusing su (his/her/your formal/their)", "Forgetting plural -s: 'mis libros' not 'mi libros'"],
+    "practice_patterns": ["___ (my) casa es grande.", "___ (his) hermana es profesora.", "___ (our) amigos son simpáticos."]
+  },
+  {
+    "id": "a1_present_progressive",
+    "concept": "Present progressive (estar + gerund)",
+    "category": "verb_tenses",
+    "description": "Estar + gerund (-ando for -ar verbs, -iendo for -er/-ir verbs) for actions in progress right now. Estoy hablando = I am speaking. Irregular gerunds: durmiendo, leyendo, diciendo.",
+    "key_verbs": ["estar"],
+    "common_errors": ["Using present progressive for habitual actions (use simple present instead)", "Irregular gerund forms: leyendo not leiendo"],
+    "practice_patterns": ["Yo estoy ___ (hablar).", "Ella está ___ (comer).", "Nosotros estamos ___ (escribir)."]
+  },
+  {
+    "id": "a1_ir_a_future",
+    "concept": "Near future: ir a + infinitive",
+    "category": "verb_tenses",
+    "description": "Express future plans using ir + a + infinitive. Voy a estudiar = I'm going to study. This is the most common way to express future at A1 level.",
+    "key_verbs": ["ir"],
+    "common_errors": ["Forgetting the 'a' between ir and the infinitive", "Conjugating both verbs (only ir is conjugated)"],
+    "practice_patterns": ["Yo voy a ___ (estudiar).", "¿Tú vas a ___ (comer)?", "Nosotros vamos a ___ (viajar)."]
+  }
+]

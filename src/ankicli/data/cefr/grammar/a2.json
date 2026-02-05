@@ -1,0 +1,227 @@
+[
+  {
+    "id": "a2_preterite_regular_ar",
+    "concept": "Preterite tense - regular -ar verbs",
+    "category": "verb_tenses",
+    "description": "Past tense for completed actions with -ar verbs: -é, -aste, -ó, -amos, -asteis, -aron. Used for specific past events with a defined beginning and/or end.",
+    "key_verbs": ["hablar", "trabajar", "estudiar", "comprar", "cocinar", "viajar"],
+    "common_errors": ["Forgetting the accent on yo (-é) and él/ella (-ó) forms", "Confusing with imperfect tense"],
+    "practice_patterns": ["Ayer yo ___ (hablar) con mi madre.", "Ella ___ (comprar) un libro la semana pasada.", "Nosotros ___ (viajar) a Barcelona el verano pasado."]
+  },
+  {
+    "id": "a2_preterite_regular_er_ir",
+    "concept": "Preterite tense - regular -er/-ir verbs",
+    "category": "verb_tenses",
+    "description": "Past tense for completed actions with -er/-ir verbs: -í, -iste, -ió, -imos, -isteis, -ieron. Note: -er and -ir verbs share the same preterite endings.",
+    "key_verbs": ["comer", "beber", "vivir", "escribir", "aprender", "recibir"],
+    "common_errors": ["Forgetting accents on -í and -ió", "Mixing up -er/-ir preterite with -ar preterite endings"],
+    "practice_patterns": ["Yo ___ (comer) paella ayer.", "Ellos ___ (vivir) en México dos años.", "Tú ___ (escribir) una carta."]
+  },
+  {
+    "id": "a2_preterite_irregular_common",
+    "concept": "Preterite tense - common irregular verbs",
+    "category": "verb_tenses",
+    "description": "Key irregular preterites: ir/ser (fui, fuiste, fue, fuimos, fuisteis, fueron), hacer (hice, hiciste, hizo...), tener (tuve...), estar (estuve...), poder (pude...), poner (puse...), decir (dije...), venir (vine...).",
+    "key_verbs": ["ir", "ser", "hacer", "tener", "estar", "poder", "decir", "venir"],
+    "common_errors": ["Ir and ser share the same preterite forms (context distinguishes them)", "Applying regular endings to irregular stems", "Hizo not hico (c->z spelling change)"],
+    "practice_patterns": ["Ayer yo ___ (ir) al cine.", "Ella ___ (hacer) la tarea.", "Nosotros ___ (tener) un problema."]
+  },
+  {
+    "id": "a2_imperfect_regular",
+    "concept": "Imperfect tense - regular verbs",
+    "category": "verb_tenses",
+    "description": "Imperfect for habitual past actions and descriptions: -ar verbs: -aba, -abas, -aba, -ábamos, -abais, -aban. -er/-ir verbs: -ía, -ías, -ía, -íamos, -íais, -ían. Used for 'used to' and 'was doing'.",
+    "key_verbs": ["hablar", "comer", "vivir", "jugar", "estudiar"],
+    "common_errors": ["Confusing when to use imperfect vs preterite", "Forgetting accent on -ábamos and all -ía forms"],
+    "practice_patterns": ["Cuando era niño, yo ___ (jugar) mucho.", "Ella siempre ___ (comer) a las dos.", "Nosotros ___ (vivir) en una casa grande."]
+  },
+  {
+    "id": "a2_imperfect_irregular",
+    "concept": "Imperfect tense - irregular verbs (ser, ir, ver)",
+    "category": "verb_tenses",
+    "description": "Only three verbs are irregular in the imperfect: ser (era, eras, era, éramos, erais, eran), ir (iba, ibas, iba, íbamos, ibais, iban), ver (veía, veías, veía, veíamos, veíais, veían).",
+    "key_verbs": ["ser", "ir", "ver"],
+    "common_errors": ["Forgetting that these are the ONLY irregular imperfect verbs", "Confusing 'era' (imperfect ser) with 'fue' (preterite ser)"],
+    "practice_patterns": ["Cuando yo ___ (ser) joven, ___ (ir) a la playa.", "Nosotros ___ (ver) la televisión cada noche.", "Ella ___ (ser) muy simpática."]
+  },
+  {
+    "id": "a2_preterite_vs_imperfect",
+    "concept": "Preterite vs imperfect - choosing correctly",
+    "category": "verb_tenses",
+    "description": "Preterite: completed actions, specific time, sequence of events. Imperfect: habitual actions, descriptions, ongoing background, age/time/weather. Often combined: imperfect sets the scene, preterite interrupts.",
+    "key_verbs": [],
+    "common_errors": ["Using preterite for descriptions ('era alto' not 'fue alto' for describing someone)", "Using imperfect for completed sequences"],
+    "practice_patterns": ["Mientras yo ___ (leer), el teléfono ___ (sonar).", "Cuando ___ (ser) las diez, ella ___ (llegar).", "___ (Hacer) sol cuando nosotros ___ (salir)."]
+  },
+  {
+    "id": "a2_reflexive_verbs",
+    "concept": "Reflexive verbs and pronouns",
+    "category": "pronouns",
+    "description": "Reflexive pronouns: me, te, se, nos, os, se. Placed before conjugated verb or attached to infinitive/gerund. Many daily routine verbs are reflexive: levantarse, acostarse, ducharse, vestirse, lavarse.",
+    "key_verbs": ["levantarse", "acostarse", "ducharse", "vestirse", "lavarse", "sentarse", "llamarse"],
+    "common_errors": ["Forgetting the reflexive pronoun", "Wrong pronoun-subject agreement", "Placement with compound tenses"],
+    "practice_patterns": ["Yo ___ ___ (levantarse) a las siete.", "Ella ___ ___ (ducharse) por la mañana.", "Nosotros ___ ___ (acostarse) temprano."]
+  },
+  {
+    "id": "a2_direct_object_pronouns",
+    "concept": "Direct object pronouns",
+    "category": "pronouns",
+    "description": "Direct object pronouns replace the thing/person receiving the action: me, te, lo/la, nos, os, los/las. Placed before conjugated verb or attached to infinitive/gerund/affirmative command.",
+    "key_verbs": ["ver", "comprar", "llamar", "conocer", "tener"],
+    "common_errors": ["Wrong gender agreement (lo vs la)", "Placing pronoun after conjugated verb", "Forgetting personal 'a' with people"],
+    "practice_patterns": ["¿El libro? Yo ___ tengo. (lo/la)", "¿La película? Nosotros ___ vimos ayer. (lo/la)", "¿Los niños? Ella ___ conoce. (los/las)"]
+  },
+  {
+    "id": "a2_indirect_object_pronouns",
+    "concept": "Indirect object pronouns",
+    "category": "pronouns",
+    "description": "Indirect object pronouns indicate to/for whom: me, te, le, nos, os, les. Often used with verbs of giving, telling, showing. Redundant use with 'a + person' is common and correct in Spanish.",
+    "key_verbs": ["dar", "decir", "enviar", "mostrar", "regalar", "preguntar"],
+    "common_errors": ["Confusing direct and indirect objects", "Forgetting redundant 'le' with 'a + person'", "Le/les don't change for gender"],
+    "practice_patterns": ["Yo ___ doy el libro a María. (le/les)", "___ dijeron la verdad. (me/nos)", "¿___ enviaste el correo a ellos? (le/les)"]
+  },
+  {
+    "id": "a2_comparatives",
+    "concept": "Comparatives and superlatives",
+    "category": "adjectives_agreement",
+    "description": "Comparatives: más/menos + adjective + que. Equality: tan + adjective + como. Superlatives: el/la más + adjective + de. Irregular: mejor (better), peor (worse), mayor (older), menor (younger).",
+    "key_verbs": [],
+    "common_errors": ["Using 'más bueno' instead of 'mejor'", "Using 'más malo' instead of 'peor'", "Confusing 'que' and 'de' in superlatives"],
+    "practice_patterns": ["María es ___ alta ___ Pedro. (más/que)", "Este libro es ___ ___ de todos. (el mejor)", "Mi casa es tan grande ___ la tuya. (como)"]
+  },
+  {
+    "id": "a2_demonstratives",
+    "concept": "Demonstrative adjectives and pronouns",
+    "category": "articles_determiners",
+    "description": "Three levels of distance: este/esta/estos/estas (this/these, near speaker), ese/esa/esos/esas (that/those, near listener), aquel/aquella/aquellos/aquellas (that/those, far from both). Neuter forms: esto, eso, aquello.",
+    "key_verbs": [],
+    "common_errors": ["Confusing ese and aquel (distance from speaker matters)", "Forgetting gender/number agreement", "Using neuter forms with known nouns"],
+    "practice_patterns": ["___ libro es mío. (this)", "___ casa es de María. (that - near you)", "___ montañas son enormes. (those - far away)"]
+  },
+  {
+    "id": "a2_por_vs_para",
+    "concept": "Por vs para - basic uses",
+    "category": "prepositions",
+    "description": "Para: purpose/goal (para estudiar), recipient (para ti), destination (para Madrid), deadline (para mañana). Por: cause/reason (por eso), duration (por dos horas), exchange (por diez euros), movement through (por el parque), means (por email).",
+    "key_verbs": [],
+    "common_errors": ["Using para for duration (should be por)", "Using por for destination (should be para)", "Confusing cause (por) with purpose (para)"],
+    "practice_patterns": ["Estudio ___ aprender. (por/para)", "Caminé ___ el parque. (por/para)", "Este regalo es ___ ti. (por/para)"]
+  },
+  {
+    "id": "a2_prepositions_place",
+    "concept": "Prepositions of place and direction",
+    "category": "prepositions",
+    "description": "Key prepositions: en (in/on/at), a (to), de (from/of), entre (between), sobre (on top of/about), debajo de (under), delante de (in front of), detrás de (behind), al lado de (next to), cerca de (near), lejos de (far from).",
+    "key_verbs": [],
+    "common_errors": ["Confusing en and a (en = location, a = direction/destination)", "Forgetting 'de' in compound prepositions: debajo de, delante de"],
+    "practice_patterns": ["El gato está ___ la mesa. (debajo de/encima de)", "Voy ___ la tienda. (a/en)", "Mi casa está ___ el parque. (cerca de/lejos de)"]
+  },
+  {
+    "id": "a2_imperative_affirmative_tu",
+    "concept": "Affirmative imperative - informal (tu)",
+    "category": "verb_moods",
+    "description": "Informal commands for tu: regular forms match the third person singular present tense (habla, come, escribe). Common irregulars: di (decir), haz (hacer), ve (ir), pon (poner), sal (salir), sé (ser), ten (tener), ven (venir).",
+    "key_verbs": ["hablar", "comer", "decir", "hacer", "ir", "poner", "salir", "venir"],
+    "common_errors": ["Using infinitive as command ('hablar' instead of 'habla')", "Forgetting irregular forms", "Confusing with usted commands"],
+    "practice_patterns": ["¡___ aquí! (venir - tú)", "¡___ la puerta! (abrir - tú)", "¡___ la verdad! (decir - tú)"]
+  },
+  {
+    "id": "a2_imperative_affirmative_usted",
+    "concept": "Affirmative imperative - formal (usted)",
+    "category": "verb_moods",
+    "description": "Formal commands for usted: take the yo present form, drop -o, add opposite ending (-ar verbs: -e, -er/-ir verbs: -a). Hablo -> hable, como -> coma, escribo -> escriba. Irregulars follow the same pattern from irregular yo forms.",
+    "key_verbs": ["hablar", "comer", "escribir", "tener", "venir"],
+    "common_errors": ["Forgetting to switch the vowel ending", "Not starting from the yo form for irregulars"],
+    "practice_patterns": ["___, por favor. (hablar - usted)", "___ asiento. (tomar - usted)", "___ la puerta. (cerrar - usted)"]
+  },
+  {
+    "id": "a2_negative_commands",
+    "concept": "Negative imperative",
+    "category": "verb_moods",
+    "description": "Negative commands use subjunctive forms for ALL persons. No + subjunctive form. Tu: no hables, no comas, no escribas. Usted: no hable, no coma, no escriba. Pronoun placement: before the verb in negatives.",
+    "key_verbs": ["hablar", "comer", "ir", "hacer", "decir"],
+    "common_errors": ["Using affirmative tu form with no ('no habla' instead of 'no hables')", "Attaching pronouns to negative commands (should precede the verb)"],
+    "practice_patterns": ["¡No ___ eso! (decir - tú)", "¡No ___ tarde! (llegar - usted)", "¡No ___ ahora! (ir - tú)"]
+  },
+  {
+    "id": "a2_present_perfect",
+    "concept": "Present perfect (pretérito perfecto)",
+    "category": "verb_tenses",
+    "description": "Haber (present) + past participle: he, has, ha, hemos, habéis, han + -ado (ar verbs) / -ido (er/ir verbs). Used for recent past or past with present relevance. Irregular participles: hecho, dicho, escrito, visto, puesto, vuelto, abierto, roto.",
+    "key_verbs": ["haber", "hacer", "decir", "escribir", "ver", "poner", "volver", "abrir"],
+    "common_errors": ["Separating haber from the participle", "Using ser/estar instead of haber as auxiliary", "Forgetting irregular past participles"],
+    "practice_patterns": ["Yo ___ ___ (haber/comer) paella hoy.", "¿Tú ___ ___ (haber/ver) esa película?", "Ellos ___ ___ (haber/hacer) la tarea."]
+  },
+  {
+    "id": "a2_adverbs_frequency",
+    "concept": "Adverbs of frequency and time",
+    "category": "sentence_structure",
+    "description": "Frequency: siempre (always), casi siempre (almost always), a menudo/frecuentemente (often), a veces (sometimes), casi nunca (hardly ever), nunca/jamás (never). Time: ya (already), todavía/aún (still/yet), ahora (now), después (after), antes (before).",
+    "key_verbs": [],
+    "common_errors": ["Position of adverbs (usually before verb or at sentence start/end)", "Double negative with nunca: 'No voy nunca' = 'Nunca voy'"],
+    "practice_patterns": ["Yo ___ desayuno a las ocho. (siempre/nunca)", "¿___ has estado en España? (alguna vez)", "Ella ___ no ha llegado. (todavía)"]
+  },
+  {
+    "id": "a2_conjunctions_basic",
+    "concept": "Basic conjunctions and connectors",
+    "category": "connectors",
+    "description": "Coordinating: y/e (and), o/u (or), pero (but), sino (but rather), ni...ni (neither...nor). Causal: porque (because), como (since). Purpose: para que (so that). Temporal: cuando (when), mientras (while), antes de (before), después de (after).",
+    "key_verbs": [],
+    "common_errors": ["Y changes to 'e' before words starting with i-/hi-", "O changes to 'u' before words starting with o-/ho-", "Confusing pero and sino"],
+    "practice_patterns": ["Quiero ir ___ no puedo. (pero/sino)", "Estudio español ___ me gusta. (porque/para que)", "Iré al cine ___ termine el trabajo. (cuando/mientras)"]
+  },
+  {
+    "id": "a2_relative_que",
+    "concept": "Relative pronoun: que",
+    "category": "relative_clauses",
+    "description": "Que is the most common relative pronoun in Spanish, meaning 'that/which/who'. It can refer to people or things. Used to join two sentences: El libro que compré es interesante. La chica que vive aquí es simpática.",
+    "key_verbs": [],
+    "common_errors": ["Omitting 'que' as English often omits 'that'", "Using quien when que is sufficient for defining clauses"],
+    "practice_patterns": ["La mujer ___ trabaja aquí es mi madre.", "El coche ___ compramos es rojo.", "Los estudiantes ___ estudian mucho aprenden rápido."]
+  },
+  {
+    "id": "a2_weather_expressions",
+    "concept": "Weather and impersonal expressions",
+    "category": "sentence_structure",
+    "description": "Weather uses hacer: hace calor/frío/sol/viento/buen tiempo/mal tiempo. Also: llueve (it rains), nieva (it snows), está nublado (it's cloudy). Impersonal expressions: hay que + infinitive (one must), se puede (one can), es necesario/importante/posible.",
+    "key_verbs": ["hacer", "llover", "nevar", "haber"],
+    "common_errors": ["Using ser/estar for weather instead of hacer", "Confusing hay (there is) with hace (weather)", "Using hay que with conjugated verb instead of infinitive"],
+    "practice_patterns": ["Hoy ___ mucho calor. (hace/es)", "En invierno ___ mucho. (llueve/nieva)", "___ que estudiar más. (hay/es)"]
+  },
+  {
+    "id": "a2_saber_vs_conocer",
+    "concept": "Saber vs conocer",
+    "category": "verb_tenses",
+    "description": "Both mean 'to know'. Saber: facts, information, how to do something (saber + infinitive). Conocer: people, places, being familiar with. Saber: sé, sabes, sabe... Conocer: conozco, conoces, conoce... (irregular yo).",
+    "key_verbs": ["saber", "conocer"],
+    "common_errors": ["Using saber for people ('sé a Juan' should be 'conozco a Juan')", "Using conocer for facts ('conozco la respuesta' should be 'sé la respuesta')"],
+    "practice_patterns": ["¿___ dónde está el museo? (sabes/conoces)", "Yo ___ a María desde hace años. (sé/conozco)", "Ella ___ hablar tres idiomas. (sabe/conoce)"]
+  },
+  {
+    "id": "a2_stem_changing_verbs",
+    "concept": "Stem-changing verbs in present tense",
+    "category": "verb_tenses",
+    "description": "Stem changes in all forms except nosotros/vosotros. e->ie: querer (quiero), pensar, empezar, preferir, sentir. o->ue: poder (puedo), dormir, volver, encontrar, contar. e->i: pedir (pido), servir, repetir, seguir.",
+    "key_verbs": ["querer", "poder", "dormir", "pedir", "pensar", "volver", "empezar", "preferir"],
+    "common_errors": ["Applying stem change to nosotros/vosotros forms", "Forgetting which vowel changes to which", "Not recognizing stem-changing patterns"],
+    "practice_patterns": ["Yo ___ (querer) ir al cine.", "Ellos ___ (poder) venir mañana.", "Tú ___ (pedir) la cuenta."]
+  },
+  {
+    "id": "a2_personal_a",
+    "concept": "Personal 'a' before direct objects",
+    "category": "prepositions",
+    "description": "When the direct object is a specific person (or personified thing/pet), place 'a' before it. Veo a María. Llamo a mi madre. Not used with tener for possession: Tengo dos hermanos (no 'a'). Not used with indefinite people: Busco un médico.",
+    "key_verbs": ["ver", "llamar", "conocer", "buscar", "visitar", "ayudar"],
+    "common_errors": ["Omitting personal 'a' with specific people", "Using personal 'a' with tener for possession", "Using it with indefinite/non-specific people"],
+    "practice_patterns": ["Veo ___ mi amigo. (a/nothing)", "Tengo ___ tres hijos. (a/nothing)", "Busco ___ alguien que hable inglés. (a/nothing)"]
+  },
+  {
+    "id": "a2_hay_vs_estar",
+    "concept": "Hay vs estar for existence and location",
+    "category": "sentence_structure",
+    "description": "Hay (there is/are): introduces existence of something new/indefinite. Está/están: locates something already known/definite. Hay un banco en la calle (existence). El banco está en la calle (location of known bank).",
+    "key_verbs": ["haber", "estar"],
+    "common_errors": ["Using hay with definite articles ('hay el libro' should be 'el libro está')", "Using estar to introduce something new"],
+    "practice_patterns": ["___ un restaurante cerca. (hay/está)", "___ restaurante ___ en la esquina. (el/está)", "¿___ leche en la nevera? (hay/está)"]
+  }
+]

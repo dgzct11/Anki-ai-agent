@@ -1,0 +1,272 @@
+[
+  {
+    "id": "b1_subjunctive_present_regular",
+    "concept": "Present subjunctive - regular verbs",
+    "category": "verb_moods",
+    "description": "Formation: take yo present indicative, drop -o, add opposite endings. -ar verbs: -e, -es, -e, -emos, -éis, -en. -er/-ir verbs: -a, -as, -a, -amos, -áis, -an. Used after expressions of desire, doubt, emotion, and impersonal expressions.",
+    "key_verbs": ["hablar", "comer", "vivir", "trabajar", "estudiar"],
+    "common_errors": ["Forgetting to switch vowel endings (a->e, e/i->a)", "Using indicative after subjunctive triggers"],
+    "practice_patterns": ["Quiero que tú ___ (hablar) con ella.", "Es importante que nosotros ___ (estudiar).", "Espero que ellos ___ (comer) bien."]
+  },
+  {
+    "id": "b1_subjunctive_present_irregular",
+    "concept": "Present subjunctive - irregular verbs",
+    "category": "verb_moods",
+    "description": "Irregular subjunctive stems come from irregular yo forms: tenga (tener), venga (venir), salga (salir), ponga (poner), diga (decir), haga (hacer), conozca (conocer). Fully irregular: sea (ser), vaya (ir), haya (haber), dé (dar), esté (estar), sepa (saber).",
+    "key_verbs": ["ser", "ir", "haber", "dar", "estar", "saber", "tener", "hacer"],
+    "common_errors": ["Not deriving from irregular yo forms", "Confusing fully irregular subjunctives"],
+    "practice_patterns": ["Espero que él ___ (ser) feliz.", "Dudo que ella ___ (tener) tiempo.", "Es posible que nosotros ___ (ir) mañana."]
+  },
+  {
+    "id": "b1_subjunctive_desire_influence",
+    "concept": "Subjunctive with desire and influence",
+    "category": "verb_moods",
+    "description": "Subjunctive required when the subject of the main clause wants/influences someone else to do something. Triggers: querer que, desear que, preferir que, pedir que, recomendar que, sugerir que, aconsejar que, prohibir que, permitir que.",
+    "key_verbs": ["querer", "pedir", "recomendar", "sugerir", "prohibir", "permitir"],
+    "common_errors": ["Using subjunctive when subject is the same (use infinitive: quiero ir, NOT quiero que yo vaya)", "Forgetting 'que' between clauses"],
+    "practice_patterns": ["Mi madre quiere que yo ___ (estudiar) más.", "El profesor recomienda que nosotros ___ (leer) este libro.", "Te pido que ___ (venir) temprano."]
+  },
+  {
+    "id": "b1_subjunctive_emotion",
+    "concept": "Subjunctive with emotions",
+    "category": "verb_moods",
+    "description": "Subjunctive after expressions of emotion about someone else's actions: me alegra que, siento que, me sorprende que, me molesta que, tengo miedo de que, me encanta que, es una lástima que, qué pena que.",
+    "key_verbs": ["alegrarse", "sentir", "sorprender", "molestar", "temer"],
+    "common_errors": ["Using indicative after emotion expressions", "Confusing with opinions (creo que + indicative)"],
+    "practice_patterns": ["Me alegra que tú ___ (estar) aquí.", "Siento que ella ___ (tener) problemas.", "Me sorprende que ellos no ___ (saber) la respuesta."]
+  },
+  {
+    "id": "b1_subjunctive_doubt_denial",
+    "concept": "Subjunctive with doubt and denial",
+    "category": "verb_moods",
+    "description": "Subjunctive after expressions of doubt or denial: dudo que, no creo que, no pienso que, no es verdad que, no es cierto que, es posible/probable que, quizás, tal vez. BUT: Creo que + indicative (belief/certainty).",
+    "key_verbs": ["dudar", "creer", "pensar"],
+    "common_errors": ["Using subjunctive after 'creo que' (should be indicative)", "Using indicative after 'no creo que' (should be subjunctive)"],
+    "practice_patterns": ["Dudo que él ___ (poder) hacerlo.", "No creo que ella ___ (tener) razón.", "Es probable que ___ (llover) mañana."]
+  },
+  {
+    "id": "b1_subjunctive_impersonal",
+    "concept": "Subjunctive with impersonal expressions",
+    "category": "verb_moods",
+    "description": "Subjunctive after impersonal expressions of judgment: es necesario que, es importante que, es mejor que, es posible que, es probable que, es una lástima que, es raro que, es normal que. BUT: es verdad/cierto/obvio/evidente que + indicative.",
+    "key_verbs": [],
+    "common_errors": ["Using subjunctive after es verdad que / es obvio que (these take indicative)", "Forgetting 'que' after impersonal expression"],
+    "practice_patterns": ["Es necesario que tú ___ (hacer) ejercicio.", "Es posible que nosotros ___ (ir) de viaje.", "Es mejor que ellos ___ (salir) temprano."]
+  },
+  {
+    "id": "b1_future_simple",
+    "concept": "Simple future tense",
+    "category": "verb_tenses",
+    "description": "Add endings to the full infinitive: -é, -ás, -á, -emos, -éis, -án. Works for all verb types. Irregular stems: tendr- (tener), vendr- (venir), saldr- (salir), pondr- (poner), sabr- (saber), podr- (poder), querr- (querer), habr- (haber), har- (hacer), dir- (decir).",
+    "key_verbs": ["tener", "venir", "salir", "poner", "saber", "poder", "querer", "hacer", "decir"],
+    "common_errors": ["Adding endings to the stem instead of the full infinitive", "Forgetting irregular future stems", "Accents on all forms except nosotros"],
+    "practice_patterns": ["Mañana yo ___ (hablar) con el jefe.", "El año que viene nosotros ___ (viajar) a España.", "¿Tú ___ (poder) venir a la fiesta?"]
+  },
+  {
+    "id": "b1_conditional",
+    "concept": "Conditional tense",
+    "category": "verb_tenses",
+    "description": "Add endings to full infinitive: -ía, -ías, -ía, -íamos, -íais, -ían. Same irregular stems as future tense. Used for hypothetical situations, polite requests, advice, and future-in-the-past.",
+    "key_verbs": ["tener", "poder", "hacer", "decir", "querer", "saber"],
+    "common_errors": ["Confusing with imperfect tense endings (both use -ía)", "Forgetting that irregulars are same as future tense"],
+    "practice_patterns": ["Yo ___ (comer) más si tuviera hambre.", "¿___ (poder) tú ayudarme?", "En tu lugar, yo ___ (hablar) con ella."]
+  },
+  {
+    "id": "b1_pluperfect",
+    "concept": "Pluperfect tense (pretérito pluscuamperfecto)",
+    "category": "verb_tenses",
+    "description": "Haber (imperfect) + past participle: había, habías, había, habíamos, habíais, habían + participio. Expresses an action completed before another past action. 'Cuando llegué, ella ya había salido.'",
+    "key_verbs": ["haber"],
+    "common_errors": ["Separating había from the participle", "Using preterite of haber instead of imperfect", "Forgetting irregular past participles"],
+    "practice_patterns": ["Cuando llegué, ella ya ___ ___ (haber/salir).", "Nunca ___ ___ (haber/ver) algo así.", "Nosotros ya ___ ___ (haber/comer) cuando él llegó."]
+  },
+  {
+    "id": "b1_double_object_pronouns",
+    "concept": "Double object pronouns",
+    "category": "pronouns",
+    "description": "When using both indirect and direct object pronouns: indirect comes first. Le/les + lo/la/los/las -> se lo/la/los/las (le/les change to se before lo/la/los/las). Se lo doy = I give it to him/her.",
+    "key_verbs": ["dar", "decir", "enviar", "regalar", "mostrar"],
+    "common_errors": ["Wrong order (direct before indirect)", "Forgetting le->se change before lo/la", "Ambiguity of 'se lo' (clarify with 'a él/ella/usted')"],
+    "practice_patterns": ["___ ___ di ayer. (el libro a María -> se lo)", "¿___ ___ enviaste? (la carta a ellos)", "Voy a ___ ___ explicar. (la lección a ti)"]
+  },
+  {
+    "id": "b1_relative_pronouns",
+    "concept": "Relative pronouns: que, quien, donde, el cual",
+    "category": "relative_clauses",
+    "description": "Que: most common, people/things. Quien(es): only people, after prepositions and non-defining clauses. Donde: place. El/la/los/las cual(es): formal, after prepositions, non-defining clauses. Lo que: 'what/that which'.",
+    "key_verbs": [],
+    "common_errors": ["Using quien for things (only for people)", "Forgetting lo que for abstract concepts", "Using que after prepositions with people (use quien)"],
+    "practice_patterns": ["La persona con ___ hablé es mi jefe. (que/quien)", "La ciudad ___ nací es pequeña. (donde/que)", "___ me preocupa es el examen. (lo que/que)"]
+  },
+  {
+    "id": "b1_ser_estar_advanced",
+    "concept": "Ser vs estar - advanced distinctions",
+    "category": "verb_tenses",
+    "description": "Adjectives that change meaning: ser listo (clever) vs estar listo (ready), ser aburrido (boring) vs estar aburrido (bored), ser malo (bad/evil) vs estar malo (sick), ser bueno (good) vs estar bueno (tasty/attractive). Estar + past participle for results of actions.",
+    "key_verbs": ["ser", "estar"],
+    "common_errors": ["Not recognizing meaning changes with ser/estar", "Using ser for results of actions (la puerta está abierta, not es abierta)"],
+    "practice_patterns": ["La comida ___ (ser/estar) rica. (taste)", "Él ___ (ser/estar) aburrido en clase. (feeling bored)", "La ventana ___ (ser/estar) rota. (result)"]
+  },
+  {
+    "id": "b1_passive_with_se",
+    "concept": "Passive and impersonal with 'se'",
+    "category": "passive_voice",
+    "description": "Passive se: se + 3rd person verb + subject. Se habla español aquí (Spanish is spoken here). Se venden coches (Cars are sold). Impersonal se: se + 3rd singular for general statements. Se dice que... (It is said that...). Se puede... (One can...).",
+    "key_verbs": [],
+    "common_errors": ["Forgetting verb agreement with passive se (se venden coches, not se vende coches)", "Confusing passive se with reflexive se"],
+    "practice_patterns": ["Aquí ___ ___ (se/hablar) inglés y español.", "En España ___ ___ (se/comer) tarde.", "___ ___ (se/vender) pisos en esta calle."]
+  },
+  {
+    "id": "b1_conditional_si_clauses_present",
+    "concept": "Si clauses - present/future (real conditions)",
+    "category": "sentence_structure",
+    "description": "Real/possible conditions: Si + present indicative, + present/future/imperative. Si llueve, no salgo. Si tengo tiempo, iré al cine. Si quieres, ven conmigo. NEVER use present subjunctive or future after si in these.",
+    "key_verbs": [],
+    "common_errors": ["Using subjunctive after si in real conditions", "Using future tense in the si clause"],
+    "practice_patterns": ["Si ___ (llover), me quedo en casa.", "Si ___ (tener) dinero, compraré un coche.", "Si ___ (querer), te ayudo."]
+  },
+  {
+    "id": "b1_conditional_si_clauses_hypothetical",
+    "concept": "Si clauses - imperfect subjunctive/conditional (hypothetical)",
+    "category": "sentence_structure",
+    "description": "Hypothetical/contrary-to-fact: Si + imperfect subjunctive, + conditional. Si tuviera dinero, compraría una casa. Si fuera tú, estudiaría más. The si clause NEVER takes conditional.",
+    "key_verbs": [],
+    "common_errors": ["Using conditional in the si clause", "Using present subjunctive instead of imperfect subjunctive", "Mixing up clause order (either order works)"],
+    "practice_patterns": ["Si yo ___ (ser) rico, ___ (viajar) por el mundo.", "Si ___ (tener) más tiempo, ___ (estudiar) italiano.", "Si ella ___ (poder), ___ (venir) a la fiesta."]
+  },
+  {
+    "id": "b1_imperfect_subjunctive",
+    "concept": "Imperfect subjunctive formation",
+    "category": "verb_moods",
+    "description": "From the 3rd person plural preterite: drop -ron, add: -ra, -ras, -ra, -ramos, -rais, -ran (or -se, -ses, -se, -semos, -seis, -sen). Hablaron -> hablara/hablase. Tuvieron -> tuviera. Fueran -> fuera (ser/ir).",
+    "key_verbs": ["hablar", "tener", "ser", "ir", "poder", "hacer", "decir", "querer"],
+    "common_errors": ["Not starting from 3rd person plural preterite", "Forgetting accent on nosotros form: habláramos", "Confusing -ra and -se forms (both are correct)"],
+    "practice_patterns": ["Si yo ___ (tener) tiempo, te ayudaría.", "Ella quería que nosotros ___ (ir) con ella.", "Me pidió que ___ (hacer) la tarea."]
+  },
+  {
+    "id": "b1_past_subjunctive_uses",
+    "concept": "Imperfect subjunctive - uses",
+    "category": "verb_moods",
+    "description": "Used when the main verb is in a past tense: Quería que vinieras (I wanted you to come). After 'como si' (as if): Habla como si fuera español. In hypothetical si clauses: Si pudiera, lo haría. After ojalá for unlikely wishes: Ojalá tuviera más tiempo.",
+    "key_verbs": [],
+    "common_errors": ["Using present subjunctive after past main verbs", "Forgetting imperfect subjunctive after 'como si'"],
+    "practice_patterns": ["Me pidió que ___ (llegar) temprano.", "Habla como si ___ (ser) un experto.", "Ojalá ___ (poder) ir contigo."]
+  },
+  {
+    "id": "b1_object_pronoun_placement",
+    "concept": "Object pronoun placement rules",
+    "category": "pronouns",
+    "description": "Before conjugated verbs: Lo veo. Before negative commands: No lo hagas. Attached to infinitives: Voy a verlo / Lo voy a ver (both valid). Attached to gerunds: Estoy haciéndolo / Lo estoy haciendo. Attached to affirmative commands: Hazlo. Written accent needed when attaching: dígame, cómpramelo.",
+    "key_verbs": [],
+    "common_errors": ["Attaching to negative commands", "Forgetting written accent when attaching to commands/gerunds", "Wrong placement with verb + infinitive combinations"],
+    "practice_patterns": ["¿El café? Estoy ___ (preparar + lo).", "¡___ (decir + me) la verdad!", "No ___ (hacer + lo) ahora."]
+  },
+  {
+    "id": "b1_indefinite_pronouns",
+    "concept": "Indefinite pronouns and adjectives",
+    "category": "pronouns",
+    "description": "Algo/nada (something/nothing), alguien/nadie (someone/nobody), alguno/ninguno (some/none), algún/ningún (before masculine nouns), todo/cada (every/each), otro (other), cualquiera (any). Double negatives required: No tengo ninguno.",
+    "key_verbs": [],
+    "common_errors": ["Forgetting double negative with nada/nadie/ninguno after no", "Alguno/ninguno lose -o before masculine singular nouns", "Cualquiera shortens to cualquier before nouns"],
+    "practice_patterns": ["No conozco a ___ aquí. (alguien/nadie)", "¿Tienes ___ pregunta? (algún/ningún)", "No tengo ___ problema. (algún/ningún)"]
+  },
+  {
+    "id": "b1_gerund_uses",
+    "concept": "Gerund (gerundio) - advanced uses",
+    "category": "verb_tenses",
+    "description": "Progressive: estar + gerund. Continuous action in past: Estuve trabajando todo el día. Manner: Salió corriendo (left running). Simultaneous action: Estudiando, aprendí mucho. With seguir/continuar: Sigue lloviendo. Ir + gerund: gradual process (va mejorando).",
+    "key_verbs": ["estar", "seguir", "continuar", "ir", "llevar"],
+    "common_errors": ["Using gerund as adjective (use infinitive or relative clause instead)", "Ir + gerund confusion with English progressive"],
+    "practice_patterns": ["Ella sigue ___ (trabajar) en el mismo lugar.", "Llevo dos horas ___ (estudiar).", "El tiempo va ___ (mejorar)."]
+  },
+  {
+    "id": "b1_llevar_tiempo",
+    "concept": "Llevar + time expressions (duration)",
+    "category": "verb_tenses",
+    "description": "Llevar + time + gerund: how long something has been happening. Llevo tres años viviendo aquí (I've been living here for three years). Llevar + time + sin + infinitive: how long since. Llevo dos días sin dormir.",
+    "key_verbs": ["llevar"],
+    "common_errors": ["Using present perfect instead of llevar construction", "Forgetting gerund after time expression"],
+    "practice_patterns": ["___ (Llevar - yo) cinco años ___ (estudiar) español.", "¿Cuánto tiempo ___ (llevar - tú) ___ (esperar)?", "Ella ___ (llevar) tres días sin ___ (comer)."]
+  },
+  {
+    "id": "b1_reported_speech_basic",
+    "concept": "Reported speech (basic)",
+    "category": "reported_speech",
+    "description": "Reporting present -> imperfect: 'Estoy cansado' -> Dijo que estaba cansado. Reporting preterite -> pluperfect: 'Fui al cine' -> Dijo que había ido al cine. Reporting future -> conditional: 'Vendré' -> Dijo que vendría. Commands -> subjunctive: 'Ven' -> Me dijo que viniera.",
+    "key_verbs": ["decir", "contar", "explicar", "preguntar", "responder"],
+    "common_errors": ["Not shifting tenses when main verb is past", "Forgetting to change pronouns and time expressions"],
+    "practice_patterns": ["Ella dijo que ___ (estar) enferma.", "Me contó que ___ (ir) a la fiesta.", "Le pregunté si ___ (poder) ayudarme."]
+  },
+  {
+    "id": "b1_cuando_subjunctive_future",
+    "concept": "Cuando + subjunctive for future",
+    "category": "connectors",
+    "description": "When referring to future events after temporal conjunctions, use subjunctive: cuando, en cuanto (as soon as), tan pronto como, después de que, antes de que (always subjunctive), hasta que. Cuando llegue, te llamo (When I arrive, I'll call you).",
+    "key_verbs": [],
+    "common_errors": ["Using indicative for future events after cuando", "Using future tense after cuando (never: cuando llegaré)", "Antes de que ALWAYS requires subjunctive, even in present"],
+    "practice_patterns": ["Cuando ___ (llegar) a casa, te llamaré.", "Espera hasta que ella ___ (venir).", "Antes de que tú ___ (salir), cierra la puerta."]
+  },
+  {
+    "id": "b1_subjunctive_purpose_clauses",
+    "concept": "Subjunctive in purpose clauses",
+    "category": "verb_moods",
+    "description": "Para que (so that/in order that) always requires subjunctive when subjects differ. Te lo digo para que lo sepas. A que: Vengo a que me ayudes. Sin que: without (someone doing something): Salió sin que nadie lo viera.",
+    "key_verbs": [],
+    "common_errors": ["Using indicative after para que", "Confusing para que (different subjects, subjunctive) with para + infinitive (same subject)"],
+    "practice_patterns": ["Te explico esto para que ___ (entender).", "Habla más alto para que todos ___ (oír).", "Salió sin que nadie ___ (ver)."]
+  },
+  {
+    "id": "b1_aunque_subjunctive_vs_indicative",
+    "concept": "Aunque with subjunctive vs indicative",
+    "category": "connectors",
+    "description": "Aunque + indicative: concession of a fact (even though). Aunque llueve, salgo (Even though it IS raining, I'm going out). Aunque + subjunctive: hypothetical concession (even if). Aunque llueva, saldré (Even if it rains, I'll go out).",
+    "key_verbs": [],
+    "common_errors": ["Always using subjunctive after aunque", "Not distinguishing factual vs hypothetical concessions"],
+    "practice_patterns": ["Aunque ___ (hacer) frío, voy a correr. (it IS cold)", "Aunque ___ (llover) mañana, iremos. (it might rain)", "Aunque ___ (ser) difícil, lo intentaré. (hypothetical)"]
+  },
+  {
+    "id": "b1_future_perfect",
+    "concept": "Future perfect tense",
+    "category": "verb_tenses",
+    "description": "Haber (future) + past participle: habré, habrás, habrá, habremos, habréis, habrán + participio. Used for actions completed before a future point: Para las diez, habré terminado. Also used for conjecture about the past: ¿Habrá llegado ya? (I wonder if he has arrived).",
+    "key_verbs": ["haber"],
+    "common_errors": ["Confusing with simple future", "Forgetting irregular past participles in compound tenses"],
+    "practice_patterns": ["Para mañana, yo ___ ___ (haber/terminar) el proyecto.", "¿___ ___ (haber/llegar) ellos ya?", "Cuando llegues, nosotros ya ___ ___ (haber/comer)."]
+  },
+  {
+    "id": "b1_conditional_perfect",
+    "concept": "Conditional perfect tense",
+    "category": "verb_tenses",
+    "description": "Haber (conditional) + past participle: habría, habrías, habría, habríamos, habríais, habrían + participio. Used for hypothetical past: Habría ido si hubiera sabido (I would have gone if I had known). Also for conjecture: Habrían sido las diez (It must have been ten).",
+    "key_verbs": ["haber"],
+    "common_errors": ["Confusing with simple conditional", "Using in si clause instead of pluperfect subjunctive"],
+    "practice_patterns": ["Yo ___ ___ (haber/ir) si me lo hubieras dicho.", "Ella ___ ___ (haber/comprar) el coche si hubiera tenido dinero.", "¿Qué ___ ___ (haber/hacer) tú en mi lugar?"]
+  },
+  {
+    "id": "b1_verbs_of_change",
+    "concept": "Verbs of change (ponerse, volverse, hacerse, convertirse, quedarse)",
+    "category": "verb_tenses",
+    "description": "Ponerse: sudden/temporary emotional change (ponerse rojo, nervioso, triste). Volverse: lasting personality change (volverse loco, antipático). Hacerse: gradual/deliberate change (hacerse rico, famoso, médico). Convertirse en: transformation (convertirse en líder). Quedarse: resulting state (quedarse solo, ciego).",
+    "key_verbs": ["ponerse", "volverse", "hacerse", "convertirse", "quedarse"],
+    "common_errors": ["Using hacerse for emotional changes (use ponerse)", "Confusing volverse (permanent) with ponerse (temporary)"],
+    "practice_patterns": ["Se ___ (ponerse) rojo de vergüenza.", "Con los años se ___ (volver) más paciente.", "Quiere ___ (hacerse) abogado."]
+  },
+  {
+    "id": "b1_discourse_markers",
+    "concept": "Discourse markers and complex connectors",
+    "category": "connectors",
+    "description": "Cause: ya que, puesto que, dado que (since/given that). Consequence: por lo tanto, por eso, así que, de modo que. Contrast: sin embargo, no obstante, en cambio. Addition: además, también, incluso. Sequence: en primer lugar, por un lado...por otro.",
+    "key_verbs": [],
+    "common_errors": ["Overusing 'pero' when more specific connectors exist", "Wrong register (sin embargo is more formal than pero)"],
+    "practice_patterns": ["Estudió mucho, ___ aprobó el examen. (por lo tanto/sin embargo)", "No vino a la fiesta; ___, envió un regalo. (sin embargo/por eso)", "Me gusta el español; ___, estudio italiano. (además/sin embargo)"]
+  },
+  {
+    "id": "b1_hacer_time_expressions",
+    "concept": "Hacer + time expressions (ago / for)",
+    "category": "verb_tenses",
+    "description": "Hace + time + que + present: ongoing duration. Hace dos años que vivo aquí (I've been living here for two years). Hace + time + que + preterite: time since completed action. Hace tres días que llegué (I arrived three days ago). Also inverted: Llegué hace tres días.",
+    "key_verbs": ["hacer"],
+    "common_errors": ["Confusing with llevar + gerund construction", "Using wrong tense: present for ongoing, preterite for completed"],
+    "practice_patterns": ["Hace tres años que ___ (vivir) aquí.", "Hace una hora que ___ (llegar).", "¿Cuánto tiempo hace que ___ (estudiar) español?"]
+  }
+]

@@ -376,6 +376,39 @@ class AnkiClient:
             "cards_fetched": len(cards),
         }
 
+    def get_due_cards(self, deck_name: str, limit: int = 50) -> list[Card]:
+        """Get cards that are due for review in a deck."""
+        return self.search_cards(f'deck:"{deck_name}" is:due', limit=limit)
+
+    def get_new_cards(self, deck_name: str, limit: int = 50) -> list[Card]:
+        """Get new (unseen) cards in a deck."""
+        return self.search_cards(f'deck:"{deck_name}" is:new', limit=limit)
+
+    def answer_card(self, card_id: int, ease: int) -> bool:
+        """Mark a card as reviewed in Anki with the given ease rating.
+
+        Args:
+            card_id: The card ID (not note ID) to answer.
+            ease: Ease rating (1=Again, 2=Hard, 3=Good, 4=Easy).
+
+        Returns:
+            True if successful.
+        """
+        # AnkiConnect needs card IDs, not note IDs.
+        # findCards returns card IDs for a note ID.
+        card_ids = _request("findCards", query=f"nid:{card_id}")
+        if not card_ids:
+            return False
+        # Answer each card (usually just one) with the given ease
+        for cid in card_ids:
+            try:
+                _request("answerCards", answers=[{"cardId": cid, "ease": ease}])
+            except AnkiConnectError:
+                # answerCards may not be available in all AnkiConnect versions.
+                # Fall back silently - the user will see the card in their next review.
+                return False
+        return True
+
     def get_collection_stats(self) -> dict:
         """
         Get overall collection statistics.

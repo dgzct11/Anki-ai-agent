@@ -1,0 +1,144 @@
+{
+  "themes": [
+    {
+      "id": "individual_physical",
+      "name": "Individual: Physical Dimension",
+      "name_es": "Individuo: dimensión física",
+      "description": "Body parts, physical traits, appearance, physical actions",
+      "subcategories": ["body_parts", "physical_traits", "appearance", "physical_actions", "senses"]
+    },
+    {
+      "id": "perception_emotions",
+      "name": "Perception and Emotions",
+      "name_es": "Individuo: dimensión perceptiva y anímica",
+      "description": "Feelings, emotions, sensations, character traits, moods",
+      "subcategories": ["emotions", "sensations", "character", "moods", "mental_states"]
+    },
+    {
+      "id": "personal_identity",
+      "name": "Personal Identity",
+      "name_es": "Identidad personal",
+      "description": "Names, nationality, age, civil status, personal documents",
+      "subcategories": ["basic_info", "nationality", "documents", "civil_status", "beliefs"]
+    },
+    {
+      "id": "relationships",
+      "name": "Personal Relationships",
+      "name_es": "Relaciones personales",
+      "description": "Family, friends, social connections, social interactions",
+      "subcategories": ["family", "friends", "social_life", "social_interactions", "formality"]
+    },
+    {
+      "id": "food_nutrition",
+      "name": "Food and Nutrition",
+      "name_es": "Alimentación",
+      "description": "Meals, food items, beverages, cooking, restaurants, diet",
+      "subcategories": ["meals", "food_items", "beverages", "cooking", "restaurants", "diet"]
+    },
+    {
+      "id": "education",
+      "name": "Education",
+      "name_es": "Educación",
+      "description": "Schools, subjects, teachers, exams, classroom, learning",
+      "subcategories": ["institutions", "subjects", "classroom", "exams", "learning_process"]
+    },
+    {
+      "id": "work",
+      "name": "Work",
+      "name_es": "Trabajo",
+      "description": "Professions, workplace, employment, business",
+      "subcategories": ["professions", "workplace", "employment", "tasks", "business"]
+    },
+    {
+      "id": "leisure",
+      "name": "Leisure and Entertainment",
+      "name_es": "Ocio",
+      "description": "Sports, hobbies, cultural activities, games, entertainment",
+      "subcategories": ["sports", "hobbies", "cultural_activities", "games", "entertainment"]
+    },
+    {
+      "id": "media_communication",
+      "name": "Information and Media",
+      "name_es": "Información y medios de comunicación",
+      "description": "Telephone, internet, mail, television, press, radio",
+      "subcategories": ["telephone", "internet", "mail", "television", "press", "social_media"]
+    },
+    {
+      "id": "housing",
+      "name": "Housing",
+      "name_es": "Vivienda",
+      "description": "Types of homes, rooms, furniture, household objects, domestic activities",
+      "subcategories": ["types", "rooms", "furniture", "household_objects", "domestic_activities"]
+    },
+    {
+      "id": "services",
+      "name": "Services",
+      "name_es": "Servicios",
+      "description": "Banking, postal, healthcare facilities, transportation services, security",
+      "subcategories": ["banking", "postal", "healthcare_services", "transportation_services", "emergency"]
+    },
+    {
+      "id": "shopping",
+      "name": "Shopping and Establishments",
+      "name_es": "Compras, tiendas y establecimientos",
+      "description": "Stores, clothing, food shopping, payments, prices",
+      "subcategories": ["stores", "clothing", "food_shopping", "payments", "prices"]
+    },
+    {
+      "id": "health_hygiene",
+      "name": "Health and Hygiene",
+      "name_es": "Salud e higiene",
+      "description": "Illnesses, symptoms, medical care, personal grooming, wellness",
+      "subcategories": ["illnesses", "symptoms", "medical_care", "hygiene", "wellness"]
+    },
+    {
+      "id": "travel_transport",
+      "name": "Travel and Transport",
+      "name_es": "Viajes, alojamiento y transporte",
+      "description": "Types of transport, accommodation, directions, tourism",
+      "subcategories": ["transport", "accommodation", "directions", "tourism", "documents"]
+    },
+    {
+      "id": "economy",
+      "name": "Economy and Commerce",
+      "name_es": "Economía e industria",
+      "description": "Money, buying and selling, business, economy, trade",
+      "subcategories": ["money", "commerce", "business", "industry", "economy"]
+    },
+    {
+      "id": "science_technology",
+      "name": "Science and Technology",
+      "name_es": "Ciencia y tecnología",
+      "description": "Computing, mathematics, science, inventions, digital technology",
+      "subcategories": ["computing", "mathematics", "science", "technology", "digital"]
+    },
+    {
+      "id": "government_society",
+      "name": "Government, Politics, and Society",
+      "name_es": "Gobierno, política y sociedad",
+      "description": "Politics, law, social issues, community, institutions",
+      "subcategories": ["politics", "law", "social_issues", "community", "institutions"]
+    },
+    {
+      "id": "arts_culture",
+      "name": "Artistic Activities",
+      "name_es": "Actividades artísticas",
+      "description": "Music, theater, visual arts, literature, photography, film",
+      "subcategories": ["music", "theater", "visual_arts", "literature", "photography", "film"]
+    },
+    {
+      "id": "religion_philosophy",
+      "name": "Religion and Philosophy",
+      "name_es": "Religión y filosofía",
+      "description": "Religious beliefs, practices, philosophy, ethics, spirituality",
+      "subcategories": ["religion", "philosophy", "ethics", "spirituality", "traditions"]
+    },
+    {
+      "id": "geography_nature",
+      "name": "Geography and Nature",
+      "name_es": "Geografía y naturaleza",
+      "description": "Weather, landscapes, animals, plants, environment, geography",
+      "subcategories": ["weather", "landscapes", "animals", "plants", "environment", "geography"]
+    }
+  ]
+}

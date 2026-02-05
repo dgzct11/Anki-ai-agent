@@ -261,6 +261,49 @@ def _create_activity_heatmap(summary: dict) -> Text:
     return text
 
 
+def format_summary_as_text(summary: dict) -> str:
+    """Format the summary as plain text for tool results / API responses."""
+    lines = []
+    total_cards = summary.get("total_cards_added", 0)
+    lines.append(f"Learning Summary - {total_cards} cards total")
+    lines.append("=" * 50)
+
+    levels_data = summary.get("levels", {})
+    for level in ["A1", "A2", "B1", "B2"]:
+        data = levels_data.get(level, {})
+        coverage = data.get("estimated_coverage", 0)
+        desc = LEVEL_DESCRIPTIONS.get(level, "")
+        vocab_count = len(data.get("what_i_know", {}).get("vocabulary", []))
+
+        lines.append(f"\n{level} ({desc}) - {coverage}% coverage, {vocab_count} words")
+
+        what_i_know = data.get("what_i_know", {})
+        if what_i_know.get("summary"):
+            lines.append(f"  Know: {what_i_know['summary'][:200]}")
+        grammar = what_i_know.get("grammar_concepts", [])
+        if grammar:
+            lines.append(f"  Grammar: {', '.join(grammar[:5])}")
+        topics = what_i_know.get("topics_covered", [])
+        if topics:
+            lines.append(f"  Topics: {', '.join(topics[:5])}")
+
+        what_to_learn = data.get("what_to_learn", {})
+        if what_to_learn.get("summary"):
+            lines.append(f"  To learn: {what_to_learn['summary'][:200]}")
+        priority = what_to_learn.get("priority_topics", [])
+        if priority:
+            lines.append(f"  Priority: {', '.join(priority[:3])}")
+
+    recent = summary.get("recent_additions", [])
+    if recent:
+        lines.append(f"\nRecent additions: {', '.join(recent[-15:])}")
+
+    if summary.get("notes"):
+        lines.append(f"\nNotes: {summary['notes']}")
+
+    return "\n".join(lines)
+
+
 def format_summary_for_display(summary: dict) -> Group:
     """Format the summary as Rich renderables for display."""
     elements = []

@@ -1,0 +1,227 @@
+[
+  {
+    "id": "c1_subjunctive_lexicalized",
+    "concept": "Lexicalized subjunctive expressions",
+    "category": "verb_moods",
+    "description": "Fixed expressions using subjunctive: sea como sea (be that as it may), pase lo que pase (whatever happens), digan lo que digan (whatever they say), cueste lo que cueste (whatever it costs), venga lo que venga, quieras o no (whether you want to or not), que yo sepa (as far as I know).",
+    "key_verbs": [],
+    "common_errors": ["Not recognizing these as fixed expressions", "Using indicative in place of subjunctive in these phrases"],
+    "practice_patterns": ["___ lo que ___ (pasar), estaré contigo.", "___ lo que ___ (costar), lo conseguiremos.", "Que yo ___ (saber), no ha llegado todavía."]
+  },
+  {
+    "id": "c1_subjunctive_adverbial_nuances",
+    "concept": "Subjunctive with nuanced adverbial expressions",
+    "category": "verb_moods",
+    "description": "A sabiendas de que (knowing full well that) + indicative. A condición de que (on condition that) + subjunctive. Con que (provided that) + subjunctive. Mal que le pese (much to his chagrin) + subjunctive. Aun cuando (even when) + subjunctive for hypothetical.",
+    "key_verbs": [],
+    "common_errors": ["Not recognizing lesser-known subjunctive triggers", "Confusing a condición de que with a sabiendas de que"],
+    "practice_patterns": ["A condición de que ___ (hacer) buen tiempo, iremos.", "Con que ___ (traer) un postre, es suficiente.", "Aun cuando ___ (llover), iremos de excursión."]
+  },
+  {
+    "id": "c1_future_subjunctive",
+    "concept": "Future subjunctive (archaic/legal)",
+    "category": "verb_moods",
+    "description": "From 3rd person plural preterite: drop -ron, add -re, -res, -re, -remos, -reis, -ren. Nearly extinct in modern Spanish except in legal/formal texts and set phrases: sea lo que fuere, donde fueres haz lo que vieres, venga quien viniere. Replaced by present subjunctive in modern usage.",
+    "key_verbs": ["ser", "haber", "tener", "poder"],
+    "common_errors": ["Using it in everyday speech (sounds archaic)", "Confusing with imperfect subjunctive -ra forms"],
+    "practice_patterns": ["Donde ___ (ir - future subj), haz lo que vieres.", "Sea lo que ___ (ser - future subj).", "Si así lo ___ (estimar - future subj) conveniente."]
+  },
+  {
+    "id": "c1_se_advanced_functions",
+    "concept": "Advanced functions of 'se'",
+    "category": "pronouns",
+    "description": "Six uses of se: 1) Reflexive: Se lava. 2) Reciprocal: Se miran. 3) Passive: Se venden pisos. 4) Impersonal: Se dice que... 5) Indirect object le->se before lo/la: Se lo di. 6) Pronominal (inherent): Se arrepiente, se queja. Distinguishing these is key to advanced comprehension.",
+    "key_verbs": ["lavarse", "arrepentirse", "quejarse"],
+    "common_errors": ["Not distinguishing the different functions in context", "Confusing passive se with impersonal se (verb agreement is the clue)"],
+    "practice_patterns": ["___ venden casas. (passive se - houses are sold)", "___ dice que va a llover. (impersonal se)", "___ arrepintió de su decisión. (pronominal se)"]
+  },
+  {
+    "id": "c1_cleft_focus_structures",
+    "concept": "Cleft and pseudo-cleft sentences",
+    "category": "sentence_structure",
+    "description": "Cleft: Es/Fue + focus + el/la que: Fue María la que llamó. Pseudo-cleft: Lo que + verb + es/fue: Lo que necesito es descansar. El que/La que: El que debería disculparse es él. Intensifying: Es a ti a quien busco. Used for emphasis and contrast.",
+    "key_verbs": [],
+    "common_errors": ["Wrong gender agreement in cleft structures", "Using que instead of quien for people in formal clefts"],
+    "practice_patterns": ["Fue Pedro ___ que rompió el vaso. (el/lo)", "___ que me molesta ___ el ruido. (lo/es)", "Es a ella a ___ buscan. (quien/que)"]
+  },
+  {
+    "id": "c1_subjunctive_independent_clauses",
+    "concept": "Subjunctive in independent clauses",
+    "category": "verb_moods",
+    "description": "Subjunctive can stand alone: Ojalá venga. Que te vaya bien. Quizás/Tal vez + subjunctive. Possibly: Acaso + subjunctive. Commands: Que pase el siguiente. Wishes: Viva España. Doubt: Que yo sepa. These show the subjunctive's role beyond subordinate clauses.",
+    "key_verbs": [],
+    "common_errors": ["Thinking subjunctive only occurs in subordinate clauses", "Not using subjunctive with quizás/tal vez when expressing uncertainty"],
+    "practice_patterns": ["¡Que ___ (tener) suerte!", "Quizás ___ (venir) mañana.", "¡___ (vivir) los novios!"]
+  },
+  {
+    "id": "c1_correlative_conjunctions",
+    "concept": "Correlative and complex conjunctions",
+    "category": "connectors",
+    "description": "Ni...ni (neither...nor), o...o (either...or), no solo...sino también (not only...but also), tanto...como (as much...as), ya...ya (whether...or), bien...bien (whether...or), sea...sea (whether...or), cuanto más...más (the more...the more).",
+    "key_verbs": [],
+    "common_errors": ["Not pairing correlatives correctly", "Using tanto...que instead of tanto...como for comparisons"],
+    "practice_patterns": ["No solo habla español, ___ también francés. (sino/pero)", "Cuanto más ___ (estudiar), más ___ (aprender).", "Ya ___ por trabajo, ya ___ por placer, viaja mucho."]
+  },
+  {
+    "id": "c1_subjunctive_relative_superlative",
+    "concept": "Subjunctive after superlatives and restrictive expressions",
+    "category": "verb_moods",
+    "description": "Subjunctive after superlatives expressing uniqueness: Es el mejor libro que haya leído. After el único/primero/último que: Es la única persona que sepa la respuesta. The subjunctive emphasizes the subjective or evaluative nature of the statement.",
+    "key_verbs": [],
+    "common_errors": ["Always using subjunctive after superlatives (indicative is also possible when stating facts)", "Not recognizing the evaluative nuance"],
+    "practice_patterns": ["Es el mejor restaurante que ___ (conocer).", "Es la primera vez que ___ (ver) algo así.", "Es lo más difícil que ___ ___ (haber/hacer) nunca."]
+  },
+  {
+    "id": "c1_dequeismo_queismo",
+    "concept": "Dequeísmo and queísmo",
+    "category": "sentence_structure",
+    "description": "Queísmo: incorrect omission of 'de' before 'que': *Me acordé que (should be: de que). Dequeísmo: incorrect addition of 'de' before 'que': *Creo de que (should be: Creo que). Test: replace clause with 'eso/algo': Me acordé de eso (correct -> de que). Creo eso (correct -> que).",
+    "key_verbs": ["acordarse", "creer", "pensar", "olvidarse", "alegrarse", "darse cuenta"],
+    "common_errors": ["Queísmo: omitting de before que after verbs requiring it", "Dequeísmo: adding de before que after verbs that don't need it"],
+    "practice_patterns": ["Me alegro ___ que hayas venido. (de/nothing)", "Creo ___ que es verdad. (de/nothing)", "Me di cuenta ___ que estaba equivocado. (de/nothing)"]
+  },
+  {
+    "id": "c1_subjunctive_after_conjunctions_review",
+    "concept": "Subjunctive vs indicative after conjunctions - advanced",
+    "category": "connectors",
+    "description": "After the fact that (el hecho de que): subjunctive in formal/written, indicative also accepted. De ahí que (hence) + subjunctive. No es que + subjunctive. Dado que (given that) + indicative. A pesar de que: indicative (factual) or subjunctive (hypothetical). Mientras: indicative (during) or subjunctive (as long as).",
+    "key_verbs": [],
+    "common_errors": ["Using indicative after 'de ahí que'", "Not recognizing the dual nature of mientras, a pesar de que"],
+    "practice_patterns": ["El hecho de que ___ (ser) difícil no es excusa.", "De ahí que ___ (tener) problemas.", "Mientras ___ (cumplir) las reglas, no hay problema. (as long as)"]
+  },
+  {
+    "id": "c1_gerund_constraints",
+    "concept": "Gerund restrictions and advanced uses",
+    "category": "verb_tenses",
+    "description": "Spanish gerund CANNOT be: adjective (una chica cantando = wrong, use 'que canta'), subject (corriendo es bueno = wrong, use 'correr es bueno'). CAN express: simultaneity (llegó cantando), manner (salió corriendo), cause (siendo tarde, me fui), condition (estudiando más, aprobarás). Exception: agua hirviendo, pan crujiendo (established uses).",
+    "key_verbs": [],
+    "common_errors": ["Using gerund as adjective (English -ing trap)", "Using gerund as subject", "Using gerund for posterior action (*Salió cerrando la puerta = wrong sequence)"],
+    "practice_patterns": ["Vi a un hombre ___ (correr/corriendo). (both valid - perception verb)", "Una carta ___ (contener/conteniendo) instrucciones. (only conteniendo in formal)", "___ (Estudiar/Estudiando) es importante. (infinitive, not gerund)"]
+  },
+  {
+    "id": "c1_reduplication_emphasis",
+    "concept": "Reduplication and emphatic structures",
+    "category": "sentence_structure",
+    "description": "Verb reduplication for concession: Quiera o no quiera. Diga lo que diga. Sea quien sea. Noun/adj reduplication for emphasis: poco a poco, más y más. Intensifiers: de lo más + adjective (extremely), lo que es + noun (emphasizing), lo que se dice (what you'd really call).",
+    "key_verbs": [],
+    "common_errors": ["Not recognizing reduplication as a grammatical pattern", "Overusing these structures (they're emphatic, not neutral)"],
+    "practice_patterns": ["___ o no ___ (querer), tiene que hacerlo.", "Es de lo más ___ (interesante).", "No es lo que se ___ (decir) un experto."]
+  },
+  {
+    "id": "c1_conditional_variations",
+    "concept": "Alternative conditional constructions",
+    "category": "sentence_structure",
+    "description": "De + infinitive as conditional: De haberlo sabido, habría venido (= Si lo hubiera sabido). De no ser por ti, no lo habría logrado. A no ser que + subjunctive (unless). Como + subjunctive for threat/warning: Como no vengas, me voy. Imperfect for softening: Quería pedirte un favor.",
+    "key_verbs": [],
+    "common_errors": ["Not recognizing de + infinitive as conditional equivalent", "Using present tense for softening requests instead of imperfect"],
+    "practice_patterns": ["___ no ___ (ser) por ti, estaría perdido.", "___ ___ (haber/saber) antes, habría actuado diferente.", "Como no ___ (dejar) de molestarme, llamo a la policía."]
+  },
+  {
+    "id": "c1_word_order_pragmatics",
+    "concept": "Word order for information structure",
+    "category": "sentence_structure",
+    "description": "Topic-comment structure: Known info first (topic), new info last (focus). Inversion for focus: Llegó María (focus on who arrived). Left-dislocation: A mí, eso no me gusta. Right-dislocation: Es muy bueno, ese restaurante. Verb-subject inversion in certain clauses: Me gusta lo que dijo el profesor.",
+    "key_verbs": [],
+    "common_errors": ["Always using SVO order (Spanish is more flexible)", "Not placing new/important information in focus position"],
+    "practice_patterns": ["___ llegó ayer. (María/She = new info in focus)", "A mí ___ me parece bien. (eso/esto = left-dislocation)", "Llamó tu hermano -> ___ ___ tu hermano. (focus shift)"]
+  },
+  {
+    "id": "c1_que_omission_literary",
+    "concept": "Que omission in literary/formal register",
+    "category": "sentence_structure",
+    "description": "In formal/literary Spanish, 'que' can sometimes be omitted: Le ruego (que) me disculpe. Espero (que) estés bien. This is common in legal, diplomatic, and literary texts. Also in wishes: Dios te bendiga (may God bless you). Note: this is register-specific and not standard in colloquial speech.",
+    "key_verbs": ["rogar", "esperar", "pedir", "suplicar"],
+    "common_errors": ["Omitting que in informal contexts", "Always including que in very formal set phrases"],
+    "practice_patterns": ["Le ruego ___ disculpe la molestia. (que/nothing)", "Espero ___ todo salga bien. (que/nothing)", "Dios ___ bendiga. (te - no que needed)"]
+  },
+  {
+    "id": "c1_cuyo_advanced",
+    "concept": "Cuyo/a/os/as and alternatives",
+    "category": "relative_clauses",
+    "description": "Cuyo (whose) agrees with the thing possessed, not the possessor: El hombre cuya casa (the man whose house - cuya agrees with casa). In formal writing only. In colloquial speech, replaced by: del que, del cual, or restructuring. Used correctly, it marks educated register.",
+    "key_verbs": [],
+    "common_errors": ["Making cuyo agree with the possessor instead of the possessed", "Using cuyo in casual conversation (sounds overly formal)"],
+    "practice_patterns": ["El autor ___ obras son famosas. (cuyo/cuyas)", "La empresa ___ empleados protestan. (cuyo/cuyos)", "El país en ___ territorio viven. (cuyo/el)"]
+  },
+  {
+    "id": "c1_subjunctive_como_manner",
+    "concept": "Como + subjunctive for manner and condition",
+    "category": "verb_moods",
+    "description": "Como + subjunctive: 'however you want/in whatever way'. Hazlo como quieras. Como + subjunctive for condition/warning: Como no estudies, suspenderás. Como + indicative: 'as/since' (causal) or 'as/the way' (manner of known action). Context determines meaning.",
+    "key_verbs": [],
+    "common_errors": ["Not distinguishing como + subjunctive (open manner) from como + indicative (known manner)", "Confusing conditional como with causal como"],
+    "practice_patterns": ["Hazlo como ___ (querer). (however you want)", "Como no ___ (venir), empezamos sin ti. (if/since - past)", "Como no ___ (venir), nos iremos. (warning - future)"]
+  },
+  {
+    "id": "c1_register_formal_informal",
+    "concept": "Register shifting: formal vs informal structures",
+    "category": "sentence_structure",
+    "description": "Formal markers: usted/ustedes, passive se, subjunctive, complex connectors (no obstante, a pesar de ello), cuyo, el cual, literary tenses. Informal markers: tú/vosotros, active voice, indicative preference, simple connectors (pero, porque), que for relative, colloquial intensifiers (super, tope, mogollón).",
+    "key_verbs": [],
+    "common_errors": ["Mixing registers inappropriately", "Being overly formal in casual settings or too casual in formal writing"],
+    "practice_patterns": ["(Formal) Le ruego ___ me informe sobre...", "(Informal) Oye, ¿me ___ lo de...?", "(Formal) No obstante, ___ (considerar) que..."]
+  },
+  {
+    "id": "c1_text_cohesion_devices",
+    "concept": "Advanced text cohesion devices",
+    "category": "connectors",
+    "description": "Anaphoric reference: dicho/mencionado (aforementioned), el mismo/la misma. Cataphoric: a continuación, lo siguiente. Reformulation: es decir, o sea, en otras palabras. Summary: en resumen, en definitiva, a fin de cuentas. Concession: si bien, aun así, con todo.",
+    "key_verbs": [],
+    "common_errors": ["Overusing basic connectors (también, pero, porque) at this level", "Not using enough cohesion markers in written text"],
+    "practice_patterns": ["El proyecto fracasó. ___, no todo fue negativo. (con todo/en definitiva)", "___, necesitamos más datos. (en otras palabras/es decir)", "___ lo dicho, pasemos al siguiente punto. (dicho esto/con todo)"]
+  },
+  {
+    "id": "c1_subjunctive_set_phrases_formal",
+    "concept": "Subjunctive in formal set phrases",
+    "category": "verb_moods",
+    "description": "Common in business/academic/legal: Sea cual sea/fuere (whatever it may be), no sea que (lest), a no ser que (unless), siempre y cuando (provided that), dado que + indicative but dado el caso de que + subjunctive, habida cuenta de que (considering that). These mark formal register.",
+    "key_verbs": [],
+    "common_errors": ["Using these in casual conversation (too formal)", "Mixing up which require subjunctive vs indicative"],
+    "practice_patterns": ["Sea cual ___ (ser) el resultado, aceptaremos.", "No ___ (ser) que se enfade, mejor no decirle.", "Lo haré siempre y cuando ___ (cumplir) tu parte."]
+  },
+  {
+    "id": "c1_ethical_dative",
+    "concept": "Ethical and superfluous dative",
+    "category": "pronouns",
+    "description": "Ethical dative expresses emotional involvement: No me le hables así al niño (Don't talk to the child like that - me shows speaker's concern). Common in Latin American Spanish: Se me fue (It got away from me). Te me cuidas (Take care of yourself - for my sake). Adds nuance, not grammatical requirement.",
+    "key_verbs": [],
+    "common_errors": ["Overusing in formal writing", "Not recognizing it as emotional involvement rather than grammatical object"],
+    "practice_patterns": ["¡No ___ me hables así! (le)", "Se ___ cayó el vaso. (me)", "El niño no ___ me come nada. (le)"]
+  },
+  {
+    "id": "c1_leismo_laismo_loismo",
+    "concept": "Leísmo, laísmo, loísmo - regional variation",
+    "category": "pronouns",
+    "description": "Standard: lo/la for direct objects, le for indirect. Leísmo: using le as masculine singular direct object (Le vi = Lo vi). Accepted by RAE for male persons. Laísmo: using la as indirect object (*La dije = Le dije). Not accepted. Loísmo: using lo as indirect object (*Lo dije = Le dije). Not accepted.",
+    "key_verbs": [],
+    "common_errors": ["Assuming all leísmo is wrong (le for male person is accepted)", "Laísmo and loísmo in regions where they're common"],
+    "practice_patterns": ["¿A Juan? ___ vi ayer. (lo/le - both accepted)", "¿A María? ___ vi ayer. (la - standard)", "¿A María? ___ dije la verdad. (le - standard, la = laísmo)"]
+  },
+  {
+    "id": "c1_modal_periphrases_advanced",
+    "concept": "Advanced modal periphrases",
+    "category": "verb_tenses",
+    "description": "Probability: deber de + infinitive (Debe de ser tarde = It must be late). Obligation: haber de + infinitive (formal: Has de saber que...). Approximation: venir a + infinitive (Viene a costar 20 euros). Intention: ir a + infinitive (in past: Iba a decirte). Result: acabar/terminar + gerund (Acabó aceptando).",
+    "key_verbs": ["deber", "haber", "venir", "acabar", "terminar"],
+    "common_errors": ["Confusing deber (obligation) with deber de (probability)", "Not recognizing venir a + infinitive as approximation"],
+    "practice_patterns": ["___ de ___ (deber/ser) las diez. (probability)", "Has ___ saber que no estoy de acuerdo. (de - obligation)", "Viene ___ costar unos cien euros. (a - approximation)"]
+  },
+  {
+    "id": "c1_pluperfect_subjunctive_advanced",
+    "concept": "Pluperfect subjunctive - advanced uses and alternatives",
+    "category": "verb_moods",
+    "description": "In si clauses: Si hubiera/hubiese sabido. In result clause (colloquial alternative): Si hubiera sabido, hubiera venido (instead of habría). After ojalá: Ojalá hubiera ido. After como si: Como si no hubiera pasado nada. The -ra form can replace conditional perfect in colloquial: Hubiera querido ir (= Habría querido ir).",
+    "key_verbs": ["haber"],
+    "common_errors": ["In formal writing, using hubiera in result clause (prefer habría)", "Confusing the two uses of -ra forms (subjunctive vs conditional replacement)"],
+    "practice_patterns": ["Si ___ ___ (haber/saber), te lo habría dicho.", "Ojalá no ___ ___ (haber/decir) eso.", "Si ___ ___ (haber/poder), ___ ___ (haber/ir) contigo."]
+  },
+  {
+    "id": "c1_participio_absoluto_advanced",
+    "concept": "Absolute and adjectival participle constructions",
+    "category": "sentence_structure",
+    "description": "Absolute participle as temporal/causal subordinate: Terminada la reunión, se fueron (Once the meeting was over...). Dicho esto, pasemos al siguiente tema. Visto lo visto (Given what we've seen). Note gender/number agreement. Also adjectival: recién llegado, dado el caso. Common in formal/academic Spanish.",
+    "key_verbs": [],
+    "common_errors": ["Forgetting participle agreement with its noun", "Using this construction in casual speech (sounds overly formal)"],
+    "practice_patterns": ["___ (terminar) la cena, salimos a pasear.", "___ (decir) lo ___ (decir), no hay vuelta atrás.", "___ lo ___ (ver), es mejor no continuar."]
+  }
+]

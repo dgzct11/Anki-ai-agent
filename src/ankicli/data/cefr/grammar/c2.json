@@ -1,0 +1,137 @@
+[
+  {
+    "id": "c2_subjunctive_nuanced_alternation",
+    "concept": "Subjunctive-indicative alternation for pragmatic effect",
+    "category": "verb_moods",
+    "description": "At C2, the choice between subjunctive and indicative is often pragmatic rather than grammatical. Quizás viene (I think he's coming - more certain) vs Quizás venga (he might come - less certain). Siento que no puedes venir (I'm sorry you can't come - empathizing with fact) vs Siento que no puedas venir (I'm sorry, I hope you might still come).",
+    "key_verbs": [],
+    "common_errors": ["Applying subjunctive rules mechanically without considering pragmatic nuance", "Not recognizing that both moods can be grammatically correct with different meanings"],
+    "practice_patterns": ["Siento que no ___ (poder) venir. (fact vs wish)", "Tal vez ___ (ser) mejor esperar. (certainty varies)", "Aunque ___ (tener) razón, no estoy de acuerdo. (fact vs concession)"]
+  },
+  {
+    "id": "c2_historical_present_narrative",
+    "concept": "Historical present and narrative tenses",
+    "category": "verb_tenses",
+    "description": "Using present tense to narrate past events for dramatic effect: Colón llega a América en 1492. Mixing narrative tenses: imperfect for background, preterite for events, present for dramatic moments, pluperfect for flashbacks. Literary use of simple past (pretérito anterior): Cuando hubo terminado, se fue.",
+    "key_verbs": [],
+    "common_errors": ["Inconsistent tense shifting within narrative", "Overusing historical present (loses effect if constant)"],
+    "practice_patterns": ["Era de noche. De pronto, alguien ___ (llamar) a la puerta. (narrative present)", "Cuando ___ ___ (haber/terminar), se marchó. (pretérito anterior)", "Estaba lloviendo. Ella ___ (salir) corriendo. (dramatic present)"]
+  },
+  {
+    "id": "c2_subjunctive_optative_desiderative",
+    "concept": "Optative and desiderative subjunctive",
+    "category": "verb_moods",
+    "description": "Independent subjunctive for wishes, curses, and blessings: Que Dios te bendiga. Maldito sea. Así sea. Viva la libertad. Que en paz descanse. Quién pudiera (If only I could). Pluguiera a Dios (Would to God - literary). These represent the subjunctive's oldest function.",
+    "key_verbs": [],
+    "common_errors": ["Not recognizing these as independent subjunctive clauses", "Using indicative in exclamatory wishes"],
+    "practice_patterns": ["¡___ (vivir) el rey!", "¡Quién ___ (poder) volar!", "Que en paz ___ (descansar)."]
+  },
+  {
+    "id": "c2_stylistic_inversion",
+    "concept": "Stylistic inversion and marked word order",
+    "category": "sentence_structure",
+    "description": "Literary/formal inversions: Dijo el profesor (said the professor), Bien lo sabe él (He knows it well), Grande fue su sorpresa (Great was his surprise). After negative adverbs: Nunca había visto tal cosa, Jamás lo haría. Conditional inversion: Hubiera yo sabido (Had I known). These mark register and emphasis.",
+    "key_verbs": [],
+    "common_errors": ["Using marked inversion in casual speech (sounds pretentious)", "Not recognizing inversion patterns in literary texts"],
+    "practice_patterns": ["Grande ___ su sorpresa al verme. (fue/era)", "Nunca ___ ___ (haber/ver) algo semejante.", "— Ven aquí — ___ (decir) su madre."]
+  },
+  {
+    "id": "c2_abstract_nominalization",
+    "concept": "Complex nominalization and abstract reference",
+    "category": "sentence_structure",
+    "description": "Advanced nominalization: el que/la que + subjunctive (whoever), lo de + infinitive/noun (the matter of), el hecho de que + subjunctive. Abstract lo: lo poco que sé, lo mucho que te quiero. Nominalized adjectives: los de abajo (those below/the underprivileged), los demás (the rest/others).",
+    "key_verbs": [],
+    "common_errors": ["Confusion between el que (the one who) and lo que (what/that which)", "Not using lo for abstract qualities with adjectives"],
+    "practice_patterns": ["___ que llegue primero, gana. (el/lo)", "No sabes ___ mucho que te echo de menos. (lo/el)", "___ de ayer fue un malentendido. (lo/el)"]
+  },
+  {
+    "id": "c2_rhetorical_questions_devices",
+    "concept": "Rhetorical questions and persuasive devices",
+    "category": "sentence_structure",
+    "description": "Rhetorical questions: ¿Acaso no lo sabías? (Didn't you know?). ¿Qué más da? (What does it matter?). ¿A quién le importa? Litotes for understatement: No es mala idea (= It's a good idea). Irony markers: Como si yo fuera tonto. No faltaba más (sarcastic). Digo yo (I would say - hedging).",
+    "key_verbs": [],
+    "common_errors": ["Taking rhetorical questions literally", "Not recognizing litotes as a common Spanish understatement strategy"],
+    "practice_patterns": ["¿Acaso ___ (creer) que no me doy cuenta?", "No ___ nada mal tu propuesta. (está/es)", "¡No ___ más! (faltaba - ironic/emphatic)"]
+  },
+  {
+    "id": "c2_se_medio_aspectual",
+    "concept": "Aspectual and middle 'se'",
+    "category": "pronouns",
+    "description": "Aspectual se adds completeness/totality: comer (eat) vs comerse (eat up entirely), beber vs beberse, leer vs leerse. Middle se: the subject is affected by the process: romperse (break by itself), caerse (fall down), morirse (die - more emotional). Se me olvidó vs Olvidé (de-agentivizing).",
+    "key_verbs": ["comer/comerse", "beber/beberse", "ir/irse", "dormir/dormirse", "morir/morirse", "caer/caerse"],
+    "common_errors": ["Not distinguishing aspectual se from reflexive se", "Overusing or underusing aspectual se (it implies entirety)"],
+    "practice_patterns": ["Se ___ (comer) toda la paella. (completeness)", "Se le ___ (romper) el vaso. (accidental)", "El vaso se ___ (caer) de la mesa. (middle voice)"]
+  },
+  {
+    "id": "c2_conditional_politeness_hedging",
+    "concept": "Conditional and imperfect for politeness and hedging",
+    "category": "verb_tenses",
+    "description": "Softening with imperfect: Quería pedirte un favor (I wanted to ask - softer than quiero). Conditional: ¿Podrías ayudarme? Yo diría que... (I would say...). Future for softening: Será mejor que... (It would be better). Imperfect subjunctive for maximum deference: Quisiera saber si... (I would like to know).",
+    "key_verbs": ["querer", "poder", "deber", "ser"],
+    "common_errors": ["Using present tense for requests in formal situations", "Not recognizing the politeness hierarchy: present < imperfect < conditional < imperfect subjunctive"],
+    "practice_patterns": ["___ (Querer - softest) pedirle un favor. (quisiera)", "___ (Poder) decirme dónde está la estación? (podría)", "Yo ___ (decir) que no es buena idea. (diría)"]
+  },
+  {
+    "id": "c2_discourse_modality_markers",
+    "concept": "Discourse modality and evidentiality markers",
+    "category": "sentence_structure",
+    "description": "Evidentiality: Al parecer/por lo visto (apparently), según dicen (as they say), se rumorea que (it's rumored). Hedging: digamos (let's say), por así decirlo (so to speak), en cierto modo (in a way). Reformulation: mejor dicho (rather), bueno (well), vamos (I mean). Attitude: desde luego, por supuesto, ni mucho menos.",
+    "key_verbs": [],
+    "common_errors": ["Not using enough discourse markers (makes speech sound flat)", "Overusing the same markers repeatedly"],
+    "practice_patterns": ["___, no es exactamente lo que esperaba. (bueno/digamos)", "___, todo salió bien. (por lo visto/según dicen)", "No es, ___, una solución perfecta. (digamos/por así decirlo)"]
+  },
+  {
+    "id": "c2_counterfactual_constructions",
+    "concept": "Complex counterfactual constructions",
+    "category": "sentence_structure",
+    "description": "Mixed counterfactuals: Si hubiera estudiado, ahora sabría (past cause, present result). De no haber sido por ti, habría fracasado. Yo que tú, no lo haría (If I were you). De haber podido, habría ido. Multiple layers: Si hubiera sabido que ibas a venir, habría preparado algo que te hubiera gustado.",
+    "key_verbs": [],
+    "common_errors": ["Not handling multiple temporal layers correctly", "Oversimplifying complex counterfactual chains"],
+    "practice_patterns": ["Si ___ ___ (haber/estudiar) más, ahora ___ (tener) un mejor trabajo. (mixed)", "Yo que tú, no ___ (hacer) eso.", "De ___ ___ (haber/poder), ___ ___ (haber/ir) contigo."]
+  },
+  {
+    "id": "c2_grammatical_metaphor",
+    "concept": "Grammatical metaphor and nominalizations in academic discourse",
+    "category": "sentence_structure",
+    "description": "Turning processes into things (nominalization) for academic/formal writing: 'The company produced more' -> 'The increase in production' (el aumento de la producción). Dense nominal groups: La constante disminución del rendimiento académico de los estudiantes. Passivization and impersonalization as distancing strategies.",
+    "key_verbs": [],
+    "common_errors": ["Overusing nominalizations (makes text impenetrable)", "Not using enough in academic writing (sounds too informal)"],
+    "practice_patterns": ["Los precios subieron -> ___ de los precios. (la subida)", "Se decidió que -> ___ fue que... (la decisión)", "Los trabajadores protestaron -> ___ de los trabajadores... (la protesta)"]
+  },
+  {
+    "id": "c2_historical_grammatical_awareness",
+    "concept": "Diachronic awareness - archaic forms in modern use",
+    "category": "verb_tenses",
+    "description": "Remnant archaic forms still in use: pluguiera/pluguiese (would it please - literary), hubiere (future subjunctive in legal texts), pretérito anterior (hubo terminado - very rare). Understanding voseo (vos + modified conjugations) in Argentine/Central American Spanish. Recognizing Ladino and historical Spanish features.",
+    "key_verbs": [],
+    "common_errors": ["Not recognizing archaic forms in legal or literary contexts", "Confusing voseo verb forms with errors"],
+    "practice_patterns": ["'Vos ___ (tener) razón.' - Argentine Spanish. (tenés)", "Archaic: 'Si Vuestra Merced ___ (ser) tan amable...' (fuere)", "Legal: 'Cuando ___ (haber) lugar...' (hubiere)"]
+  },
+  {
+    "id": "c2_pragmatic_implicature",
+    "concept": "Pragmatic implicature and conversational inference",
+    "category": "sentence_structure",
+    "description": "Understanding implied meaning beyond literal grammar: '¿No tendrás un bolígrafo?' (polite request via negative question + future of probability). 'Si tú lo dices...' (skepticism). 'Ya veremos' (polite refusal). 'Hombre, no sé...' (hedging disagreement). Grammatical structures chosen for pragmatic effect.",
+    "key_verbs": [],
+    "common_errors": ["Taking pragmatic expressions at face value", "Not recognizing implicit refusals, suggestions, or criticisms"],
+    "practice_patterns": ["¿No ___ (tener - future) cambio? (polite request)", "Ya ___. (veremos - probable refusal)", "Si tú lo ___ (decir)... (skepticism)"]
+  },
+  {
+    "id": "c2_subjunctive_optionality_advanced",
+    "concept": "Subjunctive optionality zones - regional and stylistic variation",
+    "category": "verb_moods",
+    "description": "Zones where subjunctive/indicative varies by region: después de que (Latin America often indicative, Spain subjunctive). Quizás/Tal vez (subjunctive more common in Spain). Mientras (indicative in some Latin American varieties for 'as long as'). Colloquial indicative replacing subjunctive in subordinate clauses: Quiero que vienes (non-standard but heard).",
+    "key_verbs": [],
+    "common_errors": ["Assuming one dialect's usage is 'correct' and others are 'wrong'", "Not adapting to the variety of Spanish being used/studied"],
+    "practice_patterns": ["Después de que ___ (llegar). (llegue in Spain, llegó in some LA varieties)", "Quizás ___ (venir) mañana. (venga or viene - both valid)", "Mientras ___ (poder), seguiré trabajando. (pueda in Spain, puedo in some LA)"]
+  },
+  {
+    "id": "c2_text_genre_grammar",
+    "concept": "Grammar variation across text genres",
+    "category": "sentence_structure",
+    "description": "Academic: passive se, nominalization, hedging (parece que, cabe señalar), impersonal structures. Legal: future subjunctive, formal imperatives, archaic vocabulary. Journalistic: historical present, indirect speech, quotation frames. Literary: free indirect speech, stream of consciousness, tense mixing for effect.",
+    "key_verbs": [],
+    "common_errors": ["Using colloquial grammar in academic writing", "Using overly formal grammar in creative writing"],
+    "practice_patterns": ["(Academic) Cabe ___ que los resultados sugieren... (señalar/decir)", "(Legal) Si ___ (proceder - future subj) en derecho...", "(Literary) Llovía. Ella no ___ (saber) qué hacer. ___ (Abrir) la puerta y ___ (salir). (free indirect)"]
+  }
+]
