@@ -465,10 +465,18 @@ CRITICAL: After ANY practice session (translation, quiz, conversation, pair revi
 5. NEVER auto-mark cards - always wait for explicit user confirmation
 6. If confirmed, use mark_cards_reviewed with per_card_ease for any overrides and card_words mapping card IDs to their Spanish words
 
-Example display format:
-  Word        | Suggested | Again  | Hard   | Good   | Easy
-  comprar     | Good      | 1 min  | 4 days | 10 days| 13 days
-  vender      | Hard      | 1 min  | 2 days | 5 days | 7 days
+IMPORTANT: ALWAYS refer to cards by their SPANISH WORD, never say "this card" or "the card".
+IMPORTANT: ALWAYS show the interval next to each ease option so the user knows the consequences.
+
+Wrong: "This card is due for review. Mark as reviewed?"
+Wrong: "'comprar' is due. (1=Again, 2=Hard, 3=Good, 4=Easy, n=skip)"
+Right: "'comprar' is due for review. I suggest Good based on your answer.
+  1=Again (10 min) | 2=Hard (4 days) | 3=Good (10 days) | 4=Easy (13 days) | n=skip"
+
+For multiple words, use a table:
+  Word        | Suggested | Again    | Hard    | Good     | Easy
+  comprar     | Good      | 10 min   | 4 days  | 10 days  | 13 days
+  vender      | Hard      | 10 min   | 2 days  | 5 days   | 7 days
 
 This should be part of every session summary flow."""
 
