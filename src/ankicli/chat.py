@@ -754,33 +754,60 @@ def run_practice_loop(
         if card is None:
             break
 
-        # Build list of remaining words for Claude to see
+        # Group 2-3 cards together for multi-word sentences
+        # At difficulty 1 (single word), just use 1 card
+        group_size = 1 if session.difficulty_num <= 1 else min(3, session.questions_remaining)
+        group_cards = []
+        for offset in range(group_size):
+            idx = session.current_index + offset
+            if idx < len(session.cards):
+                group_cards.append(session.cards[idx])
+
+        # Build info for grouped cards (what Claude must use)
+        group_words = [_extract_word(gc) for gc in group_cards]
+        group_info = []
+        for gc in group_cards:
+            clean_word = _re_group.sub(r'<[^>]+>', '', gc.back).strip().split('\n')[0][:40]
+            group_info.append(f"  - {clean_word} (EN: {gc.front})")
+        group_section = "\n".join(group_info)
+
+        # Also build a wider context of upcoming words (for Claude to see what's coming)
         remaining_cards = []
         for idx in range(session.current_index, min(session.current_index + 10, len(session.cards))):
             remaining_cards.append(session.cards[idx])
-
         remaining_info = []
         for rc in remaining_cards:
             clean_word = _re_group.sub(r'<[^>]+>', '', rc.back).strip().split('\n')[0][:40]
             remaining_info.append(f"  - {clean_word} (EN: {rc.front})")
         remaining_section = "\n".join(remaining_info)
-        current_word = _extract_word(card)
 
-        # Step 1: Ask Claude to generate a sentence combining multiple target words
+        # Step 1: Ask Claude to generate a sentence using the grouped words
         direction_label = "English" if session.direction == PracticeDirection.EN_TO_ES else "Spanish"
         target_lang = "Spanish" if session.direction == PracticeDirection.EN_TO_ES else "English"
-        gen_prompt = (
-            f"[PRACTICE MODE - GENERATE SENTENCE]\n"
-            f"Question {session.current_index + 1}/{session.total_questions}\n"
-            f"Difficulty level: {session.difficulty_num}/5 ({session.difficulty_label})\n\n"
-            f"Upcoming words to practice ({len(remaining_cards)}):\n{remaining_section}\n\n"
-            f"Generate a SINGLE {direction_label} sentence for the user to translate to {target_lang}.\n"
-            f"The sentence MUST use the word '{current_word}' and should also naturally include 1-2 other "
-            f"words from the list above if they fit well together.\n"
-            f"Do NOT reveal the target words or the {target_lang} translation.\n"
-            f"Just present the sentence to translate. Keep it appropriate for difficulty level {session.difficulty_num}/5.\n"
-            f"Format: just the sentence, nothing else."
-        )
+
+        if len(group_cards) > 1:
+            gen_prompt = (
+                f"[PRACTICE MODE - GENERATE SENTENCE]\n"
+                f"Question {session.current_index + 1}/{session.total_questions}\n"
+                f"Difficulty level: {session.difficulty_num}/5 ({session.difficulty_label})\n\n"
+                f"TARGET WORDS for this question (use ALL of these):\n{group_section}\n\n"
+                f"Other upcoming words for context:\n{remaining_section}\n\n"
+                f"Generate a SINGLE {direction_label} sentence that naturally uses ALL {len(group_cards)} "
+                f"target words: {', '.join(group_words)}.\n"
+                f"Do NOT reveal which {target_lang} words to use. Do NOT show the translation.\n"
+                f"Just output the sentence. Keep it appropriate for difficulty level {session.difficulty_num}/5."
+            )
+        else:
+            gen_prompt = (
+                f"[PRACTICE MODE - GENERATE SENTENCE]\n"
+                f"Question {session.current_index + 1}/{session.total_questions}\n"
+                f"Difficulty level: {session.difficulty_num}/5 ({session.difficulty_label})\n\n"
+                f"TARGET WORD: {group_words[0]}\n\n"
+                f"Other upcoming words for context:\n{remaining_section}\n\n"
+                f"Generate a SINGLE {direction_label} sentence using the target word.\n"
+                f"Do NOT reveal the {target_lang} translation.\n"
+                f"Just output the sentence. Keep it appropriate for difficulty level {session.difficulty_num}/5."
+            )
 
         # Get Claude's generated sentence
         generated_sentence = ""
@@ -800,13 +827,15 @@ def run_practice_loop(
         generated_sentence = generated_sentence.strip().strip('"').strip("'")
 
         # Show question panel with Claude's generated sentence (no target words shown)
+        any_due = any(gc.is_due for gc in group_cards)
         console.print(create_practice_question_panel(
             question_num=session.current_index + 1,
             total=session.total_questions,
             phrase=generated_sentence,
             direction=session.direction,
-            is_due=card.is_due,
+            is_due=any_due,
             difficulty=session.difficulty_level,
+            target_words=f"{len(group_cards)} words" if len(group_cards) > 1 else "",
         ))
 
         # Get user answer
@@ -827,15 +856,16 @@ def run_practice_loop(
 
         if answer.lower() == "/skip":
             from .translation_practice import PracticeResult
-            session.record_result(PracticeResult(
-                card_id=card.card_id,
-                front=card.front,
-                back=card.back,
-                user_answer="(skipped)",
-                feedback_level=FeedbackLevel.INCORRECT,
-                feedback_text="Skipped",
-            ))
-            console.print("[dim]Skipped.[/dim]\n")
+            for gc in group_cards:
+                session.record_result(PracticeResult(
+                    card_id=gc.card_id,
+                    front=gc.front,
+                    back=gc.back,
+                    user_answer="(skipped)",
+                    feedback_level=FeedbackLevel.INCORRECT,
+                    feedback_text="Skipped",
+                ))
+            console.print(f"[dim]Skipped {len(group_cards)} word(s).[/dim]\n")
             continue
 
         if answer.lower() == "/score":
@@ -861,11 +891,10 @@ def run_practice_loop(
         eval_prompt = (
             f"[PRACTICE MODE - EVALUATE TRANSLATION]\n"
             f"The sentence was: {generated_sentence}\n"
-            f"User's translation to {target_lang}: {answer}\n"
-            f"Primary target word: {current_word}\n"
-            f"Words from the deck that could appear in the sentence:\n{remaining_section}\n\n"
+            f"User's translation to {target_lang}: {answer}\n\n"
+            f"Target words being tested ({len(group_cards)}):\n{group_section}\n\n"
             f"Evaluate the translation. Score each 0-4: Meaning, Grammar, Naturalness, Vocabulary.\n"
-            f"Give per-word feedback on target words used in the sentence.\n"
+            f"Give per-word feedback on EACH target word: did the user use the right word?\n"
             f"Show the correct translation if wrong."
         )
 

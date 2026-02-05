@@ -1826,20 +1826,18 @@ def handle_mark_cards_reviewed(anki: AnkiClient, tool_input: dict, **ctx) -> str
         card_ease = per_card_ease.get(cid_str, default_ease)
         if card_ease not in (1, 2, 3, 4):
             card_ease = default_ease
+        word = card_words.get(str(cid), str(cid))
         try:
-            success = anki.answer_card(int(cid), card_ease)
+            success, message = anki.answer_card(int(cid), card_ease)
             if success:
                 succeeded += 1
-                word = card_words.get(str(cid), str(cid))
                 details.append(f"  {word}: {ease_labels.get(card_ease, '?')}")
             else:
                 failed += 1
-                word = card_words.get(str(cid), str(cid))
-                details.append(f"  {word}: FAILED (answer_card returned False)")
+                details.append(f"  {word}: COULD NOT MARK — {message}")
         except Exception as e:
             failed += 1
-            word = card_words.get(str(cid), str(cid))
-            details.append(f"  {word}: FAILED ({e})")
+            details.append(f"  {word}: COULD NOT MARK — {e}")
 
     # Record study activity for streaks
     try:

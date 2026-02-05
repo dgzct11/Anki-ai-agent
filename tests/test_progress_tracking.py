@@ -502,7 +502,7 @@ class TestMarkCardsReviewedHandler:
         handler_fn = HANDLERS["mark_cards_reviewed"]
 
         mock_anki = MagicMock()
-        mock_anki.answer_card.return_value = True
+        mock_anki.answer_card.return_value = (True, "OK")
 
         result = handler_fn(mock_anki, {"card_ids": ["123", "456"], "ease": 3})
         assert "2 card(s) as reviewed" in result
@@ -514,11 +514,11 @@ class TestMarkCardsReviewedHandler:
         handler_fn = HANDLERS["mark_cards_reviewed"]
 
         mock_anki = MagicMock()
-        mock_anki.answer_card.side_effect = [True, False]
+        mock_anki.answer_card.side_effect = [(True, "OK"), (False, "not in queue")]
 
         result = handler_fn(mock_anki, {"card_ids": ["123", "456"], "ease": 3})
         assert "1 card(s) as reviewed" in result
-        assert "failed" in result
+        assert "COULD NOT MARK" in result
 
     def test_invalid_ease(self):
         from ankicli.tool_handlers import HANDLERS
@@ -541,7 +541,7 @@ class TestMarkCardsReviewedHandler:
         handler_fn = HANDLERS["mark_cards_reviewed"]
 
         mock_anki = MagicMock()
-        mock_anki.answer_card.return_value = True
+        mock_anki.answer_card.return_value = (True, "OK")
 
         result = handler_fn(mock_anki, {"card_ids": ["123"]})
         mock_anki.answer_card.assert_called_once_with(123, 3)

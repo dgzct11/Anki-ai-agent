@@ -471,34 +471,42 @@ class AnkiClient:
             "easy": _format_interval(easy_ivl),
         }
 
-    def answer_card(self, card_id: int, ease: int) -> bool:
-        """Try to mark a card as reviewed via answerCards.
+    def answer_card(self, card_id: int, ease: int) -> tuple[bool, str]:
+        """Mark a card as reviewed via answerCards (preserves full SRS).
 
-        answerCards only works if the card is currently at the top of
-        Anki's review queue. For arbitrary cards (like those practiced
-        in the CLI), this will fail. No fallback to setDueDate since
-        that corrupts SRS data.
+        answerCards calls Anki's native scheduler.answerCard() — the exact
+        same method the GUI uses. It only works if the card is currently
+        in Anki's review queue. No fallback to setDueDate since that
+        corrupts SRS data (no ease factor update, no FSRS stability, etc).
 
         Args:
             card_id: The note ID to answer. Will find associated card IDs.
             ease: Ease rating (1=Again, 2=Hard, 3=Good, 4=Easy).
 
         Returns:
-            True if successful, False if card not in reviewer.
+            Tuple of (success: bool, message: str).
+            On failure, message explains why so it can be shown to the user.
         """
         card_ids = _request("findCards", query=f"nid:{card_id}")
         if not card_ids:
-            return False
+            return False, f"No card found for note ID {card_id}"
 
         for cid in card_ids:
             try:
                 result = _request("answerCards", answers=[{"cardId": cid, "ease": ease}])
                 if isinstance(result, list) and result and result[0] is True:
-                    return True
-            except AnkiConnectError:
-                pass
+                    return True, "OK"
+            except AnkiConnectError as e:
+                error_msg = str(e)
+                if "not at top of queue" in error_msg.lower() or "queue" in error_msg.lower():
+                    return False, (
+                        "Card is not in Anki's active review queue. "
+                        "To mark it, open Anki and review it there — "
+                        "answerCards only works for the card currently shown in the reviewer."
+                    )
+                return False, f"AnkiConnect error: {error_msg}"
 
-        return False
+        return False, "answerCards returned no result"
 
     def get_card_reviews(self, deck_name: str | None = None) -> list[dict]:
         """
