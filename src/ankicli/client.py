@@ -483,43 +483,29 @@ def _format_interval(days: float) -> str:
     def answer_card(self, card_id: int, ease: int) -> bool:
         """Mark a card as reviewed in Anki with the given ease rating.
 
-        Strategy depends on card state:
-        - Review cards: try answerCards (proper SRS), fall back to setDueDate!
-        - New cards: Again=skip, Good/Easy=graduate to review via setDueDate!
-        - Learning/relearning cards: Again=skip (let Anki handle steps),
-          Good/Easy=graduate to review via setDueDate!
+        Uses answerCards which calls Anki's native scheduler.answerCard() —
+        the exact same method the GUI uses. This properly updates all SRS
+        state: interval, ease factor, reps, lapses, revlog, FSRS stability.
+
+        No fallback to setDueDate because it corrupts SRS data (no revlog,
+        no ease factor update, no FSRS stability update, skips learning steps).
 
         Args:
             card_id: The note ID to answer. Will find associated card IDs.
             ease: Ease rating (1=Again, 2=Hard, 3=Good, 4=Easy).
 
         Returns:
-            True if successful.
+            True if successful, False if failed.
         """
         # Find actual card IDs for this note
         card_ids = _request("findCards", query=f"nid:{card_id}")
         if not card_ids:
             return False
 
-        # Get card state
-        try:
-            cards_info = _request("cardsInfo", cards=[card_ids[0]])
-            info = cards_info[0] if cards_info else {}
-        except (AnkiConnectError, IndexError):
-            info = {}
-
-        card_type = info.get("type", 0)  # 0=new, 1=learning, 2=review, 3=relearn
-        interval = info.get("interval", 0)
-        factor = info.get("factor", 2500) / 1000
-
-        # For new and learning cards with Again: don't touch them.
-        # Let Anki's own learning steps handle the progression.
-        if card_type in (0, 1, 3) and ease == 1:
-            # Card stays in its current state — Anki will show it again
-            # in the learning steps. This is the correct behavior.
-            return True
-
-        # Try answerCards first — properly updates SRS for review cards
+        # answerCards calls scheduler.answerCard(card, ease) which is
+        # identical to pressing a button in the Anki GUI reviewer.
+        # It handles all card types (new, learning, review, relearning)
+        # and both SM-2 and FSRS schedulers correctly.
         for cid in card_ids:
             try:
                 result = _request("answerCards", answers=[{"cardId": cid, "ease": ease}])
@@ -528,25 +514,7 @@ def _format_interval(days: float) -> str:
             except AnkiConnectError:
                 pass
 
-        # Fallback: use setDueDate with '!' suffix (also sets interval)
-        if card_type in (0, 1, 3):
-            # New/learning card: graduate to review
-            # Hard=1 day, Good=1 day, Easy=4 days
-            due_days = {2: 1, 3: 1, 4: 4}.get(ease, 1)
-        else:
-            # Review card: compute interval from current state
-            if ease == 2:
-                due_days = max(1, round(interval * 1.2))
-            elif ease == 3:
-                due_days = max(1, round(interval * factor))
-            else:
-                due_days = max(1, round(interval * factor * 1.3))
-
-        try:
-            _request("setDueDate", cards=card_ids, days=f"{due_days}!")
-            return True
-        except AnkiConnectError:
-            return False
+        return False
 
     def get_card_reviews(self, deck_name: str | None = None) -> list[dict]:
         """
