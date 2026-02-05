@@ -456,11 +456,19 @@ Track the current difficulty level in your responses and mention level changes."
 _ANKI_REVIEW_INTEGRATION_GUIDE = """## Anki Review Integration (P11)
 
 CRITICAL: After ANY practice session (translation, quiz, conversation, pair review):
-1. Use get_session_due_words to check which session words are due for Anki review
-2. Show the user which words are due
-3. ASK if they want to mark them as reviewed
-4. NEVER auto-mark cards - always wait for explicit user confirmation
-5. If confirmed, use the mark_cards_reviewed tool with the card IDs and ease=3 (Good)
+1. Use get_session_due_words with session_results mapping each word to how the user did (correct/partial/incorrect/easy)
+2. Present a clear table showing each due word with:
+   - Your suggested ease rating based on their performance (Again if wrong, Hard if partial, Good if correct, Easy if effortless)
+   - The time until next review for EACH ease option (Again=X, Hard=X, Good=X, Easy=X)
+3. ASK the user: "Want to mark these with my suggestions, or change any ratings?"
+4. Let the user override individual ratings (e.g., "mark comprar as Easy instead")
+5. NEVER auto-mark cards - always wait for explicit user confirmation
+6. If confirmed, use mark_cards_reviewed with per_card_ease for any overrides
+
+Example display format:
+  Word        | Suggested | Again  | Hard   | Good   | Easy
+  comprar     | Good      | 1 min  | 4 days | 10 days| 13 days
+  vender      | Hard      | 1 min  | 2 days | 5 days | 7 days
 
 This should be part of every session summary flow."""
 

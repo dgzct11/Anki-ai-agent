@@ -950,25 +950,45 @@ def run_practice_loop(
         if card.is_due:
             try:
                 import re as _re
-                # Clean the word from the back field for display
                 clean_word = _re.sub(r'<[^>]+>', '', card.back).strip()[:40]
+                suggested_ease = feedback_to_ease(feedback_level)
+                ease_labels = {1: "Again", 2: "Hard", 3: "Good", 4: "Easy"}
+                suggested_label = ease_labels.get(suggested_ease, "Good")
+
+                # Get interval estimates
+                try:
+                    intervals = assistant.anki.get_next_intervals(int(card.card_id))
+                except Exception:
+                    intervals = {"again": "?", "hard": "?", "good": "?", "easy": "?"}
+
+                console.print(f"  [cyan]'{clean_word}'[/cyan] — Suggested: [bold]{suggested_label}[/bold]")
+                console.print(f"  [dim]Again={intervals['again']} | Hard={intervals['hard']} | Good={intervals['good']} | Easy={intervals['easy']}[/dim]")
+
                 review_answer = prompt_session.prompt(
-                    [("class:prompt", f"Mark '{clean_word}' as reviewed in Anki? (y/n): ")],
+                    [("class:prompt", f"Mark as reviewed? ({suggested_label}/1-4/n): ")],
                 ).strip().lower()
 
-                if review_answer in ("y", "yes"):
-                    ease = feedback_to_ease(feedback_level)
+                if review_answer in ("n", "no", ""):
+                    console.print("[dim]Skipped.[/dim]")
+                else:
+                    # Parse ease: accept number, label, or just 'y'/'yes' for suggested
+                    ease_map = {"again": 1, "hard": 2, "good": 3, "easy": 4, "y": suggested_ease, "yes": suggested_ease}
+                    if review_answer in ease_map:
+                        ease = ease_map[review_answer]
+                    elif review_answer.isdigit() and int(review_answer) in (1, 2, 3, 4):
+                        ease = int(review_answer)
+                    else:
+                        ease = suggested_ease
+
                     try:
                         success = assistant.anki.answer_card(int(card.card_id), ease)
                         if success:
                             result.marked_reviewed = True
-                            console.print("[green]Marked as reviewed in Anki.[/green]")
+                            console.print(f"[green]Marked as {ease_labels.get(ease, '?')} in Anki.[/green]")
                         else:
-                            console.print("[yellow]Could not mark card (AnkiConnect may not support answerCards).[/yellow]")
+                            console.print("[yellow]Could not mark card.[/yellow]")
                     except Exception as e:
                         console.print(f"[yellow]Could not mark reviewed: {e}[/yellow]")
-                else:
-                    console.print("[dim]Skipped Anki review marking.[/dim]")
             except (KeyboardInterrupt, EOFError):
                 pass
 

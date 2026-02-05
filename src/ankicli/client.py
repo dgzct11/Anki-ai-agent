@@ -384,6 +384,70 @@ class AnkiClient:
         """Get new (unseen) cards in a deck."""
         return self.search_cards(f'deck:"{deck_name}" is:new', limit=limit)
 
+    def get_next_intervals(self, card_id: int) -> dict[str, str]:
+        """Estimate the next review intervals for each ease button.
+
+        Uses cardsInfo to get current interval and ease factor, then
+        estimates what each button would do.
+
+        Args:
+            card_id: The card/note ID.
+
+        Returns:
+            Dict with keys "again", "hard", "good", "easy" mapping to
+            human-readable interval strings like "10 min", "2 days", etc.
+        """
+        card_ids = _request("findCards", query=f"nid:{card_id}")
+        if not card_ids:
+            return {"again": "?", "hard": "?", "good": "?", "easy": "?"}
+
+        try:
+            cards_info = _request("cardsInfo", cards=[card_ids[0]])
+            if not cards_info:
+                return {"again": "?", "hard": "?", "good": "?", "easy": "?"}
+            info = cards_info[0]
+        except (AnkiConnectError, IndexError):
+            return {"again": "?", "hard": "?", "good": "?", "easy": "?"}
+
+        interval = info.get("interval", 0)  # current interval in days
+        factor = info.get("factor", 2500) / 1000  # ease factor (e.g., 2.5)
+        card_type = info.get("type", 0)  # 0=new, 1=learning, 2=review, 3=relearn
+
+        def _format_interval(days: float) -> str:
+            if days < 1:
+                minutes = max(1, int(days * 24 * 60))
+                return f"{minutes} min"
+            elif days < 30:
+                d = max(1, round(days))
+                return f"{d} day{'s' if d != 1 else ''}"
+            elif days < 365:
+                m = round(days / 30)
+                return f"{m} month{'s' if m != 1 else ''}"
+            else:
+                y = round(days / 365, 1)
+                return f"{y} year{'s' if y != 1 else ''}"
+
+        if card_type in (0, 1, 3):  # new, learning, or relearning
+            return {
+                "again": "1 min",
+                "hard": "6 min",
+                "good": "10 min",
+                "easy": "4 days",
+            }
+
+        # Review card: estimate based on current interval and ease factor
+        again_ivl = max(1, interval * 0.1)  # lapse: ~10% of current
+        hard_ivl = max(1, interval * 1.2)
+        good_ivl = max(1, interval * factor)
+        easy_ivl = max(1, interval * factor * 1.3)
+
+        return {
+            "again": _format_interval(again_ivl),
+            "hard": _format_interval(hard_ivl),
+            "good": _format_interval(good_ivl),
+            "easy": _format_interval(easy_ivl),
+        }
+
     def answer_card(self, card_id: int, ease: int) -> bool:
         """Mark a card as reviewed in Anki with the given ease rating.
 

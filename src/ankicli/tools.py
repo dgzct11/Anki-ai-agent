@@ -986,7 +986,7 @@ ANKI_TOOLS = [
     },
     {
         "name": "get_session_due_words",
-        "description": "After ANY practice session (translation, quiz, conversation, pair review), get which words from the session are due for Anki review today. Shows the words and ASKS if user wants to mark them reviewed. NEVER auto-mark.",
+        "description": "After ANY practice session (translation, quiz, conversation, pair review), get which words from the session are due for Anki review today. Shows words with suggested ease ratings based on session performance, plus time estimates for each ease option. ASKS user to confirm or adjust ratings before marking. NEVER auto-mark.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -998,6 +998,10 @@ ANKI_TOOLS = [
                     "type": "array",
                     "items": {"type": "string"},
                     "description": "List of Spanish words encountered during the session"
+                },
+                "session_results": {
+                    "type": "object",
+                    "description": "Optional map of word -> result ('correct', 'partial', 'incorrect', 'easy') from the practice session. Used to suggest ease ratings."
                 }
             },
             "required": ["deck_name", "session_words"]
@@ -1005,7 +1009,7 @@ ANKI_TOOLS = [
     },
     {
         "name": "mark_cards_reviewed",
-        "description": "Mark specific cards as reviewed in Anki. ONLY call this AFTER the user explicitly confirms they want to mark cards as reviewed. Never call without user confirmation. Uses answer_card() with the given ease rating.",
+        "description": "Mark specific cards as reviewed in Anki. ONLY call this AFTER the user explicitly confirms they want to mark cards as reviewed. Never call without user confirmation. Supports per-card ease ratings so the user can choose different ratings for each word.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -1016,7 +1020,11 @@ ANKI_TOOLS = [
                 },
                 "ease": {
                     "type": "integer",
-                    "description": "Ease rating: 1=Again, 2=Hard, 3=Good, 4=Easy (default: 3)"
+                    "description": "Default ease rating for all cards: 1=Again, 2=Hard, 3=Good, 4=Easy (default: 3). Overridden by per_card_ease if provided."
+                },
+                "per_card_ease": {
+                    "type": "object",
+                    "description": "Optional per-card ease overrides. Keys are card IDs (strings), values are ease ratings (1-4). Cards not listed here use the default ease."
                 }
             },
             "required": ["card_ids"]

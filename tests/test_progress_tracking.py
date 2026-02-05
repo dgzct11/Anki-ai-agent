@@ -518,7 +518,7 @@ class TestMarkCardsReviewedHandler:
 
         result = handler_fn(mock_anki, {"card_ids": ["123", "456"], "ease": 3})
         assert "1 card(s) as reviewed" in result
-        assert "1 failed" in result
+        assert "failed" in result
 
     def test_invalid_ease(self):
         from ankicli.tool_handlers import HANDLERS

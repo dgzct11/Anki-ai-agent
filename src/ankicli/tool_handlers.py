@@ -1736,6 +1736,7 @@ def handle_get_grammar_scores(anki: AnkiClient, tool_input: dict, **ctx) -> str:
 def handle_get_session_due_words(anki: AnkiClient, tool_input: dict, **ctx) -> str:
     deck_name = tool_input["deck_name"]
     session_words = tool_input.get("session_words", [])
+    session_results = tool_input.get("session_results", {})
 
     if not session_words:
         return "No session words provided."
@@ -1766,12 +1767,39 @@ def handle_get_session_due_words(anki: AnkiClient, tool_input: dict, **ctx) -> s
         "",
     ]
     for word, card_id in sorted(due_word_map.items()):
-        lines.append(f"  - {word} (card ID: {card_id})")
+        # Get interval estimates for each ease button
+        try:
+            intervals = anki.get_next_intervals(int(card_id))
+        except Exception:
+            intervals = {"again": "?", "hard": "?", "good": "?", "easy": "?"}
+
+        # Suggest ease based on session performance
+        word_result = session_results.get(word, "correct")
+        if word_result == "incorrect":
+            suggested_ease = 1
+            suggested_label = "Again"
+        elif word_result == "partial":
+            suggested_ease = 2
+            suggested_label = "Hard"
+        elif word_result == "easy":
+            suggested_ease = 4
+            suggested_label = "Easy"
+        else:
+            suggested_ease = 3
+            suggested_label = "Good"
+
+        lines.append(f"  {word} (card ID: {card_id})")
+        lines.append(f"    Suggested: {suggested_label} ({suggested_ease})")
+        lines.append(f"    Intervals: Again={intervals['again']}, Hard={intervals['hard']}, Good={intervals['good']}, Easy={intervals['easy']}")
+        lines.append("")
+
     lines.extend([
-        "",
-        "IMPORTANT: Ask the user if they want to mark these as reviewed.",
-        "DO NOT auto-mark. Wait for explicit confirmation.",
-        "If the user says yes, use mark_cards_reviewed with the card IDs.",
+        "IMPORTANT: Present this info to the user in a clear table format showing:",
+        "  - Each word, your suggested ease rating, and the interval for each option",
+        "  - Ask if they want to accept your suggestions or change any ratings",
+        "  - Let them override individual words (e.g., 'mark comprar as Easy')",
+        "DO NOT auto-mark. Wait for explicit user confirmation.",
+        "If confirmed, use mark_cards_reviewed with per-card ease ratings.",
     ])
     return "\n".join(lines)
 
@@ -1779,21 +1807,29 @@ def handle_get_session_due_words(anki: AnkiClient, tool_input: dict, **ctx) -> s
 @handler("mark_cards_reviewed")
 def handle_mark_cards_reviewed(anki: AnkiClient, tool_input: dict, **ctx) -> str:
     card_ids = tool_input["card_ids"]
-    ease = tool_input.get("ease", 3)
+    default_ease = tool_input.get("ease", 3)
+    per_card_ease = tool_input.get("per_card_ease", {})
 
-    if ease not in (1, 2, 3, 4):
-        return f"Invalid ease rating: {ease}. Must be 1 (Again), 2 (Hard), 3 (Good), or 4 (Easy)."
+    if default_ease not in (1, 2, 3, 4):
+        return f"Invalid ease rating: {default_ease}. Must be 1 (Again), 2 (Hard), 3 (Good), or 4 (Easy)."
 
     if not card_ids:
         return "No card IDs provided."
 
+    ease_labels = {1: "Again", 2: "Hard", 3: "Good", 4: "Easy"}
     succeeded = 0
     failed = 0
+    details = []
     for cid in card_ids:
+        cid_str = str(cid)
+        card_ease = per_card_ease.get(cid_str, default_ease)
+        if card_ease not in (1, 2, 3, 4):
+            card_ease = default_ease
         try:
-            success = anki.answer_card(int(cid), ease)
+            success = anki.answer_card(int(cid), card_ease)
             if success:
                 succeeded += 1
+                details.append(f"  {cid}: {ease_labels.get(card_ease, '?')}")
             else:
                 failed += 1
         except Exception:
@@ -1806,13 +1842,14 @@ def handle_mark_cards_reviewed(anki: AnkiClient, tool_input: dict, **ctx) -> str
     except Exception:
         pass
 
-    ease_labels = {1: "Again", 2: "Hard", 3: "Good", 4: "Easy"}
-    ease_label = ease_labels.get(ease, str(ease))
+    result_lines = [f"Marked {succeeded} card(s) as reviewed in Anki:"]
+    result_lines.extend(details)
 
     if failed == 0:
-        return f"Marked {succeeded} card(s) as reviewed in Anki (ease: {ease_label})."
+        return "\n".join(result_lines)
     else:
-        return f"Marked {succeeded} card(s) as reviewed, {failed} failed (ease: {ease_label})."
+        result_lines.append(f"  ({failed} card(s) failed to mark)")
+        return "\n".join(result_lines)
 
 
 # ---------------------------------------------------------------------------
