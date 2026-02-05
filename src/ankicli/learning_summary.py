@@ -1,16 +1,25 @@
 """Persistent learning summary storage."""
 
 import json
-from datetime import datetime
-from pathlib import Path
+from datetime import datetime, date, timedelta
 
-SUMMARY_DIR = Path(__file__).parent.parent.parent / ".ankicli"
-SUMMARY_FILE = SUMMARY_DIR / "learning_summary.json"
+from rich import box
+from rich.columns import Columns
+from rich.console import Group
+from rich.panel import Panel
+from rich.rule import Rule
+from rich.table import Table
+from rich.text import Text
 
+from .paths import SUMMARY_FILE, ensure_data_dir
 
-def _ensure_dir():
-    """Ensure the config directory exists."""
-    SUMMARY_DIR.mkdir(parents=True, exist_ok=True)
+# CEFR level descriptions
+LEVEL_DESCRIPTIONS = {
+    "A1": "Beginner",
+    "A2": "Elementary",
+    "B1": "Intermediate",
+    "B2": "Upper Intermediate",
+}
 
 
 def get_default_summary() -> dict:
@@ -87,7 +96,7 @@ def get_default_summary() -> dict:
 
 def load_summary() -> dict:
     """Load the learning summary from disk."""
-    _ensure_dir()
+    ensure_data_dir()
     if not SUMMARY_FILE.exists():
         return get_default_summary()
     try:
@@ -103,120 +112,245 @@ def load_summary() -> dict:
 
 def save_summary(summary: dict) -> None:
     """Save the learning summary to disk."""
-    _ensure_dir()
+    ensure_data_dir()
     summary["last_updated"] = datetime.now().isoformat()
     with open(SUMMARY_FILE, "w") as f:
         json.dump(summary, f, indent=2, ensure_ascii=False)
 
 
-def format_summary_for_display(summary: dict) -> str:
-    """Format the summary for readable display."""
-    output = []
-    output.append("=" * 70)
-    output.append("SPANISH LEARNING PROGRESS SUMMARY")
-    output.append("=" * 70)
+def create_progress_bar(known: int, total: int, bar_width: int = 20) -> Text:
+    """Create a colored progress bar from known/total counts.
 
-    if summary.get("last_updated"):
-        output.append(f"Last updated: {summary['last_updated'][:16].replace('T', ' ')}")
-    output.append(f"Total cards added: {summary.get('total_cards_added', 0)}")
-    output.append("")
+    Designed so CEFR concrete numbers can replace estimated percentages
+    by simply passing (matched_words, total_cefr_words) instead of
+    (estimated_coverage, 100).
+    """
+    if total <= 0:
+        percent = 0.0
+    else:
+        percent = (known / total) * 100
 
-    # Level breakdown
+    filled = int(bar_width * percent / 100)
+    empty = bar_width - filled
+    bar_str = "\u2588" * filled + "\u2591" * empty
+
+    # Color based on percentage
+    if percent < 25:
+        color = "red"
+    elif percent < 50:
+        color = "yellow"
+    elif percent < 75:
+        color = "cyan"
+    else:
+        color = "green"
+
+    text = Text()
+    text.append("[", style="dim")
+    text.append(bar_str, style=color)
+    text.append("] ", style="dim")
+    text.append(f"{percent:.0f}%", style=f"bold {color}")
+    return text
+
+
+def _create_level_table(data: dict) -> Table:
+    """Create a two-column table for WHAT I KNOW vs WHAT TO LEARN."""
+    table = Table(
+        show_header=True,
+        header_style="bold",
+        box=box.ROUNDED,
+        expand=True,
+        padding=(0, 1),
+    )
+    table.add_column("WHAT I KNOW", style="green", ratio=1)
+    table.add_column("WHAT TO LEARN", style="yellow", ratio=1)
+
+    # Build left column (what I know)
+    left_parts = []
+    what_i_know = data.get("what_i_know", {})
+
+    if what_i_know.get("summary"):
+        summary_text = what_i_know["summary"]
+        # Truncate long summaries
+        if len(summary_text) > 200:
+            summary_text = summary_text[:200] + "..."
+        left_parts.append(summary_text)
+
+    vocab = what_i_know.get("vocabulary", [])
+    if vocab:
+        left_parts.append(f"\nVocabulary: {len(vocab)} words")
+
+    grammar = what_i_know.get("grammar_concepts", [])
+    if grammar:
+        left_parts.append(f"Grammar: {', '.join(grammar[:5])}")
+        if len(grammar) > 5:
+            left_parts.append(f"  (+{len(grammar) - 5} more)")
+
+    topics = what_i_know.get("topics_covered", [])
+    if topics:
+        left_parts.append(f"Topics: {', '.join(topics[:5])}")
+        if len(topics) > 5:
+            left_parts.append(f"  (+{len(topics) - 5} more)")
+
+    if not left_parts:
+        left_parts.append("[dim]Not started yet[/dim]")
+
+    # Build right column (what to learn)
+    right_parts = []
+    what_to_learn = data.get("what_to_learn", {})
+
+    if what_to_learn.get("summary"):
+        summary_text = what_to_learn["summary"]
+        if len(summary_text) > 200:
+            summary_text = summary_text[:200] + "..."
+        right_parts.append(summary_text)
+
+    vocab_gaps = what_to_learn.get("vocabulary_gaps", [])
+    if vocab_gaps:
+        right_parts.append(f"\nVocab gaps: {', '.join(vocab_gaps[:5])}")
+
+    grammar_gaps = what_to_learn.get("grammar_gaps", [])
+    if grammar_gaps:
+        right_parts.append(f"Grammar gaps: {', '.join(grammar_gaps[:4])}")
+
+    priority = what_to_learn.get("priority_topics", [])
+    if priority:
+        right_parts.append(f"\nPriority: {', '.join(priority[:3])}")
+
+    if not right_parts:
+        right_parts.append("[dim]No gaps identified[/dim]")
+
+    table.add_row("\n".join(left_parts), "\n".join(right_parts))
+    return table
+
+
+def _create_activity_heatmap(summary: dict) -> Text:
+    """Create a 14-day activity heatmap using Unicode blocks."""
+    activity = summary.get("daily_activity", {})
+    today = date.today()
+
+    text = Text()
+    text.append("  ACTIVITY ", style="bold dim")
+    text.append("(last 14 days)\n", style="dim")
+    text.append("  ", style="")
+
+    for days_ago in range(13, -1, -1):
+        d = today - timedelta(days=days_ago)
+        day_key = d.isoformat()
+        count = activity.get(day_key, 0)
+
+        if count == 0:
+            text.append("\u2591\u2591", style="dim")
+        elif count <= 5:
+            text.append("\u2592\u2592", style="yellow")
+        elif count <= 10:
+            text.append("\u2593\u2593", style="cyan")
+        else:
+            text.append("\u2588\u2588", style="green")
+        text.append(" ", style="")
+
+    text.append("\n  ", style="")
+    text.append("\u2591\u2591", style="dim")
+    text.append("=0  ", style="dim")
+    text.append("\u2592\u2592", style="yellow")
+    text.append("=1-5  ", style="dim")
+    text.append("\u2593\u2593", style="cyan")
+    text.append("=6-10  ", style="dim")
+    text.append("\u2588\u2588", style="green")
+    text.append("=11+", style="dim")
+
+    return text
+
+
+def format_summary_for_display(summary: dict) -> Group:
+    """Format the summary as Rich renderables for display."""
+    elements = []
+
+    # Header panel
+    total_cards = summary.get("total_cards_added", 0)
+    last_updated = summary.get("last_updated", "")
+    if last_updated:
+        last_updated = last_updated[:16].replace("T", " ")
+
+    header_text = Text()
+    header_text.append("LEARNING DASHBOARD\n", style="bold cyan")
+    header_text.append(f"Spanish - {total_cards} cards", style="dim")
+    if last_updated:
+        header_text.append(f"  |  Last updated: {last_updated}", style="dim")
+    header_text.justify = "center"
+
+    elements.append(Panel(header_text, border_style="cyan", box=box.DOUBLE))
+
+    # Overall progress
+    overall_text = Text()
+    overall_text.append("  OVERALL PROGRESS\n", style="bold")
+
+    levels_data = summary.get("levels", {})
+    level_summaries = []
     for level in ["A1", "A2", "B1", "B2"]:
-        data = summary.get("levels", {}).get(level, {})
+        data = levels_data.get(level, {})
         coverage = data.get("estimated_coverage", 0)
-        bar_width = 20
-        filled = int(bar_width * coverage / 100)
-        bar = "█" * filled + "░" * (bar_width - filled)
+        vocab_count = len(data.get("what_i_know", {}).get("vocabulary", []))
+        level_summaries.append(f"{level}: {coverage}%")
 
-        output.append(f"{'─' * 70}")
-        output.append(f"  {level}: [{bar}] {coverage}%")
-        output.append(f"{'─' * 70}")
+    # Overall bar (average of all levels)
+    total_coverage = sum(
+        levels_data.get(lv, {}).get("estimated_coverage", 0)
+        for lv in ["A1", "A2", "B1", "B2"]
+    )
+    avg_coverage = total_coverage / 4
 
-        # What I know
-        what_i_know = data.get("what_i_know", {})
-        if what_i_know.get("summary"):
-            output.append("")
-            output.append(f"  WHAT I KNOW:")
-            # Word wrap the summary
-            summary_text = what_i_know["summary"]
-            words = summary_text.split()
-            line = "    "
-            for word in words:
-                if len(line) + len(word) + 1 > 68:
-                    output.append(line)
-                    line = "    " + word
-                else:
-                    line = line + " " + word if line.strip() else "    " + word
-            if line.strip():
-                output.append(line)
+    overall_text.append("  ")
+    bar = create_progress_bar(int(avg_coverage), 100, bar_width=30)
+    overall_text.append_text(bar)
+    overall_text.append("\n  ")
+    overall_text.append("  |  ".join(level_summaries), style="dim")
 
-            # Show vocabulary count
-            vocab = what_i_know.get("vocabulary", [])
-            if vocab:
-                output.append(f"    Vocabulary: {len(vocab)} words")
+    elements.append(overall_text)
 
-            # Show grammar concepts
-            grammar = what_i_know.get("grammar_concepts", [])
-            if grammar:
-                output.append(f"    Grammar: {', '.join(grammar)}")
+    # Per-level sections
+    for level in ["A1", "A2", "B1", "B2"]:
+        data = levels_data.get(level, {})
+        coverage = data.get("estimated_coverage", 0)
+        description = LEVEL_DESCRIPTIONS.get(level, "")
+        vocab_count = len(data.get("what_i_know", {}).get("vocabulary", []))
 
-            # Show topics
-            topics = what_i_know.get("topics_covered", [])
-            if topics:
-                output.append(f"    Topics: {', '.join(topics)}")
+        # Level header with progress bar
+        level_header = Text()
+        level_header.append(f"  {level}  {description}", style="bold")
+        level_header.append("  ")
+        if vocab_count > 0:
+            level_header.append(f"{vocab_count} words  ", style="dim")
+        level_bar = create_progress_bar(coverage, 100)
+        level_header.append_text(level_bar)
 
-        # What to learn
-        what_to_learn = data.get("what_to_learn", {})
-        if what_to_learn.get("summary") or what_to_learn.get("priority_topics"):
-            output.append("")
-            output.append(f"  WHAT TO LEARN:")
-            if what_to_learn.get("summary"):
-                summary_text = what_to_learn["summary"]
-                words = summary_text.split()
-                line = "    "
-                for word in words:
-                    if len(line) + len(word) + 1 > 68:
-                        output.append(line)
-                        line = "    " + word
-                    else:
-                        line = line + " " + word if line.strip() else "    " + word
-                if line.strip():
-                    output.append(line)
+        elements.append(Rule(style="dim"))
+        elements.append(level_header)
 
-            # Show vocabulary gaps
-            vocab_gaps = what_to_learn.get("vocabulary_gaps", [])
-            if vocab_gaps:
-                output.append(f"    Missing vocab: {', '.join(vocab_gaps[:5])}")
+        # Two-column table
+        elements.append(_create_level_table(data))
 
-            # Show grammar gaps
-            grammar_gaps = what_to_learn.get("grammar_gaps", [])
-            if grammar_gaps:
-                output.append(f"    Missing grammar: {', '.join(grammar_gaps[:3])}")
-
-            # Show priority topics
-            priority = what_to_learn.get("priority_topics", [])
-            if priority:
-                output.append(f"    Priority: {', '.join(priority[:3])}")
-
-        output.append("")
+    # Activity heatmap
+    elements.append(Rule(style="dim"))
+    elements.append(_create_activity_heatmap(summary))
 
     # Recent additions
-    if summary.get("recent_additions"):
-        output.append("RECENT ADDITIONS:")
-        output.append("-" * 40)
-        recent = summary["recent_additions"][-15:]
-        # Show in rows of 5
-        for i in range(0, len(recent), 5):
-            chunk = recent[i:i+5]
-            output.append("  " + ", ".join(chunk))
-        output.append("")
+    recent = summary.get("recent_additions", [])
+    if recent:
+        elements.append(Rule(style="dim"))
+        recent_text = Text()
+        recent_text.append("  RECENT ADDITIONS ", style="bold dim")
+        recent_text.append(f"(last {min(len(recent), 15)})\n", style="dim")
+        recent_text.append("  ", style="")
+        display_recent = recent[-15:]
+        recent_text.append(", ".join(display_recent), style="cyan")
+        elements.append(recent_text)
 
     # Notes
     if summary.get("notes"):
-        output.append("NOTES:")
-        output.append("-" * 40)
-        output.append(summary["notes"])
+        elements.append(Rule(style="dim"))
+        notes_text = Text()
+        notes_text.append("  NOTES\n", style="bold dim")
+        notes_text.append(f"  {summary['notes']}", style="dim italic")
+        elements.append(notes_text)
 
-    output.append("=" * 70)
-    return "\n".join(output)
+    return Group(*elements)

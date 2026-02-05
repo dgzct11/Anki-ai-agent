@@ -2,15 +2,8 @@
 
 import json
 from datetime import datetime
-from pathlib import Path
 
-STORE_DIR = Path(__file__).parent.parent.parent / ".ankicli"
-CONVERSATION_FILE = STORE_DIR / "conversation.json"
-
-
-def _ensure_dir():
-    """Ensure the config directory exists."""
-    STORE_DIR.mkdir(parents=True, exist_ok=True)
+from .paths import CONVERSATION_FILE, ensure_data_dir
 
 
 def _serialize_message(msg: dict) -> dict:
@@ -56,7 +49,7 @@ def _serialize_message(msg: dict) -> dict:
 
 def save_conversation(messages: list[dict], input_tokens: int = 0, output_tokens: int = 0) -> None:
     """Save conversation history to disk."""
-    _ensure_dir()
+    ensure_data_dir()
 
     # Serialize messages
     serialized_messages = [_serialize_message(msg) for msg in messages]
@@ -79,7 +72,7 @@ def load_conversation() -> dict:
     Returns:
         Dict with 'messages', 'input_tokens', 'output_tokens', 'last_saved'
     """
-    _ensure_dir()
+    ensure_data_dir()
 
     if not CONVERSATION_FILE.exists():
         return {

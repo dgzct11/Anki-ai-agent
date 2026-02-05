@@ -1,11 +1,11 @@
 """Terminal chat UI for Anki assistant."""
 
 import sys
-from pathlib import Path
 
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.styles import Style
+from rich import box
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
@@ -16,23 +16,26 @@ from rich.progress import (
     TaskProgressColumn,
     TextColumn,
 )
+from rich.table import Table
 from rich.text import Text
 
 from .assistant import AnkiAssistant
 from .chat_log import add_exchange, format_history_for_display, clear_log
 from .client import AnkiClient
-from .config import CLAUDE_MODELS, get_model_specs, load_config, save_config
+from .config import CLAUDE_MODELS, get_model_specs, load_config, save_config, format_tool_notes_display
 from .conversation_store import get_conversation_age
-from .learning_summary import load_summary, format_summary_for_display
+from .learning_summary import (
+    load_summary,
+    format_summary_for_display,
+    create_progress_bar,
+    LEVEL_DESCRIPTIONS,
+)
+from .paths import DATA_DIR, HISTORY_FILE
 
 # Style for prompt_toolkit
 PROMPT_STYLE = Style.from_dict({
     "prompt": "cyan bold",
 })
-
-# History file path (within project directory)
-HISTORY_DIR = Path(__file__).parent.parent.parent / ".ankicli"
-HISTORY_FILE = HISTORY_DIR / "chat_history"
 
 
 def format_tokens(n: int) -> str:
@@ -43,7 +46,7 @@ def format_tokens(n: int) -> str:
 
 
 def create_context_bar(status: dict) -> Text:
-    """Create a context usage bar."""
+    """Create a context usage bar with session stats."""
     percent = status["percent_used"]
     input_tokens = status["input_tokens"]
     max_tokens = status["max_tokens"]
@@ -58,11 +61,11 @@ def create_context_bar(status: dict) -> Text:
     else:
         color = "red"
 
-    # Create bar (40 chars wide)
+    # Create bar
     bar_width = 30
     filled = int(bar_width * percent / 100)
     empty = bar_width - filled
-    bar = "█" * filled + "░" * empty
+    bar = "\u2588" * filled + "\u2591" * empty
 
     text = Text()
     text.append("Context: [", style="dim")
@@ -70,6 +73,15 @@ def create_context_bar(status: dict) -> Text:
     text.append("] ", style="dim")
     text.append(f"{percent:.1f}%", style=color)
     text.append(f" ({format_tokens(input_tokens)}/{format_tokens(max_tokens)})", style="dim")
+
+    # Session stats
+    session_minutes = status.get("session_minutes", 0)
+    session_cards = status.get("session_cards_added", 0)
+    if session_minutes > 0 or session_cards > 0:
+        text.append("  |  ", style="dim")
+        text.append(f"{session_minutes} min", style="cyan")
+        if session_cards > 0:
+            text.append(f"  +{session_cards} cards", style="green")
 
     return text
 
@@ -198,6 +210,19 @@ def _summarize_tool_input(tool_name: str, input_data: dict) -> str:
             parts.append("DRY RUN")
         return ", ".join(parts)
 
+    elif tool_name == "set_tool_note":
+        tool_target = input_data.get("tool_name", "")
+        note = input_data.get("note", "")
+        if len(note) > 40:
+            note = note[:40] + "..."
+        return f"[{tool_target}] {note}"
+
+    elif tool_name == "get_tool_notes":
+        return "listing preferences"
+
+    elif tool_name == "remove_tool_note":
+        return f"[{input_data.get('tool_name', '')}]"
+
     # Default handling for other tools
     parts = []
     for key, value in input_data.items():
@@ -244,6 +269,7 @@ def run_chat():
         "  [cyan]progress[/cyan] - Show learning progress summary\n"
         "  [cyan]status[/cyan]   - Show context usage\n"
         "  [cyan]model[/cyan]    - Show or change the Claude model\n"
+        "  [cyan]notes[/cyan]    - Show saved preferences\n"
         "  [cyan]compact[/cyan]  - Summarize history to free context\n"
         "  [cyan]clear[/cyan]    - Reset conversation\n"
         "  [cyan]new[/cyan]      - Start fresh (discard history)\n"
@@ -263,7 +289,7 @@ def run_chat():
 
     # Set up prompt with history
     try:
-        HISTORY_DIR.mkdir(parents=True, exist_ok=True)
+        DATA_DIR.mkdir(parents=True, exist_ok=True)
         session: PromptSession = PromptSession(
             history=FileHistory(str(HISTORY_FILE)),
             style=PROMPT_STYLE,
@@ -320,6 +346,41 @@ def run_chat():
 
             if user_input.lower() == "history":
                 console.print(format_history_for_display(10))
+                console.print()
+                continue
+
+            if user_input.lower().startswith("notes"):
+                parts = user_input.strip().split(maxsplit=2)
+                config = load_config()
+
+                if len(parts) == 1:
+                    # Show current notes
+                    console.print(format_tool_notes_display(config))
+                elif parts[1].lower() == "clear":
+                    if config.tool_notes:
+                        config.tool_notes.clear()
+                        save_config(config)
+                        console.print("[green]All preferences cleared.[/green]")
+                    else:
+                        console.print("[dim]No preferences to clear.[/dim]")
+                elif parts[1].lower() == "remove" and len(parts) >= 3:
+                    tool_name = parts[2]
+                    if tool_name in config.tool_notes:
+                        del config.tool_notes[tool_name]
+                        save_config(config)
+                        # Reload into assistant
+                        assistant.config = config
+                        console.print(f"[green]Preference removed for '{tool_name}'.[/green]")
+                    else:
+                        console.print(f"[yellow]No preference found for '{tool_name}'.[/yellow]")
+                else:
+                    console.print(
+                        "[dim]Usage:[/dim]\n"
+                        "  [cyan]notes[/cyan]              - Show all preferences\n"
+                        "  [cyan]notes remove <tool>[/cyan] - Remove a preference\n"
+                        "  [cyan]notes clear[/cyan]         - Clear all preferences\n\n"
+                        "[dim]To add preferences, tell the assistant in chat (e.g., 'I prefer informal Spanish').[/dim]"
+                    )
                 console.print()
                 continue
 

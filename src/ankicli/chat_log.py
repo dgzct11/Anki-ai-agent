@@ -2,28 +2,21 @@
 
 import json
 from datetime import datetime
-from pathlib import Path
 from typing import Optional
 
-LOG_DIR = Path(__file__).parent.parent.parent / ".ankicli"
-LOG_FILE = LOG_DIR / "chat_log.json"
+from .paths import CHAT_LOG_FILE, ensure_data_dir
 
 # Maximum number of exchanges to keep
 MAX_EXCHANGES = 100
 
 
-def _ensure_dir():
-    """Ensure the log directory exists."""
-    LOG_DIR.mkdir(parents=True, exist_ok=True)
-
-
 def load_log() -> list[dict]:
     """Load the chat log from disk."""
-    _ensure_dir()
-    if not LOG_FILE.exists():
+    ensure_data_dir()
+    if not CHAT_LOG_FILE.exists():
         return []
     try:
-        with open(LOG_FILE) as f:
+        with open(CHAT_LOG_FILE) as f:
             return json.load(f)
     except (json.JSONDecodeError, IOError):
         return []
@@ -31,10 +24,10 @@ def load_log() -> list[dict]:
 
 def save_log(log: list[dict]) -> None:
     """Save the chat log to disk."""
-    _ensure_dir()
+    ensure_data_dir()
     # Keep only the most recent exchanges
     log = log[-MAX_EXCHANGES:]
-    with open(LOG_FILE, "w") as f:
+    with open(CHAT_LOG_FILE, "w") as f:
         json.dump(log, f, indent=2, ensure_ascii=False)
 
 
