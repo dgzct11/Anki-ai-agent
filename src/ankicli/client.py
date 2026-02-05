@@ -1,0 +1,402 @@
+"""AnkiConnect client for interacting with Anki desktop."""
+
+import json
+import urllib.request
+from typing import Any
+
+from .models import Card, Deck, NoteType
+
+ANKI_CONNECT_URL = "http://localhost:8765"
+
+
+class AnkiConnectError(Exception):
+    """Base exception for AnkiConnect errors."""
+    pass
+
+
+class ConnectionError(AnkiConnectError):
+    """Could not connect to AnkiConnect."""
+    pass
+
+
+def _request(action: str, **params) -> Any:
+    """Make a request to AnkiConnect."""
+    payload = json.dumps({
+        "action": action,
+        "version": 6,
+        "params": params
+    }).encode("utf-8")
+
+    try:
+        req = urllib.request.Request(ANKI_CONNECT_URL, payload)
+        req.add_header("Content-Type", "application/json")
+        response = urllib.request.urlopen(req, timeout=10)
+        result = json.loads(response.read().decode("utf-8"))
+    except urllib.error.URLError as e:
+        raise ConnectionError(
+            "Cannot connect to Anki. Make sure Anki is running with AnkiConnect installed."
+        ) from e
+
+    if result.get("error"):
+        raise AnkiConnectError(result["error"])
+
+    return result.get("result")
+
+
+class AnkiClient:
+    """Client for interacting with Anki via AnkiConnect."""
+
+    def ping(self) -> bool:
+        """Check if AnkiConnect is available."""
+        try:
+            result = _request("version")
+            return result is not None
+        except Exception:
+            return False
+
+    def get_decks(self) -> list[Deck]:
+        """Fetch all decks from Anki."""
+        deck_names = _request("deckNames")
+        decks = []
+
+        for name in deck_names:
+            # Get deck stats
+            try:
+                stats = _request("getDeckStats", decks=[name])
+                stat = stats.get(str(list(stats.keys())[0]), {}) if stats else {}
+                decks.append(Deck(
+                    id=str(stat.get("deck_id", name)),
+                    name=name,
+                    new_count=stat.get("new_count", 0),
+                    learn_count=stat.get("learn_count", 0),
+                    review_count=stat.get("review_count", 0),
+                ))
+            except Exception:
+                decks.append(Deck(id=name, name=name))
+
+        return decks
+
+    def get_note_types(self) -> list[NoteType]:
+        """Fetch available note types (models)."""
+        model_names = _request("modelNames")
+        note_types = []
+
+        for name in model_names:
+            try:
+                fields = _request("modelFieldNames", modelName=name)
+                note_types.append(NoteType(
+                    id=name,
+                    name=name,
+                    fields=fields or []
+                ))
+            except Exception:
+                note_types.append(NoteType(id=name, name=name))
+
+        return note_types
+
+    def add_card(
+        self,
+        deck_name: str,
+        front: str,
+        back: str,
+        tags: list[str] | None = None,
+        note_type: str = "Basic",
+    ) -> int:
+        """
+        Add a new card to a deck.
+
+        Returns:
+            The note ID of the created card
+        """
+        note = {
+            "deckName": deck_name,
+            "modelName": note_type,
+            "fields": {
+                "Front": front,
+                "Back": back,
+            },
+            "tags": tags or [],
+            "options": {
+                "allowDuplicate": False,
+            },
+        }
+
+        note_id = _request("addNote", note=note)
+        return note_id
+
+    def add_cards(
+        self,
+        deck_name: str,
+        cards: list[dict],
+        note_type: str = "Basic",
+    ) -> list[int]:
+        """
+        Add multiple cards at once.
+
+        Args:
+            deck_name: Target deck
+            cards: List of dicts with 'front', 'back', and optional 'tags'
+            note_type: Note type to use
+
+        Returns:
+            List of note IDs
+        """
+        notes = []
+        for card in cards:
+            notes.append({
+                "deckName": deck_name,
+                "modelName": note_type,
+                "fields": {
+                    "Front": card["front"],
+                    "Back": card["back"],
+                },
+                "tags": card.get("tags", []),
+            })
+
+        result = _request("addNotes", notes=notes)
+        return result
+
+    def search_cards(self, query: str, limit: int = 50) -> list[Card]:
+        """
+        Search for cards using Anki's search syntax.
+
+        Args:
+            query: Search query (e.g., 'deck:MyDeck', 'tag:mytag')
+            limit: Maximum results to return
+        """
+        note_ids = _request("findNotes", query=query)
+
+        if not note_ids:
+            return []
+
+        # Limit results
+        note_ids = note_ids[:limit]
+
+        # Get note info
+        notes_info = _request("notesInfo", notes=note_ids)
+
+        cards = []
+        for note in notes_info:
+            fields = note.get("fields", {})
+            front = fields.get("Front", {}).get("value", "")
+            back = fields.get("Back", {}).get("value", "")
+
+            cards.append(Card(
+                id=str(note.get("noteId", "")),
+                front=front,
+                back=back,
+                deck_id="",
+                tags=note.get("tags", []),
+            ))
+
+        return cards
+
+    def get_deck_cards(self, deck_name: str, limit: int = 100) -> list[Card]:
+        """Get all cards in a deck."""
+        return self.search_cards(f'deck:"{deck_name}"', limit=limit)
+
+    def sync(self) -> None:
+        """Trigger a sync with AnkiWeb."""
+        _request("sync")
+
+    def create_deck(self, name: str) -> int:
+        """Create a new deck."""
+        return _request("createDeck", deck=name)
+
+    def update_note(
+        self,
+        note_id: int,
+        front: str | None = None,
+        back: str | None = None,
+        tags: list[str] | None = None,
+    ) -> None:
+        """
+        Update an existing note's fields and/or tags.
+
+        Args:
+            note_id: The note ID to update
+            front: New front content (None to keep existing)
+            back: New back content (None to keep existing)
+            tags: New tags (None to keep existing)
+        """
+        note_update: dict = {"id": note_id}
+
+        if front is not None or back is not None:
+            fields = {}
+            if front is not None:
+                fields["Front"] = front
+            if back is not None:
+                fields["Back"] = back
+            note_update["fields"] = fields
+
+        if tags is not None:
+            note_update["tags"] = tags
+
+        _request("updateNote", note=note_update)
+
+    def update_notes(self, updates: list[dict]) -> list[bool]:
+        """
+        Update multiple notes at once.
+
+        Args:
+            updates: List of dicts with 'note_id' and optional 'front', 'back', 'tags'
+
+        Returns:
+            List of success booleans
+        """
+        results = []
+        for update in updates:
+            try:
+                self.update_note(
+                    note_id=update["note_id"],
+                    front=update.get("front"),
+                    back=update.get("back"),
+                    tags=update.get("tags"),
+                )
+                results.append(True)
+            except Exception:
+                results.append(False)
+        return results
+
+    def delete_notes(self, note_ids: list[int]) -> None:
+        """
+        Delete notes by their IDs.
+
+        Args:
+            note_ids: List of note IDs to delete
+        """
+        _request("deleteNotes", notes=note_ids)
+
+    def delete_note(self, note_id: int) -> None:
+        """Delete a single note by ID."""
+        self.delete_notes([note_id])
+
+    def get_note(self, note_id: int) -> Card | None:
+        """Get a single note by ID."""
+        notes_info = _request("notesInfo", notes=[note_id])
+        if not notes_info:
+            return None
+
+        note = notes_info[0]
+        fields = note.get("fields", {})
+        return Card(
+            id=str(note.get("noteId", "")),
+            front=fields.get("Front", {}).get("value", ""),
+            back=fields.get("Back", {}).get("value", ""),
+            deck_id="",
+            tags=note.get("tags", []),
+        )
+
+    def move_cards_to_deck(self, card_ids: list[int], deck_name: str) -> None:
+        """Move cards to a different deck."""
+        _request("changeDeck", cards=card_ids, deck=deck_name)
+
+    def add_tags(self, note_ids: list[int], tags: str) -> None:
+        """Add tags to notes (space-separated tag string)."""
+        _request("addTags", notes=note_ids, tags=tags)
+
+    def remove_tags(self, note_ids: list[int], tags: str) -> None:
+        """Remove tags from notes (space-separated tag string)."""
+        _request("removeTags", notes=note_ids, tags=tags)
+
+    def find_and_replace(
+        self,
+        note_ids: list[int],
+        field: str,
+        search: str,
+        replace: str,
+        regex: bool = False,
+    ) -> int:
+        """
+        Find and replace text in a field across multiple notes.
+
+        Returns:
+            Number of notes modified
+        """
+        return _request(
+            "findAndReplaceInModels" if regex else "findAndReplaceInModels",
+            notes=note_ids,
+            field=field,
+            find=search,
+            replace=replace,
+            regex=regex,
+        )
+
+    def get_deck_stats(self, deck_name: str) -> dict:
+        """
+        Get detailed statistics for a deck.
+
+        Returns:
+            Dict with total_cards, new_count, learn_count, review_count, etc.
+        """
+        stats = _request("getDeckStats", decks=[deck_name])
+        if not stats:
+            return {}
+        # Get the first (and only) deck's stats
+        deck_id = list(stats.keys())[0]
+        stat = stats[deck_id]
+        return {
+            "deck_id": stat.get("deck_id"),
+            "name": stat.get("name", deck_name),
+            "total_cards": stat.get("total_in_deck", 0),
+            "new_count": stat.get("new_count", 0),
+            "learn_count": stat.get("learn_count", 0),
+            "review_count": stat.get("review_count", 0),
+        }
+
+    def get_all_fronts(self, deck_name: str, limit: int = 500) -> list[str]:
+        """
+        Get just the front text of all cards in a deck.
+
+        Returns:
+            List of front text strings
+        """
+        cards = self.search_cards(f'deck:"{deck_name}"', limit=limit)
+        return [c.front for c in cards]
+
+    def get_deck_summary(self, deck_name: str, limit: int = 100) -> dict:
+        """
+        Get a comprehensive summary of a deck.
+
+        Returns:
+            Dict with stats and sample cards
+        """
+        stats = self.get_deck_stats(deck_name)
+        cards = self.search_cards(f'deck:"{deck_name}"', limit=limit)
+
+        # Collect unique tags
+        all_tags = set()
+        for card in cards:
+            all_tags.update(card.tags)
+
+        return {
+            **stats,
+            "sample_cards": cards[:20],
+            "all_tags": sorted(all_tags),
+            "cards_fetched": len(cards),
+        }
+
+    def get_collection_stats(self) -> dict:
+        """
+        Get overall collection statistics.
+
+        Returns:
+            Dict with total decks, cards, etc.
+        """
+        decks = self.get_decks()
+        total_new = sum(d.new_count for d in decks)
+        total_learn = sum(d.learn_count for d in decks)
+        total_review = sum(d.review_count for d in decks)
+
+        # Get total cards count
+        all_notes = _request("findNotes", query="*")
+
+        return {
+            "total_decks": len(decks),
+            "total_notes": len(all_notes) if all_notes else 0,
+            "total_new": total_new,
+            "total_learning": total_learn,
+            "total_review": total_review,
+            "total_due": total_new + total_learn + total_review,
+            "decks": [{"name": d.name, "due": d.total_due} for d in decks],
+        }
