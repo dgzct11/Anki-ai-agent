@@ -483,9 +483,11 @@ def _format_interval(days: float) -> str:
     def answer_card(self, card_id: int, ease: int) -> bool:
         """Mark a card as reviewed in Anki with the given ease rating.
 
-        Tries answerCards first (properly updates SRS algorithm).
-        Falls back to setDueDate with '!' suffix (updates interval) if
-        answerCards fails.
+        Strategy depends on card state:
+        - Review cards: try answerCards (proper SRS), fall back to setDueDate!
+        - New cards: Again=skip, Good/Easy=graduate to review via setDueDate!
+        - Learning/relearning cards: Again=skip (let Anki handle steps),
+          Good/Easy=graduate to review via setDueDate!
 
         Args:
             card_id: The note ID to answer. Will find associated card IDs.
@@ -499,7 +501,25 @@ def _format_interval(days: float) -> str:
         if not card_ids:
             return False
 
-        # Try answerCards first — this properly updates Anki's SRS
+        # Get card state
+        try:
+            cards_info = _request("cardsInfo", cards=[card_ids[0]])
+            info = cards_info[0] if cards_info else {}
+        except (AnkiConnectError, IndexError):
+            info = {}
+
+        card_type = info.get("type", 0)  # 0=new, 1=learning, 2=review, 3=relearn
+        interval = info.get("interval", 0)
+        factor = info.get("factor", 2500) / 1000
+
+        # For new and learning cards with Again: don't touch them.
+        # Let Anki's own learning steps handle the progression.
+        if card_type in (0, 1, 3) and ease == 1:
+            # Card stays in its current state — Anki will show it again
+            # in the learning steps. This is the correct behavior.
+            return True
+
+        # Try answerCards first — properly updates SRS for review cards
         for cid in card_ids:
             try:
                 result = _request("answerCards", answers=[{"cardId": cid, "ease": ease}])
@@ -508,23 +528,14 @@ def _format_interval(days: float) -> str:
             except AnkiConnectError:
                 pass
 
-        # Fallback: use setDueDate with '!' suffix which also sets the interval
-        # '1!' means due in 1 day AND sets interval to 1 day
-        try:
-            cards_info = _request("cardsInfo", cards=[card_ids[0]])
-            info = cards_info[0] if cards_info else {}
-            interval = info.get("interval", 0)
-            factor = info.get("factor", 2500) / 1000
-        except (AnkiConnectError, IndexError):
-            interval = 0
-            factor = 2.5
-
-        if interval <= 0:
-            due_days = {1: 0, 2: 1, 3: 1, 4: 4}.get(ease, 1)
+        # Fallback: use setDueDate with '!' suffix (also sets interval)
+        if card_type in (0, 1, 3):
+            # New/learning card: graduate to review
+            # Hard=1 day, Good=1 day, Easy=4 days
+            due_days = {2: 1, 3: 1, 4: 4}.get(ease, 1)
         else:
-            if ease == 1:
-                due_days = 0
-            elif ease == 2:
+            # Review card: compute interval from current state
+            if ease == 2:
                 due_days = max(1, round(interval * 1.2))
             elif ease == 3:
                 due_days = max(1, round(interval * factor))
@@ -532,7 +543,6 @@ def _format_interval(days: float) -> str:
                 due_days = max(1, round(interval * factor * 1.3))
 
         try:
-            # The '!' suffix tells Anki to also set the interval, not just the due date
             _request("setDueDate", cards=card_ids, days=f"{due_days}!")
             return True
         except AnkiConnectError:

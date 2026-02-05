@@ -493,7 +493,11 @@ For multiple words, use a table:
   comprar     | Good      | 10 min   | 4 days  | 10 days  | 13 days
   vender      | Hard      | 10 min   | 2 days  | 5 days   | 7 days
 
-This should be part of every session summary flow."""
+Note on card types:
+- Review cards (due): all ease options work normally
+- New/learning cards: Again = leave for Anki's learning steps (no action needed),
+  Good/Easy = graduate to review. Don't suggest Again for new cards that the user
+  got right — just suggest Good or Easy to graduate them."""
 
 _READING_PRACTICE_GUIDE = """## Reading Practice (P9)
 
