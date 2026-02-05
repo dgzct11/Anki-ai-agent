@@ -43,6 +43,32 @@ def _request(action: str, **params) -> Any:
     return result.get("result")
 
 
+def _format_interval(days: float) -> str:
+    """Format a day count as a human-readable interval string."""
+    if days < 0:
+        seconds = abs(days)
+        if seconds < 60:
+            return "<1 min"
+        return f"{int(seconds / 60)} min"
+    elif days < 1.0 / 24 / 60:
+        return "<1 min"
+    elif days < 1.0 / 24:
+        minutes = max(1, int(days * 24 * 60))
+        return f"{minutes} min"
+    elif days < 1:
+        hours = max(1, round(days * 24))
+        return f"{hours} hour{'s' if hours != 1 else ''}"
+    elif days < 30:
+        d = max(1, round(days))
+        return f"{d} day{'s' if d != 1 else ''}"
+    elif days < 365:
+        m = max(1, round(days / 30))
+        return f"{m} month{'s' if m != 1 else ''}"
+    else:
+        y = round(days / 365, 1)
+        return f"{y} year{'s' if y != 1 else ''}"
+
+
 class AnkiClient:
     """Client for interacting with Anki via AnkiConnect."""
 
@@ -444,41 +470,6 @@ class AnkiClient:
             "good": _format_interval(good_ivl),
             "easy": _format_interval(easy_ivl),
         }
-
-
-def _format_interval(days: float) -> str:
-    """Format a day count as a human-readable interval string.
-
-    Handles Anki-style intervals including sub-minute, minute, day,
-    month, and year ranges.
-    """
-    if days < 0:
-        # Negative interval means seconds in Anki
-        seconds = abs(days)
-        if seconds < 60:
-            return "<1 min"
-        minutes = int(seconds / 60)
-        return f"{minutes} min"
-    elif days < 1.0 / 24 / 60:
-        # Less than 1 minute
-        return "<1 min"
-    elif days < 1.0 / 24:
-        # Less than 1 hour, show minutes
-        minutes = max(1, int(days * 24 * 60))
-        return f"{minutes} min"
-    elif days < 1:
-        # Less than 1 day, show hours
-        hours = max(1, round(days * 24))
-        return f"{hours} hour{'s' if hours != 1 else ''}"
-    elif days < 30:
-        d = max(1, round(days))
-        return f"{d} day{'s' if d != 1 else ''}"
-    elif days < 365:
-        m = max(1, round(days / 30))
-        return f"{m} month{'s' if m != 1 else ''}"
-    else:
-        y = round(days / 365, 1)
-        return f"{y} year{'s' if y != 1 else ''}"
 
     def answer_card(self, card_id: int, ease: int) -> bool:
         """Mark a card as reviewed in Anki with the given ease rating.
