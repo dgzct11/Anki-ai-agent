@@ -144,18 +144,17 @@ _PRACTICE_EVALUATION_GUIDE = """## Translation Practice Evaluation
 When evaluating translations in practice mode (messages starting with [PRACTICE MODE]):
 
 **Multi-Word Sentences (IMPORTANT for efficiency):**
-When generating practice phrases, combine 2-3 target words into a SINGLE sentence whenever possible.
-Instead of testing "comprar" alone: "I bought a book"
-Test "comprar" + "tienda" + "precio" together: "I bought a book at the store because the price was good"
+Practice uses a two-step flow:
+1. GENERATE: You receive a list of upcoming words. Generate a natural sentence that includes
+   the primary target word PLUS 1-2 other words from the list that fit naturally.
+   Do NOT reveal the target words to the user. Just present the sentence to translate.
+2. EVALUATE: After the user translates, evaluate their work and give per-word feedback.
 
-This is more efficient, more natural, and reinforces word connections. The target words should be
-bolded or listed so the user knows which words are being tested.
+Example: If upcoming words include comprar, tienda, precio — generate:
+"I bought a book at the store because the price was good."
+The user must figure out which Spanish words to use without being told.
 
-Format: "Translate to Spanish (target words: comprar, tienda, precio):"
-Then: "I bought a book at the store because the price was good."
-
-When cards are provided one at a time, look ahead at upcoming cards and group 2-3 together.
-When evaluating, give specific feedback on each target word's usage.
+This tests productive recall, not recognition. Never show target words in the question.
 
 **Scoring Rubric (0-4 for each):**
 - **Meaning** (0-4): 0=completely wrong, 1=major errors, 2=partially correct, 3=correct with minor issues, 4=perfect

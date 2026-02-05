@@ -754,32 +754,59 @@ def run_practice_loop(
         if card is None:
             break
 
-        # Build list of all remaining words so Claude can see the full picture
+        # Build list of remaining words for Claude to see
         remaining_cards = []
         for idx in range(session.current_index, min(session.current_index + 10, len(session.cards))):
-            c = session.cards[idx]
-            remaining_cards.append(c)
+            remaining_cards.append(session.cards[idx])
 
-        # For the first question or difficulty level 1, just use one card
-        # Otherwise, let Claude see all remaining and pick the grouping
-        group_cards = [card]  # Default: at least the current card
+        remaining_info = []
+        for rc in remaining_cards:
+            clean_word = _re_group.sub(r'<[^>]+>', '', rc.back).strip().split('\n')[0][:40]
+            remaining_info.append(f"  - {clean_word} (EN: {rc.front})")
+        remaining_section = "\n".join(remaining_info)
+        current_word = _extract_word(card)
 
-        # Determine the phrase to show
-        if session.direction == PracticeDirection.EN_TO_ES:
-            phrase = card.front
-        else:
-            phrase = card.back
+        # Step 1: Ask Claude to generate a sentence combining multiple target words
+        direction_label = "English" if session.direction == PracticeDirection.EN_TO_ES else "Spanish"
+        target_lang = "Spanish" if session.direction == PracticeDirection.EN_TO_ES else "English"
+        gen_prompt = (
+            f"[PRACTICE MODE - GENERATE SENTENCE]\n"
+            f"Question {session.current_index + 1}/{session.total_questions}\n"
+            f"Difficulty level: {session.difficulty_num}/5 ({session.difficulty_label})\n\n"
+            f"Upcoming words to practice ({len(remaining_cards)}):\n{remaining_section}\n\n"
+            f"Generate a SINGLE {direction_label} sentence for the user to translate to {target_lang}.\n"
+            f"The sentence MUST use the word '{current_word}' and should also naturally include 1-2 other "
+            f"words from the list above if they fit well together.\n"
+            f"Do NOT reveal the target words or the {target_lang} translation.\n"
+            f"Just present the sentence to translate. Keep it appropriate for difficulty level {session.difficulty_num}/5.\n"
+            f"Format: just the sentence, nothing else."
+        )
 
-        target_words = [_extract_word(c) for c in group_cards]
-        target_label = ", ".join(target_words) if len(group_cards) > 1 else ""
+        # Get Claude's generated sentence
+        generated_sentence = ""
+        try:
+            with console.status("[cyan]Generating sentence...[/cyan]", spinner="dots"):
+                for event in assistant.chat(gen_prompt):
+                    if event["type"] == "text_delta":
+                        generated_sentence += event["content"]
+        except Exception as e:
+            console.print(f"[red]Error generating sentence: {e}[/red]")
+            # Fall back to showing card directly
+            if session.direction == PracticeDirection.EN_TO_ES:
+                generated_sentence = card.front
+            else:
+                generated_sentence = card.back
+
+        generated_sentence = generated_sentence.strip().strip('"').strip("'")
+
+        # Show question panel with Claude's generated sentence (no target words shown)
         console.print(create_practice_question_panel(
             question_num=session.current_index + 1,
             total=session.total_questions,
-            phrase=phrase,
+            phrase=generated_sentence,
             direction=session.direction,
             is_due=card.is_due,
             difficulty=session.difficulty_level,
-            target_words=target_label,
         ))
 
         # Get user answer
@@ -820,60 +847,27 @@ def run_practice_loop(
             continue
 
         if answer.lower() == "/hint":
-            # Show first letters of the answer
             if session.direction == PracticeDirection.EN_TO_ES:
                 hint_source = card.back
             else:
                 hint_source = card.front
-            # Strip HTML for hint
             import re
             clean = re.sub(r'<[^>]+>', ' ', hint_source).strip()
-            # Show first 3 characters
             hint = clean[:3] + "..." if len(clean) > 3 else clean
             console.print(f"[dim]Hint: {hint}[/dim]\n")
             continue
 
-        # Send answer to Claude for evaluation
-        # Build the full list of remaining words so Claude can see what's coming
-        remaining_info = []
-        for rc in remaining_cards:
-            clean_word = _re_group.sub(r'<[^>]+>', '', rc.back).strip().split('\n')[0][:40]
-            remaining_info.append(f"  - {clean_word} (EN: {rc.front}, due: {rc.is_due})")
-        remaining_section = "\n".join(remaining_info)
-
-        # Current card info
-        current_word = _extract_word(card)
-
-        if session.direction == PracticeDirection.EN_TO_ES:
-            eval_prompt = (
-                f"[PRACTICE MODE - GENERATE AND EVALUATE]\n"
-                f"Question {session.current_index + 1}/{session.total_questions}\n"
-                f"Difficulty: {session.difficulty_level} (level {session.difficulty_num}/5)\n\n"
-                f"Remaining words to practice ({len(remaining_cards)}):\n{remaining_section}\n\n"
-                f"INSTRUCTIONS: Generate a SINGLE English sentence for the user to translate to Spanish.\n"
-                f"Pick 2-3 words from the remaining list that fit naturally together in one sentence.\n"
-                f"Clearly state which target words are being tested.\n"
-                f"The primary word for this question is: {current_word}\n\n"
-                f"If the user has already provided a translation below, evaluate it.\n"
-                f"If not, just present the sentence for them to translate.\n\n"
-                f"User's translation: {answer}\n\n"
-                f"When evaluating, score each 0-4: Meaning, Grammar, Naturalness, Vocabulary.\n"
-                f"Give per-word feedback on each target word's usage.\n"
-                f"List which words from the remaining list were covered by this question."
-            )
-        else:
-            eval_prompt = (
-                f"[PRACTICE MODE - GENERATE AND EVALUATE]\n"
-                f"Question {session.current_index + 1}/{session.total_questions}\n"
-                f"Difficulty: {session.difficulty_level} (level {session.difficulty_num}/5)\n\n"
-                f"Remaining words to practice ({len(remaining_cards)}):\n{remaining_section}\n\n"
-                f"INSTRUCTIONS: Generate a SINGLE Spanish sentence for the user to translate to English.\n"
-                f"Pick 2-3 words from the remaining list that fit naturally together.\n"
-                f"The primary word for this question is: {current_word}\n\n"
-                f"User's translation: {answer}\n\n"
-                f"When evaluating, score each 0-4: Meaning, Grammar, Naturalness, Vocabulary.\n"
-                f"Give per-word feedback. List which words were covered."
-            )
+        # Step 2: Ask Claude to evaluate the translation
+        eval_prompt = (
+            f"[PRACTICE MODE - EVALUATE TRANSLATION]\n"
+            f"The sentence was: {generated_sentence}\n"
+            f"User's translation to {target_lang}: {answer}\n"
+            f"Primary target word: {current_word}\n"
+            f"Words from the deck that could appear in the sentence:\n{remaining_section}\n\n"
+            f"Evaluate the translation. Score each 0-4: Meaning, Grammar, Naturalness, Vocabulary.\n"
+            f"Give per-word feedback on target words used in the sentence.\n"
+            f"Show the correct translation if wrong."
+        )
 
         # Stream Claude's evaluation
         response_text = ""
