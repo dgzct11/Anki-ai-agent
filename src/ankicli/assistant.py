@@ -470,34 +470,24 @@ Track the current difficulty level in your responses and mention level changes."
 
 _ANKI_REVIEW_INTEGRATION_GUIDE = """## Anki Review Integration (P11)
 
-CRITICAL: After ANY practice session (translation, quiz, conversation, pair review):
-1. Use get_session_due_words with session_results mapping each word to how the user did (correct/partial/incorrect/easy)
-2. Present a clear table showing each due word with:
-   - Your suggested ease rating based on their performance (Again if wrong, Hard if partial, Good if correct, Easy if effortless)
-   - The time until next review for EACH ease option (Again=X, Hard=X, Good=X, Easy=X)
-3. ASK the user: "Want to mark these with my suggestions, or change any ratings?"
-4. Let the user override individual ratings (e.g., "mark comprar as Easy instead")
-5. NEVER auto-mark cards - always wait for explicit user confirmation
-6. If confirmed, use mark_cards_reviewed with per_card_ease for any overrides and card_words mapping card IDs to their Spanish words
+After ANY practice session, show the user which words they practiced that are due for Anki review.
+Do NOT try to mark cards as reviewed programmatically — this would corrupt Anki's SRS algorithm.
+Instead, give the user a clear summary of what to press when they review in Anki.
 
-IMPORTANT: ALWAYS refer to cards by their SPANISH WORD, never say "this card" or "the card".
-IMPORTANT: ALWAYS show the interval next to each ease option so the user knows the consequences.
+Steps:
+1. Use get_session_due_words with session_results mapping each word to performance
+2. Present a review summary showing each due word with your suggested rating
+3. Tell the user: "When you review these in Anki, here's what I'd suggest pressing:"
 
-Wrong: "This card is due for review. Mark as reviewed?"
-Wrong: "'comprar' is due. (1=Again, 2=Hard, 3=Good, 4=Easy, n=skip)"
-Right: "'comprar' is due for review. I suggest Good based on your answer.
-  1=Again (10 min) | 2=Hard (4 days) | 3=Good (10 days) | 4=Easy (13 days) | n=skip"
+Example format:
+  When you review in Anki, I suggest:
+  Word        | Press   | Why
+  comprar     | Good    | You got it right
+  vender      | Again   | You confused it with comprar
+  seguir      | Hard    | Partial — verb form was wrong
 
-For multiple words, use a table:
-  Word        | Suggested | Again    | Hard    | Good     | Easy
-  comprar     | Good      | 10 min   | 4 days  | 10 days  | 13 days
-  vender      | Hard      | 10 min   | 2 days  | 5 days   | 7 days
-
-Note on card types:
-- Review cards (due): all ease options work normally
-- New/learning cards: Again = leave for Anki's learning steps (no action needed),
-  Good/Easy = graduate to review. Don't suggest Again for new cards that the user
-  got right — just suggest Good or Easy to graduate them."""
+IMPORTANT: ALWAYS refer to cards by their SPANISH WORD, never "this card".
+Do NOT use mark_cards_reviewed — it cannot properly update Anki's SRS."""
 
 _READING_PRACTICE_GUIDE = """## Reading Practice (P9)
 

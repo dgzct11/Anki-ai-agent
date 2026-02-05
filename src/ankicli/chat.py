@@ -974,49 +974,9 @@ def run_practice_loop(
                 is_due_for_review=gc.is_due,
             )
 
-            # If card is due, ask about marking reviewed
+            # Track due cards for session-end review summary
             if gc.is_due:
-                try:
-                    import re as _re
-                    clean_word = _re.sub(r'<[^>]+>', '', gc.back).strip()[:40]
-                    suggested_ease = feedback_to_ease(feedback_level)
-                    ease_labels = {1: "Again", 2: "Hard", 3: "Good", 4: "Easy"}
-                    suggested_label = ease_labels.get(suggested_ease, "Good")
-
-                    try:
-                        intervals = assistant.anki.get_next_intervals(int(gc.card_id))
-                    except Exception:
-                        intervals = {"again": "?", "hard": "?", "good": "?", "easy": "?"}
-
-                    console.print(f"  [cyan]'{clean_word}'[/cyan] — Suggested: [bold]{suggested_label}[/bold]")
-                    console.print(f"  [dim]Again={intervals['again']} | Hard={intervals['hard']} | Good={intervals['good']} | Easy={intervals['easy']}[/dim]")
-
-                    review_answer = prompt_session.prompt(
-                        [("class:prompt", f"Mark as reviewed? ({suggested_label}/1-4/n): ")],
-                    ).strip().lower()
-
-                    if review_answer in ("n", "no", ""):
-                        console.print("[dim]Skipped.[/dim]")
-                    else:
-                        ease_map = {"again": 1, "hard": 2, "good": 3, "easy": 4, "y": suggested_ease, "yes": suggested_ease}
-                        if review_answer in ease_map:
-                            ease = ease_map[review_answer]
-                        elif review_answer.isdigit() and int(review_answer) in (1, 2, 3, 4):
-                            ease = int(review_answer)
-                        else:
-                            ease = suggested_ease
-
-                        try:
-                            success = assistant.anki.answer_card(int(gc.card_id), ease)
-                            if success:
-                                result.marked_reviewed = True
-                                console.print(f"[green]Marked '{clean_word}' as {ease_labels.get(ease, '?')} in Anki.[/green]")
-                            else:
-                                console.print("[yellow]Could not mark card.[/yellow]")
-                        except Exception as e:
-                            console.print(f"[yellow]Could not mark reviewed: {e}[/yellow]")
-                except (KeyboardInterrupt, EOFError):
-                    pass
+                result.is_due_for_review = True
 
             session.record_result(result)
 
@@ -1028,6 +988,27 @@ def run_practice_loop(
     # Show session summary
     if session.results:
         console.print(create_practice_summary_panel(session))
+
+        # Show Anki review recommendations for due cards
+        due_results = [r for r in session.results if r.is_due_for_review]
+        if due_results:
+            import re as _re_review
+            ease_labels = {1: "Again", 2: "Hard", 3: "Good", 4: "Easy"}
+            console.print()
+            console.print("[bold cyan]Anki Review Suggestions:[/bold cyan]")
+            console.print("[dim]When you review these in Anki, I suggest pressing:[/dim]")
+            for r in due_results:
+                clean_word = _re_review.sub(r'<[^>]+>', '', r.back).strip()[:30]
+                suggested = feedback_to_ease(r.feedback_level)
+                label = ease_labels.get(suggested, "Good")
+                if r.feedback_level == FeedbackLevel.CORRECT:
+                    reason = "got it right"
+                elif r.feedback_level == FeedbackLevel.PARTIAL:
+                    reason = "partially correct"
+                else:
+                    reason = "needs more practice"
+                console.print(f"  [cyan]{clean_word}[/cyan] → [bold]{label}[/bold] [dim]({reason})[/dim]")
+            console.print()
 
         # Log the session via Claude
         summary = session.get_summary_dict()

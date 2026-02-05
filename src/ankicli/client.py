@@ -472,31 +472,24 @@ class AnkiClient:
         }
 
     def answer_card(self, card_id: int, ease: int) -> bool:
-        """Mark a card as reviewed in Anki with the given ease rating.
+        """Try to mark a card as reviewed via answerCards.
 
-        Tries answerCards first (full SRS update, but only works if the card
-        is at the top of Anki's review queue). Falls back to setDueDate with
-        '!' suffix which reschedules the card with an appropriate interval.
-
-        setDueDate limitations vs answerCards:
-        - Creates a "Manual" revlog entry (type 4) instead of a proper review
-        - Does not update ease factor or FSRS stability/difficulty
-        - For learning cards, graduates them directly to review
-        These tradeoffs are acceptable for CLI practice review marking.
+        answerCards only works if the card is currently at the top of
+        Anki's review queue. For arbitrary cards (like those practiced
+        in the CLI), this will fail. No fallback to setDueDate since
+        that corrupts SRS data.
 
         Args:
             card_id: The note ID to answer. Will find associated card IDs.
             ease: Ease rating (1=Again, 2=Hard, 3=Good, 4=Easy).
 
         Returns:
-            True if successful, False if failed.
+            True if successful, False if card not in reviewer.
         """
-        # Find actual card IDs for this note
         card_ids = _request("findCards", query=f"nid:{card_id}")
         if not card_ids:
             return False
 
-        # Try answerCards first — full SRS update but requires card in reviewer
         for cid in card_ids:
             try:
                 result = _request("answerCards", answers=[{"cardId": cid, "ease": ease}])
@@ -505,39 +498,7 @@ class AnkiClient:
             except AnkiConnectError:
                 pass
 
-        # Fallback: setDueDate with '!' suffix
-        # This reschedules the card and creates a Manual revlog entry.
-        # Get current card info to compute appropriate interval
-        try:
-            cards_info = _request("cardsInfo", cards=[card_ids[0]])
-            info = cards_info[0] if cards_info else {}
-        except (AnkiConnectError, IndexError):
-            info = {}
-
-        interval = info.get("interval", 0)
-        factor = info.get("factor", 2500) / 1000
-        card_type = info.get("type", 0)  # 0=new, 1=learning, 2=review, 3=relearn
-
-        # Again (1): due today for review cards, skip for learning
-        if ease == 1:
-            due_days = 0
-        elif card_type in (0, 1, 3):
-            # New/learning: graduate with appropriate interval
-            due_days = {2: 1, 3: 1, 4: 4}.get(ease, 1)
-        else:
-            # Review card: compute from current interval and ease factor
-            if ease == 2:
-                due_days = max(1, round(interval * 1.2))
-            elif ease == 3:
-                due_days = max(1, round(interval * factor))
-            else:
-                due_days = max(1, round(interval * factor * 1.3))
-
-        try:
-            _request("setDueDate", cards=card_ids, days=f"{due_days}!")
-            return True
-        except AnkiConnectError:
-            return False
+        return False
 
     def get_card_reviews(self, deck_name: str | None = None) -> list[dict]:
         """
