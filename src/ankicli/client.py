@@ -481,11 +481,11 @@ def _format_interval(days: float) -> str:
         return f"{y} year{'s' if y != 1 else ''}"
 
     def answer_card(self, card_id: int, ease: int) -> bool:
-        """Mark a card as reviewed in Anki by rescheduling it.
+        """Mark a card as reviewed in Anki with the given ease rating.
 
-        Uses setDueDate (a standard AnkiConnect action) to reschedule the card
-        based on the ease rating. This simulates a review by pushing the card's
-        due date forward by an appropriate interval.
+        Tries answerCards first (properly updates SRS algorithm).
+        Falls back to setDueDate with '!' suffix (updates interval) if
+        answerCards fails.
 
         Args:
             card_id: The note ID to answer. Will find associated card IDs.
@@ -499,45 +499,41 @@ def _format_interval(days: float) -> str:
         if not card_ids:
             return False
 
-        # Get current card info to compute appropriate interval
+        # Try answerCards first — this properly updates Anki's SRS
+        for cid in card_ids:
+            try:
+                result = _request("answerCards", answers=[{"cardId": cid, "ease": ease}])
+                if result is not None:
+                    return True
+            except AnkiConnectError:
+                pass
+
+        # Fallback: use setDueDate with '!' suffix which also sets the interval
+        # '1!' means due in 1 day AND sets interval to 1 day
         try:
             cards_info = _request("cardsInfo", cards=[card_ids[0]])
-            if cards_info:
-                info = cards_info[0]
-                interval = info.get("interval", 0)
-                factor = info.get("factor", 2500) / 1000
-            else:
-                interval = 0
-                factor = 2.5
-        except AnkiConnectError:
+            info = cards_info[0] if cards_info else {}
+            interval = info.get("interval", 0)
+            factor = info.get("factor", 2500) / 1000
+        except (AnkiConnectError, IndexError):
             interval = 0
             factor = 2.5
 
-        # Compute due date offset based on ease
         if interval <= 0:
-            # New or learning card
-            if ease == 1:
-                due_days = 0  # Again: review today
-            elif ease == 2:
-                due_days = 1  # Hard: tomorrow
-            elif ease == 3:
-                due_days = 1  # Good: tomorrow
-            else:
-                due_days = 4  # Easy: 4 days
+            due_days = {1: 0, 2: 1, 3: 1, 4: 4}.get(ease, 1)
         else:
-            # Review card: scale based on current interval and ease factor
             if ease == 1:
-                due_days = 0  # Again: review today (enters relearning)
+                due_days = 0
             elif ease == 2:
-                due_days = max(1, round(interval * 1.2))  # Hard
+                due_days = max(1, round(interval * 1.2))
             elif ease == 3:
-                due_days = max(1, round(interval * factor))  # Good
+                due_days = max(1, round(interval * factor))
             else:
-                due_days = max(1, round(interval * factor * 1.3))  # Easy
+                due_days = max(1, round(interval * factor * 1.3))
 
-        # setDueDate uses a relative string like "0" (today), "1" (tomorrow), etc.
         try:
-            _request("setDueDate", cards=card_ids, days=str(due_days))
+            # The '!' suffix tells Anki to also set the interval, not just the due date
+            _request("setDueDate", cards=card_ids, days=f"{due_days}!")
             return True
         except AnkiConnectError:
             return False
