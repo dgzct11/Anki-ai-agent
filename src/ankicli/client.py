@@ -487,32 +487,37 @@ def _format_interval(days: float) -> str:
         the exact same method the GUI uses. This properly updates all SRS
         state: interval, ease factor, reps, lapses, revlog, FSRS stability.
 
-        No fallback to setDueDate because it corrupts SRS data (no revlog,
-        no ease factor update, no FSRS stability update, skips learning steps).
-
         Args:
             card_id: The note ID to answer. Will find associated card IDs.
             ease: Ease rating (1=Again, 2=Hard, 3=Good, 4=Easy).
 
         Returns:
             True if successful, False if failed.
+
+        Raises:
+            AnkiConnectError: If the AnkiConnect request fails, with details
+                about what went wrong for debugging.
         """
         # Find actual card IDs for this note
         card_ids = _request("findCards", query=f"nid:{card_id}")
         if not card_ids:
-            return False
+            raise AnkiConnectError(
+                f"No card IDs found for note ID {card_id}. "
+                f"The findCards query 'nid:{card_id}' returned empty."
+            )
 
         # answerCards calls scheduler.answerCard(card, ease) which is
         # identical to pressing a button in the Anki GUI reviewer.
-        # It handles all card types (new, learning, review, relearning)
-        # and both SM-2 and FSRS schedulers correctly.
         for cid in card_ids:
-            try:
-                result = _request("answerCards", answers=[{"cardId": cid, "ease": ease}])
-                if result is not None:
-                    return True
-            except AnkiConnectError:
-                pass
+            result = _request("answerCards", answers=[{"cardId": cid, "ease": ease}])
+            # answerCards returns a list of booleans
+            if isinstance(result, list) and result and result[0] is True:
+                return True
+            elif isinstance(result, list) and result and result[0] is False:
+                raise AnkiConnectError(
+                    f"answerCards returned False for card ID {cid} (note {card_id}). "
+                    f"The card may not exist or the scheduler rejected the answer."
+                )
 
         return False
 

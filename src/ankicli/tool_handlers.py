@@ -1834,8 +1834,12 @@ def handle_mark_cards_reviewed(anki: AnkiClient, tool_input: dict, **ctx) -> str
                 details.append(f"  {word}: {ease_labels.get(card_ease, '?')}")
             else:
                 failed += 1
-        except Exception:
+                word = card_words.get(str(cid), str(cid))
+                details.append(f"  {word}: FAILED (answer_card returned False)")
+        except Exception as e:
             failed += 1
+            word = card_words.get(str(cid), str(cid))
+            details.append(f"  {word}: FAILED ({e})")
 
     # Record study activity for streaks
     try:
