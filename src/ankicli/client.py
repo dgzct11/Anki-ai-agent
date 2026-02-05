@@ -474,9 +474,15 @@ class AnkiClient:
     def answer_card(self, card_id: int, ease: int) -> bool:
         """Mark a card as reviewed in Anki with the given ease rating.
 
-        Uses answerCards which calls Anki's native scheduler.answerCard() —
-        the exact same method the GUI uses. This properly updates all SRS
-        state: interval, ease factor, reps, lapses, revlog, FSRS stability.
+        Tries answerCards first (full SRS update, but only works if the card
+        is at the top of Anki's review queue). Falls back to setDueDate with
+        '!' suffix which reschedules the card with an appropriate interval.
+
+        setDueDate limitations vs answerCards:
+        - Creates a "Manual" revlog entry (type 4) instead of a proper review
+        - Does not update ease factor or FSRS stability/difficulty
+        - For learning cards, graduates them directly to review
+        These tradeoffs are acceptable for CLI practice review marking.
 
         Args:
             card_id: The note ID to answer. Will find associated card IDs.
@@ -484,33 +490,54 @@ class AnkiClient:
 
         Returns:
             True if successful, False if failed.
-
-        Raises:
-            AnkiConnectError: If the AnkiConnect request fails, with details
-                about what went wrong for debugging.
         """
         # Find actual card IDs for this note
         card_ids = _request("findCards", query=f"nid:{card_id}")
         if not card_ids:
-            raise AnkiConnectError(
-                f"No card IDs found for note ID {card_id}. "
-                f"The findCards query 'nid:{card_id}' returned empty."
-            )
+            return False
 
-        # answerCards calls scheduler.answerCard(card, ease) which is
-        # identical to pressing a button in the Anki GUI reviewer.
+        # Try answerCards first — full SRS update but requires card in reviewer
         for cid in card_ids:
-            result = _request("answerCards", answers=[{"cardId": cid, "ease": ease}])
-            # answerCards returns a list of booleans
-            if isinstance(result, list) and result and result[0] is True:
-                return True
-            elif isinstance(result, list) and result and result[0] is False:
-                raise AnkiConnectError(
-                    f"answerCards returned False for card ID {cid} (note {card_id}). "
-                    f"The card may not exist or the scheduler rejected the answer."
-                )
+            try:
+                result = _request("answerCards", answers=[{"cardId": cid, "ease": ease}])
+                if isinstance(result, list) and result and result[0] is True:
+                    return True
+            except AnkiConnectError:
+                pass
 
-        return False
+        # Fallback: setDueDate with '!' suffix
+        # This reschedules the card and creates a Manual revlog entry.
+        # Get current card info to compute appropriate interval
+        try:
+            cards_info = _request("cardsInfo", cards=[card_ids[0]])
+            info = cards_info[0] if cards_info else {}
+        except (AnkiConnectError, IndexError):
+            info = {}
+
+        interval = info.get("interval", 0)
+        factor = info.get("factor", 2500) / 1000
+        card_type = info.get("type", 0)  # 0=new, 1=learning, 2=review, 3=relearn
+
+        # Again (1): due today for review cards, skip for learning
+        if ease == 1:
+            due_days = 0
+        elif card_type in (0, 1, 3):
+            # New/learning: graduate with appropriate interval
+            due_days = {2: 1, 3: 1, 4: 4}.get(ease, 1)
+        else:
+            # Review card: compute from current interval and ease factor
+            if ease == 2:
+                due_days = max(1, round(interval * 1.2))
+            elif ease == 3:
+                due_days = max(1, round(interval * factor))
+            else:
+                due_days = max(1, round(interval * factor * 1.3))
+
+        try:
+            _request("setDueDate", cards=card_ids, days=f"{due_days}!")
+            return True
+        except AnkiConnectError:
+            return False
 
     def get_card_reviews(self, deck_name: str | None = None) -> list[dict]:
         """
