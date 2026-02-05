@@ -1391,4 +1391,54 @@ ANKI_TOOLS = [
             "required": ["recently_reviewed"]
         }
     },
+    # --- Vocab staging list ---
+    {
+        "name": "add_to_vocab_list",
+        "description": "Save a word to the user's new vocab staging list for later review. Use this when the user encounters a word they might want to add to their Anki deck but aren't ready to create a card yet.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "word": {
+                    "type": "string",
+                    "description": "The Spanish word to save"
+                },
+                "english": {
+                    "type": "string",
+                    "description": "English translation"
+                },
+                "context": {
+                    "type": "string",
+                    "description": "Optional context for why the word was saved (e.g., 'came up in practice', 'suggested by network')"
+                },
+                "level": {
+                    "type": "string",
+                    "description": "Optional CEFR level (A1-C2)"
+                }
+            },
+            "required": ["word", "english"]
+        }
+    },
+    {
+        "name": "get_vocab_list",
+        "description": "Show the user's saved vocab staging list — words they're considering adding to their Anki deck.",
+        "input_schema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+        }
+    },
+    {
+        "name": "remove_from_vocab_list",
+        "description": "Remove a word from the vocab staging list, either because it was added to Anki or the user decided against it.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "word": {
+                    "type": "string",
+                    "description": "The Spanish word to remove"
+                }
+            },
+            "required": ["word"]
+        }
+    },
 ]

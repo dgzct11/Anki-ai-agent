@@ -500,6 +500,26 @@ During practice and quiz sessions, track error patterns within the current sessi
 - At session end, include flagged patterns in the summary
 - Also log these patterns to the persistent error journal using log_error"""
 
+_VOCAB_LIST_GUIDE = """## Vocab Staging List
+
+The user has a vocab list where they can save words they might want to add to their Anki deck later.
+
+When to suggest adding to the vocab list (use add_to_vocab_list):
+- When the user encounters a new word during practice/conversation that isn't in their deck
+- When you suggest related words or cognates they might want to learn
+- When the word-of-the-day or network suggestions surface interesting words
+- When the user says "save that word" or "remind me about that word"
+
+When to show the list (use get_vocab_list):
+- When the user asks "what words do I have saved?" or "show my vocab list"
+- At the start of a session, mention if there are words waiting: "You have 5 words on your vocab list"
+
+When to remove from the list (use remove_from_vocab_list):
+- After successfully creating an Anki card for a word from the list
+- When the user explicitly says to remove a word
+
+Always include the English translation and context when adding. Include CEFR level if known."""
+
 # All prompt sections in order, for build_system_prompt to assemble.
 _PROMPT_SECTIONS = [
     _CORE_IDENTITY,
@@ -526,6 +546,7 @@ _PROMPT_SECTIONS = [
     _ANKI_REVIEW_INTEGRATION_GUIDE,
     _READING_PRACTICE_GUIDE,
     _SESSION_ERROR_TRACKING_GUIDE,
+    _VOCAB_LIST_GUIDE,
 ]
 
 

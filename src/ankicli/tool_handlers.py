@@ -2514,3 +2514,99 @@ def handle_get_network_study_suggestions(anki: AnkiClient, tool_input: dict, **c
     lines.append("Study these to reinforce your vocabulary network.")
 
     return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# Vocab staging list
+# ---------------------------------------------------------------------------
+
+def _load_vocab_list() -> list[dict]:
+    """Load the vocab staging list from disk."""
+    from .paths import VOCAB_LIST_FILE, ensure_data_dir
+    import json
+    ensure_data_dir()
+    if not VOCAB_LIST_FILE.exists():
+        return []
+    try:
+        with open(VOCAB_LIST_FILE) as f:
+            return json.load(f)
+    except (json.JSONDecodeError, IOError):
+        return []
+
+
+def _save_vocab_list(items: list[dict]) -> None:
+    """Save the vocab staging list to disk."""
+    from .paths import VOCAB_LIST_FILE, ensure_data_dir
+    import json
+    ensure_data_dir()
+    with open(VOCAB_LIST_FILE, "w") as f:
+        json.dump(items, f, indent=2, ensure_ascii=False)
+
+
+@handler("add_to_vocab_list")
+def handle_add_to_vocab_list(anki: "AnkiClient", tool_input: dict, **ctx) -> str:
+    from datetime import datetime
+
+    word = tool_input["word"].strip()
+    english = tool_input["english"].strip()
+    context = tool_input.get("context", "")
+    level = tool_input.get("level", "")
+
+    items = _load_vocab_list()
+
+    # Check for duplicates
+    for item in items:
+        if item.get("word", "").lower() == word.lower():
+            return f"'{word}' is already on your vocab list."
+
+    items.append({
+        "word": word,
+        "english": english,
+        "context": context,
+        "level": level,
+        "added": datetime.now().isoformat()[:10],
+    })
+    _save_vocab_list(items)
+    return f"Added '{word}' ({english}) to your vocab list. You now have {len(items)} word(s) saved."
+
+
+@handler("get_vocab_list")
+def handle_get_vocab_list(anki: "AnkiClient", tool_input: dict, **ctx) -> str:
+    items = _load_vocab_list()
+    if not items:
+        return "Your vocab list is empty. Words you save will appear here."
+
+    lines = [f"Vocab list ({len(items)} words):", ""]
+    for i, item in enumerate(items, 1):
+        word = item.get("word", "?")
+        english = item.get("english", "?")
+        level = item.get("level", "")
+        context = item.get("context", "")
+        added = item.get("added", "")
+
+        label = f"  {i}. {word} — {english}"
+        if level:
+            label += f" [{level}]"
+        if context:
+            label += f" ({context})"
+        if added:
+            label += f" [added {added}]"
+        lines.append(label)
+
+    lines.extend(["", "Use add_card to create Anki cards for any of these, then remove them from the list."])
+    return "\n".join(lines)
+
+
+@handler("remove_from_vocab_list")
+def handle_remove_from_vocab_list(anki: "AnkiClient", tool_input: dict, **ctx) -> str:
+    word = tool_input["word"].strip()
+    items = _load_vocab_list()
+
+    original_len = len(items)
+    items = [item for item in items if item.get("word", "").lower() != word.lower()]
+
+    if len(items) == original_len:
+        return f"'{word}' was not found on your vocab list."
+
+    _save_vocab_list(items)
+    return f"Removed '{word}' from your vocab list. {len(items)} word(s) remaining."

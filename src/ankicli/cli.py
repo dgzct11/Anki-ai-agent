@@ -611,6 +611,79 @@ def errors() -> None:
 
 
 @cli.command()
+@click.argument("action", type=click.Choice(["list", "add", "remove", "clear"]), default="list")
+@click.argument("word", required=False)
+@click.option("--english", "-e", help="English translation (for add)")
+def vocab(action: str, word: str | None, english: str | None) -> None:
+    """Manage your vocab staging list.
+
+    Save words you might want to add to your Anki deck later.
+
+    \b
+    Examples:
+      ankicli vocab list
+      ankicli vocab add comprar -e "to buy"
+      ankicli vocab remove comprar
+      ankicli vocab clear
+    """
+    from .tool_handlers import _load_vocab_list, _save_vocab_list
+
+    if action == "list":
+        items = _load_vocab_list()
+        if not items:
+            console.print("[dim]Your vocab list is empty.[/dim]")
+            return
+        console.print(f"[cyan]Vocab list ({len(items)} words):[/cyan]\n")
+        for i, item in enumerate(items, 1):
+            w = item.get("word", "?")
+            en = item.get("english", "?")
+            level = item.get("level", "")
+            ctx = item.get("context", "")
+            added = item.get("added", "")
+            line = f"  {i}. [bold]{w}[/bold] — {en}"
+            if level:
+                line += f" [cyan][{level}][/cyan]"
+            if ctx:
+                line += f" [dim]({ctx})[/dim]"
+            if added:
+                line += f" [dim][{added}][/dim]"
+            console.print(line)
+
+    elif action == "add":
+        if not word:
+            console.print("[red]Please provide a word: ankicli vocab add <word> -e <english>[/red]")
+            return
+        if not english:
+            console.print("[red]Please provide an English translation with -e[/red]")
+            return
+        items = _load_vocab_list()
+        for item in items:
+            if item.get("word", "").lower() == word.lower():
+                console.print(f"[yellow]'{word}' is already on your vocab list.[/yellow]")
+                return
+        from datetime import datetime
+        items.append({"word": word, "english": english, "context": "CLI", "level": "", "added": datetime.now().isoformat()[:10]})
+        _save_vocab_list(items)
+        console.print(f"[green]Added '{word}' ({english}) to your vocab list.[/green]")
+
+    elif action == "remove":
+        if not word:
+            console.print("[red]Please provide a word: ankicli vocab remove <word>[/red]")
+            return
+        items = _load_vocab_list()
+        new_items = [item for item in items if item.get("word", "").lower() != word.lower()]
+        if len(new_items) == len(items):
+            console.print(f"[yellow]'{word}' was not found on your vocab list.[/yellow]")
+            return
+        _save_vocab_list(new_items)
+        console.print(f"[green]Removed '{word}' from your vocab list.[/green]")
+
+    elif action == "clear":
+        _save_vocab_list([])
+        console.print("[green]Vocab list cleared.[/green]")
+
+
+@cli.command()
 @click.option("--force", is_flag=True, help="Generate a new challenge even if today's was already done")
 def daily(force: bool) -> None:
     """Show the daily word challenge.
