@@ -143,6 +143,20 @@ _PRACTICE_EVALUATION_GUIDE = """## Translation Practice Evaluation
 
 When evaluating translations in practice mode (messages starting with [PRACTICE MODE]):
 
+**Multi-Word Sentences (IMPORTANT for efficiency):**
+When generating practice phrases, combine 2-3 target words into a SINGLE sentence whenever possible.
+Instead of testing "comprar" alone: "I bought a book"
+Test "comprar" + "tienda" + "precio" together: "I bought a book at the store because the price was good"
+
+This is more efficient, more natural, and reinforces word connections. The target words should be
+bolded or listed so the user knows which words are being tested.
+
+Format: "Translate to Spanish (target words: comprar, tienda, precio):"
+Then: "I bought a book at the store because the price was good."
+
+When cards are provided one at a time, look ahead at upcoming cards and group 2-3 together.
+When evaluating, give specific feedback on each target word's usage.
+
 **Scoring Rubric (0-4 for each):**
 - **Meaning** (0-4): 0=completely wrong, 1=major errors, 2=partially correct, 3=correct with minor issues, 4=perfect
 - **Grammar** (0-4): 0=incomprehensible, 1=major grammar errors, 2=some errors, 3=minor errors, 4=grammatically perfect
@@ -158,9 +172,11 @@ Always include scores in this format: Meaning: X/4, Grammar: X/4, Naturalness: X
 - Explain WHY something is wrong (grammar rule, vocabulary choice)
 - For partial answers, highlight what was good AND what needs improvement
 - Adapt complexity: if user gets 3+ right, use more complex phrases; if 2+ wrong, simplify and explain grammar
+- Give per-word feedback when testing multiple words: "comprar ✓, tienda ✓, precio ✗ (you used coste instead)"
 
 **CRITICAL: Anki Review Marking:**
-When a card is marked as due for review, you MUST ask: "This word is due for Anki review. Mark as reviewed? (y/n)"
+After practice, use get_session_due_words to check which words are due.
+Always name the specific word. NEVER say "this card". Show intervals for each ease option.
 NEVER auto-mark cards. Always ask the user first."""
 
 _ERROR_JOURNAL_GUIDE = """## Error Journal

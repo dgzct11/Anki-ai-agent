@@ -528,6 +528,7 @@ def create_practice_question_panel(
     direction: PracticeDirection,
     is_due: bool,
     difficulty: str,
+    target_words: str = "",
 ) -> Panel:
     """Create a styled panel for a practice question."""
     content = Text()
@@ -547,8 +548,12 @@ def create_practice_question_panel(
 
     content.append(f"  {phrase}", style="bold white")
 
+    if target_words:
+        content.append("\n")
+        content.append(f"  Target words: {target_words}", style="cyan")
+
     if is_due:
-        content.append("\n\n")
+        content.append("\n")
         content.append("  (due for Anki review)", style="dim italic")
 
     return Panel(
@@ -736,10 +741,28 @@ def run_practice_loop(
     console.print(create_practice_commands_panel())
     console.print()
 
+    import re as _re_group
+
+    def _extract_word(c):
+        """Extract the main word from a card's back field."""
+        clean = _re_group.sub(r'<[^>]+>', '', c.back).strip()
+        first_line = clean.split('\n')[0].split('(')[0].strip()
+        return first_line[:30]
+
     while not session.is_finished:
         card = session.current_card
         if card is None:
             break
+
+        # Build list of all remaining words so Claude can see the full picture
+        remaining_cards = []
+        for idx in range(session.current_index, min(session.current_index + 10, len(session.cards))):
+            c = session.cards[idx]
+            remaining_cards.append(c)
+
+        # For the first question or difficulty level 1, just use one card
+        # Otherwise, let Claude see all remaining and pick the grouping
+        group_cards = [card]  # Default: at least the current card
 
         # Determine the phrase to show
         if session.direction == PracticeDirection.EN_TO_ES:
@@ -747,7 +770,8 @@ def run_practice_loop(
         else:
             phrase = card.back
 
-        # Show question panel
+        target_words = [_extract_word(c) for c in group_cards]
+        target_label = ", ".join(target_words) if len(group_cards) > 1 else ""
         console.print(create_practice_question_panel(
             question_num=session.current_index + 1,
             total=session.total_questions,
@@ -755,6 +779,7 @@ def run_practice_loop(
             direction=session.direction,
             is_due=card.is_due,
             difficulty=session.difficulty_level,
+            target_words=target_label,
         ))
 
         # Get user answer
@@ -809,37 +834,45 @@ def run_practice_loop(
             continue
 
         # Send answer to Claude for evaluation
-        # Build the evaluation prompt with the card data
+        # Build the full list of remaining words so Claude can see what's coming
+        remaining_info = []
+        for rc in remaining_cards:
+            clean_word = _re_group.sub(r'<[^>]+>', '', rc.back).strip().split('\n')[0][:40]
+            remaining_info.append(f"  - {clean_word} (EN: {rc.front}, due: {rc.is_due})")
+        remaining_section = "\n".join(remaining_info)
+
+        # Current card info
+        current_word = _extract_word(card)
+
         if session.direction == PracticeDirection.EN_TO_ES:
             eval_prompt = (
-                f"[PRACTICE MODE - EVALUATE TRANSLATION]\n"
+                f"[PRACTICE MODE - GENERATE AND EVALUATE]\n"
                 f"Question {session.current_index + 1}/{session.total_questions}\n"
-                f"English phrase: {card.front}\n"
-                f"Expected Spanish (from card back): {card.back}\n"
-                f"User's translation: {answer}\n"
-                f"Difficulty: {session.difficulty_level}\n"
-                f"Card is due for review: {card.is_due}\n\n"
-                f"Evaluate the user's translation on these criteria (score each 0-4):\n"
-                f"1. Meaning - Does it convey the correct meaning?\n"
-                f"2. Grammar - Is it grammatically correct?\n"
-                f"3. Naturalness - Does it sound natural to a native speaker?\n"
-                f"4. Vocabulary - Did they use appropriate vocabulary?\n\n"
-                f"Give brief, encouraging feedback. If wrong, show the correct answer.\n"
-                f"If the card is due for Anki review, ask: 'This word is due for review. Mark as reviewed in Anki? (y/n)'"
+                f"Difficulty: {session.difficulty_level} (level {session.difficulty_num}/5)\n\n"
+                f"Remaining words to practice ({len(remaining_cards)}):\n{remaining_section}\n\n"
+                f"INSTRUCTIONS: Generate a SINGLE English sentence for the user to translate to Spanish.\n"
+                f"Pick 2-3 words from the remaining list that fit naturally together in one sentence.\n"
+                f"Clearly state which target words are being tested.\n"
+                f"The primary word for this question is: {current_word}\n\n"
+                f"If the user has already provided a translation below, evaluate it.\n"
+                f"If not, just present the sentence for them to translate.\n\n"
+                f"User's translation: {answer}\n\n"
+                f"When evaluating, score each 0-4: Meaning, Grammar, Naturalness, Vocabulary.\n"
+                f"Give per-word feedback on each target word's usage.\n"
+                f"List which words from the remaining list were covered by this question."
             )
         else:
             eval_prompt = (
-                f"[PRACTICE MODE - EVALUATE TRANSLATION]\n"
+                f"[PRACTICE MODE - GENERATE AND EVALUATE]\n"
                 f"Question {session.current_index + 1}/{session.total_questions}\n"
-                f"Spanish phrase: {card.back}\n"
-                f"Expected English (from card front): {card.front}\n"
-                f"User's translation: {answer}\n"
-                f"Difficulty: {session.difficulty_level}\n"
-                f"Card is due for review: {card.is_due}\n\n"
-                f"Evaluate the user's translation (score each 0-4):\n"
-                f"1. Meaning  2. Grammar  3. Naturalness  4. Vocabulary\n\n"
-                f"Give brief, encouraging feedback.\n"
-                f"If the card is due for Anki review, ask: 'This word is due for review. Mark as reviewed in Anki? (y/n)'"
+                f"Difficulty: {session.difficulty_level} (level {session.difficulty_num}/5)\n\n"
+                f"Remaining words to practice ({len(remaining_cards)}):\n{remaining_section}\n\n"
+                f"INSTRUCTIONS: Generate a SINGLE Spanish sentence for the user to translate to English.\n"
+                f"Pick 2-3 words from the remaining list that fit naturally together.\n"
+                f"The primary word for this question is: {current_word}\n\n"
+                f"User's translation: {answer}\n\n"
+                f"When evaluating, score each 0-4: Meaning, Grammar, Naturalness, Vocabulary.\n"
+                f"Give per-word feedback. List which words were covered."
             )
 
         # Stream Claude's evaluation
@@ -930,69 +963,72 @@ def run_practice_loop(
             correct_answer=correct_ans,
         ))
 
-        # Record result
+        # Record results for all grouped cards
         from .translation_practice import PracticeResult
-        result = PracticeResult(
-            card_id=card.card_id,
-            front=card.front,
-            back=card.back,
-            user_answer=answer,
-            feedback_level=feedback_level,
-            feedback_text=response_text,
-            meaning_score=meaning,
-            grammar_score=grammar,
-            naturalness_score=naturalness,
-            vocabulary_score=vocabulary,
-            is_due_for_review=card.is_due,
-        )
+        for gc in group_cards:
+            result = PracticeResult(
+                card_id=gc.card_id,
+                front=gc.front,
+                back=gc.back,
+                user_answer=answer,
+                feedback_level=feedback_level,
+                feedback_text=response_text,
+                meaning_score=meaning,
+                grammar_score=grammar,
+                naturalness_score=naturalness,
+                vocabulary_score=vocabulary,
+                is_due_for_review=gc.is_due,
+            )
 
-        # If card is due, ask about marking reviewed
-        if card.is_due:
-            try:
-                import re as _re
-                clean_word = _re.sub(r'<[^>]+>', '', card.back).strip()[:40]
-                suggested_ease = feedback_to_ease(feedback_level)
-                ease_labels = {1: "Again", 2: "Hard", 3: "Good", 4: "Easy"}
-                suggested_label = ease_labels.get(suggested_ease, "Good")
-
-                # Get interval estimates
+            # If card is due, ask about marking reviewed
+            if gc.is_due:
                 try:
-                    intervals = assistant.anki.get_next_intervals(int(card.card_id))
-                except Exception:
-                    intervals = {"again": "?", "hard": "?", "good": "?", "easy": "?"}
-
-                console.print(f"  [cyan]'{clean_word}'[/cyan] — Suggested: [bold]{suggested_label}[/bold]")
-                console.print(f"  [dim]Again={intervals['again']} | Hard={intervals['hard']} | Good={intervals['good']} | Easy={intervals['easy']}[/dim]")
-
-                review_answer = prompt_session.prompt(
-                    [("class:prompt", f"Mark as reviewed? ({suggested_label}/1-4/n): ")],
-                ).strip().lower()
-
-                if review_answer in ("n", "no", ""):
-                    console.print("[dim]Skipped.[/dim]")
-                else:
-                    # Parse ease: accept number, label, or just 'y'/'yes' for suggested
-                    ease_map = {"again": 1, "hard": 2, "good": 3, "easy": 4, "y": suggested_ease, "yes": suggested_ease}
-                    if review_answer in ease_map:
-                        ease = ease_map[review_answer]
-                    elif review_answer.isdigit() and int(review_answer) in (1, 2, 3, 4):
-                        ease = int(review_answer)
-                    else:
-                        ease = suggested_ease
+                    import re as _re
+                    clean_word = _re.sub(r'<[^>]+>', '', gc.back).strip()[:40]
+                    suggested_ease = feedback_to_ease(feedback_level)
+                    ease_labels = {1: "Again", 2: "Hard", 3: "Good", 4: "Easy"}
+                    suggested_label = ease_labels.get(suggested_ease, "Good")
 
                     try:
-                        success = assistant.anki.answer_card(int(card.card_id), ease)
-                        if success:
-                            result.marked_reviewed = True
-                            console.print(f"[green]Marked as {ease_labels.get(ease, '?')} in Anki.[/green]")
-                        else:
-                            console.print("[yellow]Could not mark card.[/yellow]")
-                    except Exception as e:
-                        console.print(f"[yellow]Could not mark reviewed: {e}[/yellow]")
-            except (KeyboardInterrupt, EOFError):
-                pass
+                        intervals = assistant.anki.get_next_intervals(int(gc.card_id))
+                    except Exception:
+                        intervals = {"again": "?", "hard": "?", "good": "?", "easy": "?"}
 
-        session.record_result(result)
+                    console.print(f"  [cyan]'{clean_word}'[/cyan] — Suggested: [bold]{suggested_label}[/bold]")
+                    console.print(f"  [dim]Again={intervals['again']} | Hard={intervals['hard']} | Good={intervals['good']} | Easy={intervals['easy']}[/dim]")
+
+                    review_answer = prompt_session.prompt(
+                        [("class:prompt", f"Mark as reviewed? ({suggested_label}/1-4/n): ")],
+                    ).strip().lower()
+
+                    if review_answer in ("n", "no", ""):
+                        console.print("[dim]Skipped.[/dim]")
+                    else:
+                        ease_map = {"again": 1, "hard": 2, "good": 3, "easy": 4, "y": suggested_ease, "yes": suggested_ease}
+                        if review_answer in ease_map:
+                            ease = ease_map[review_answer]
+                        elif review_answer.isdigit() and int(review_answer) in (1, 2, 3, 4):
+                            ease = int(review_answer)
+                        else:
+                            ease = suggested_ease
+
+                        try:
+                            success = assistant.anki.answer_card(int(gc.card_id), ease)
+                            if success:
+                                result.marked_reviewed = True
+                                console.print(f"[green]Marked '{clean_word}' as {ease_labels.get(ease, '?')} in Anki.[/green]")
+                            else:
+                                console.print("[yellow]Could not mark card.[/yellow]")
+                        except Exception as e:
+                            console.print(f"[yellow]Could not mark reviewed: {e}[/yellow]")
+                except (KeyboardInterrupt, EOFError):
+                    pass
+
+            session.record_result(result)
+
+        # Skip ahead past the grouped cards (first one was already advanced by record_result)
+        # record_result increments current_index, so after recording all group_cards,
+        # current_index is already at the right position
         console.print()
 
     # Show session summary
