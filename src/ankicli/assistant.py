@@ -702,7 +702,7 @@ def build_system_prompt(*, general_note: str | None = None, extra_sections: list
 class AnkiAssistant:
     """Claude-powered Anki assistant with tool calling."""
 
-    def __init__(self, model: str | None = None):
+    def __init__(self, model: str | None = None, stateless: bool = False):
         api_key = os.environ.get("ANTHROPIC_API_KEY")
         if not api_key:
             raise ValueError(
@@ -710,7 +710,12 @@ class AnkiAssistant:
                 "Get your API key from https://console.anthropic.com/"
             )
 
-        self.config = load_config()
+        self.stateless = stateless
+        if stateless:
+            from .config import Config
+            self.config = Config()  # Empty default config, no file I/O
+        else:
+            self.config = load_config()
         self.client = Anthropic(api_key=api_key)
         self.anki = AnkiClient()
         self.model = model or self.config.main_model
@@ -718,7 +723,7 @@ class AnkiAssistant:
         self.messages: list[dict] = []
         self.input_tokens_used = 0
         self.output_tokens_used = 0
-        self._auto_save = True  # Auto-save conversation after each exchange
+        self._auto_save = not stateless  # Disable auto-save in stateless mode
         self._progress_queue: queue.Queue[dict] = queue.Queue()
         # Session tracking
         self.session_start_time = time.time()

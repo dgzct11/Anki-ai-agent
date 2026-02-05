@@ -2535,3 +2535,119 @@ def run_chat():
         except EOFError:
             console.print("\n[dim]Goodbye![/dim]")
             break
+
+
+def run_worker():
+    """Run a stateless worker chat session.
+
+    This is a lightweight chat mode that:
+    - Does NOT read or write conversation state files
+    - Does NOT update learning summary, streaks, or progress
+    - Does NOT persist between sessions
+    - CAN read/write Anki cards via AnkiConnect
+    - Can run in parallel with a regular chat window
+
+    Use this for bulk card editing, deck management, etc.
+    """
+    console = Console()
+
+    # Check Anki connection
+    anki = AnkiClient()
+    if not anki.ping():
+        console.print(
+            "[red]Cannot connect to Anki[/red]\n"
+            "[dim]Make sure Anki is running with AnkiConnect installed.[/dim]"
+        )
+        sys.exit(1)
+
+    # Initialize stateless assistant
+    try:
+        assistant = AnkiAssistant(stateless=True)
+    except ValueError as e:
+        console.print(f"[red]{e}[/red]")
+        sys.exit(1)
+
+    console.print()
+    worker_text = Text()
+    worker_text.append("ANKI WORKER", style="bold yellow")
+    worker_text.append("\n")
+    worker_text.append("Stateless mode — no files read or written", style="dim")
+    worker_text.append("\n")
+    worker_text.append("Safe to run alongside a chat session", style="dim")
+    worker_text.justify = "center"
+    console.print(Panel(worker_text, border_style="yellow", box=box.DOUBLE))
+    console.print("[dim]Type your instructions. Use 'exit' to quit.[/dim]\n")
+
+    session: PromptSession = PromptSession(style=PROMPT_STYLE)
+
+    while True:
+        try:
+            user_input = session.prompt(
+                [("class:prompt", "Worker: ")],
+            ).strip()
+
+            if not user_input:
+                continue
+
+            if user_input.lower() in ("exit", "quit", "q"):
+                console.print("[dim]Worker session ended.[/dim]")
+                break
+
+            if user_input.lower() in ("clear", "new"):
+                assistant.messages.clear()
+                assistant.input_tokens_used = 0
+                assistant.output_tokens_used = 0
+                console.print("[dim]Conversation cleared.[/dim]\n")
+                continue
+
+            if user_input.lower() == "status":
+                status = assistant.get_context_status()
+                console.print(f"[bold]Model:[/bold] [green]{status['model_name']}[/green]")
+                console.print(create_context_bar(status))
+                console.print(f"[dim]Messages: {len(assistant.messages)}[/dim]\n")
+                continue
+
+            # Stream Claude's response
+            full_response = ""
+            spinner_active = False
+            status_ctx = None
+
+            try:
+                for event in assistant.chat(user_input):
+                    if event["type"] == "text_delta":
+                        if spinner_active and status_ctx:
+                            status_ctx.stop()
+                            spinner_active = False
+                        console.print(event["content"], end="", highlight=False)
+                        full_response += event["content"]
+                    elif event["type"] == "text_stop":
+                        console.print()
+                    elif event["type"] == "tool_use":
+                        if spinner_active and status_ctx:
+                            status_ctx.stop()
+                            spinner_active = False
+                        console.print(create_tool_panel(event["name"], event["input"]))
+                    elif event["type"] == "tool_result":
+                        console.print(create_result_panel(event["name"], event["result"]))
+                        status_ctx = console.status("[cyan]Thinking...[/cyan]", spinner="dots")
+                        status_ctx.start()
+                        spinner_active = True
+                    elif event["type"] == "context_status":
+                        pass
+
+                if spinner_active and status_ctx:
+                    status_ctx.stop()
+
+            except Exception as e:
+                if spinner_active and status_ctx:
+                    status_ctx.stop()
+                console.print(f"\n[red]Error: {e}[/red]")
+
+            console.print()
+
+        except KeyboardInterrupt:
+            console.print("\n[dim]Use 'exit' to quit[/dim]")
+            continue
+        except EOFError:
+            console.print("\n[dim]Worker session ended.[/dim]")
+            break

@@ -48,6 +48,25 @@ def chat() -> None:
 
 
 @cli.command()
+def worker() -> None:
+    """Start a stateless worker session for bulk card editing.
+
+    A lightweight chat mode that can run alongside a regular chat session.
+    Does NOT read or write any state files (conversation, progress, etc.).
+    Has full access to Anki for editing cards, searching, and deck management.
+
+    \b
+    Use cases:
+      - Bulk edit cards while practicing in another window
+      - Add cognate hints to existing cards
+      - Reorganize tags or decks
+      - Any Anki operation that doesn't need learning state
+    """
+    from .chat import run_worker
+    run_worker()
+
+
+@cli.command()
 @click.argument("deck", required=False)
 @click.option("-n", "--count", default=10, help="Number of questions (default: 10)")
 @click.option("-d", "--direction", default="en_to_es", type=click.Choice(["en_to_es", "es_to_en"]), help="Translation direction")
