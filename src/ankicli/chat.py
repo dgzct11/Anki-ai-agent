@@ -741,8 +741,12 @@ def run_practice_loop(
     import re as _re
 
     def _extract_word(c):
-        clean = _re.sub(r'<[^>]+>', '', c.back).strip()
-        return clean.split('\n')[0].split('(')[0].strip()[:30]
+        # Replace <br> with newline before stripping HTML, so we can split on first line
+        text = _re.sub(r'<br\s*/?>', '\n', c.back, flags=_re.IGNORECASE)
+        clean = _re.sub(r'<[^>]+>', '', text).strip()
+        # Take just the first word/phrase (before newline, parentheses, or bullet)
+        first_line = clean.split('\n')[0].split('(')[0].split('•')[0].strip()
+        return first_line[:30]
 
     def _pull_due_cards(deck_name, limit=15):
         """Pull fresh due + new cards from Anki."""
@@ -970,7 +974,7 @@ def run_practice_loop(
         suggested_label = ease_labels.get(suggested_ease, "Good")
         card_words_list = [_extract_word(gc) for gc in group_cards]
 
-        console.print(f"[cyan]Words: {', '.join(card_words_list)}[/cyan] → Suggested: [bold]{suggested_label}[/bold]")
+        console.print(f"\n[cyan]Mark:[/cyan] {', '.join(card_words_list)} → [bold]{suggested_label}[/bold]")
         try:
             mark_answer = prompt_session.prompt(
                 [("class:prompt", f"Mark in Anki? ({suggested_label}/1-4/n): ")],
