@@ -1749,15 +1749,30 @@ def handle_get_session_due_words(anki: AnkiClient, tool_input: dict, **ctx) -> s
     if not due_cards:
         return "No cards are due for review in this deck."
 
-    import re
+    # Match words to due cards using word:: tags (precise) instead of
+    # text search (which falsely matches words in example sentences)
     due_word_map: dict[str, str] = {}
-    for card in due_cards:
-        clean_back = re.sub(r'<[^>]+>', ' ', card.back).strip().lower()
-        clean_front = re.sub(r'<[^>]+>', ' ', card.front).strip().lower()
-        for word in session_words:
-            word_lower = word.lower().strip()
-            if word_lower in clean_back or word_lower in clean_front:
+    for word in session_words:
+        word_lower = word.lower().strip()
+        for card in due_cards:
+            # Check word:: tag first (most reliable)
+            has_word_tag = any(
+                t.lower() == f"word::{word_lower}" for t in card.tags
+            )
+            if has_word_tag:
                 due_word_map[word] = card.id
+                break
+        else:
+            # Fallback: check if the word is the MAIN word on the card back
+            # (first bold word, not in example sentences)
+            import re
+            for card in due_cards:
+                # Extract just the first line / bold word from back
+                back_text = re.sub(r'<[^>]+>', ' ', card.back).strip()
+                main_word = back_text.split('\n')[0].split('(')[0].strip().lower()
+                if word_lower == main_word:
+                    due_word_map[word] = card.id
+                    break
 
     if not due_word_map:
         return "None of the session words are due for Anki review today."
