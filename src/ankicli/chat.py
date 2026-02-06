@@ -852,7 +852,7 @@ def run_practice_loop(
             console.print("[dim]Please type your translation, or /skip or /quit.[/dim]\n")
             continue
 
-        if answer.lower() == "/quit":
+        if answer.lower() in ("/quit", "exit", "quit", "q"):
             console.print("[dim]Ending practice session...[/dim]")
             break
 
@@ -989,7 +989,10 @@ def run_practice_loop(
         except (KeyboardInterrupt, EOFError):
             mark_input = "n"
 
-        if mark_input in ("n", "no", ""):
+        if mark_input in ("exit", "quit", "q", "/quit"):
+            console.print("[dim]Ending practice session...[/dim]")
+            break
+        elif mark_input in ("n", "no", ""):
             console.print("[dim]Skipped marking.[/dim]")
         else:
             # Parse per-word overrides: "siempre again, tarde good, anoche n"
