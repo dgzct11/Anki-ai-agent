@@ -728,115 +728,88 @@ def create_practice_commands_panel() -> Panel:
 
 def run_practice_loop(
     console: Console,
-    assistant: AnkiAssistant,
-    session: PracticeSession,
-    prompt_session: PromptSession,
+    assistant: "AnkiAssistant",
+    session: "PracticeSession",
+    prompt_session: "PromptSession",
 ) -> None:
-    """Run the interactive practice sub-loop.
+    """Run the interactive practice loop.
 
-    This takes over the terminal with a question-answer-feedback cycle,
-    sending user translations through the assistant for Claude to evaluate.
+    Continuously pulls due/new cards from Anki, generates multi-word sentences,
+    evaluates translations, and marks cards. Loops until no cards remain or user quits.
     """
+    from .translation_practice import PracticeResult, PracticeCard, feedback_to_ease
+
     console.print()
     console.print(create_practice_commands_panel())
     console.print()
 
-    import re as _re_group
+    import re as _re
 
     def _extract_word(c):
-        """Extract the main word from a card's back field."""
-        clean = _re_group.sub(r'<[^>]+>', '', c.back).strip()
-        first_line = clean.split('\n')[0].split('(')[0].strip()
-        return first_line[:30]
+        clean = _re.sub(r'<[^>]+>', '', c.back).strip()
+        return clean.split('\n')[0].split('(')[0].strip()[:30]
 
-    # Fix #34: Track actual question number separately from card index
-    # so multi-word groups don't cause jumps like "Question 3/15" -> "Question 6/15"
-    question_display_num = 0
+    def _pull_due_cards(deck_name, limit=15):
+        """Pull fresh due + new cards from Anki."""
+        cards = []
+        try:
+            due = assistant.anki.get_due_cards(deck_name, limit=limit)
+            for c in due:
+                cards.append(PracticeCard(card_id=c.id, front=c.front, back=c.back, tags=c.tags, is_due=True))
+        except Exception:
+            pass
+        if len(cards) < limit:
+            try:
+                new = assistant.anki.get_new_cards(deck_name, limit=limit - len(cards))
+                existing_ids = {c.card_id for c in cards}
+                for c in new:
+                    if c.id not in existing_ids:
+                        cards.append(PracticeCard(card_id=c.id, front=c.front, back=c.back, tags=c.tags, is_new=True))
+            except Exception:
+                pass
+        return cards
 
-    while not session.is_finished:
-        card = session.current_card
-        if card is None:
+    question_num = 0
+    direction_label = "English" if session.direction == PracticeDirection.EN_TO_ES else "Spanish"
+    target_lang = "Spanish" if session.direction == PracticeDirection.EN_TO_ES else "English"
+
+    while True:
+        # Pull fresh cards from Anki each iteration
+        available = _pull_due_cards(session.deck_name)
+        if not available:
+            console.print("[bold green]No more cards to practice! All caught up.[/bold green]")
             break
 
-        # Group 2-3 cards together for multi-word sentences
-        # At difficulty 1 (single word), just use 1 card
-        # Prioritize due cards in the group
-        group_size = 1 if session.difficulty_num <= 1 else min(3, session.questions_remaining)
+        due_count = sum(1 for c in available if c.is_due)
+        new_count = sum(1 for c in available if c.is_new)
+        console.print(f"[dim]{due_count} due, {new_count} new cards available[/dim]")
 
-        # Collect remaining cards and sort: due cards first
-        remaining_for_group = []
-        for offset in range(min(group_size + 5, session.questions_remaining)):
-            idx = session.current_index + offset
-            if idx < len(session.cards):
-                remaining_for_group.append((offset, session.cards[idx]))
+        # Pick 3-5 words for the sentence
+        group_size = min(5, max(3, len(available)))
+        group_cards = available[:group_size]
+        question_num += 1
 
-        # Sort by: due first, then original order
-        remaining_for_group.sort(key=lambda x: (not x[1].is_due, x[0]))
-
-        # Take the first group_size cards (due cards will be first)
-        group_cards = [c for _, c in remaining_for_group[:group_size]]
-        if not group_cards:
-            group_cards = [card]  # fallback to current card
-
-        question_display_num += 1
-
-        # Build info for grouped cards (what Claude must use)
+        # Build target word info for Claude (internal, not shown to user)
         group_words = [_extract_word(gc) for gc in group_cards]
         group_info = []
         for gc in group_cards:
-            clean_word = _re_group.sub(r'<[^>]+>', '', gc.back).strip().split('\n')[0][:40]
-            due_flag = " [DUE]" if gc.is_due else ""
-            group_info.append(f"  - {clean_word} (EN: {gc.front}){due_flag}")
+            clean_word = _re.sub(r'<[^>]+>', '', gc.back).strip().split('\n')[0][:40]
+            group_info.append(f"  - {clean_word} (EN: {gc.front})")
         group_section = "\n".join(group_info)
 
-        # Also build a wider context of upcoming words (for Claude to see what's coming)
-        remaining_cards = []
-        for idx in range(session.current_index, min(session.current_index + 10, len(session.cards))):
-            remaining_cards.append(session.cards[idx])
-        remaining_info = []
-        for rc in remaining_cards:
-            clean_word = _re_group.sub(r'<[^>]+>', '', rc.back).strip().split('\n')[0][:40]
-            remaining_info.append(f"  - {clean_word} (EN: {rc.front})")
-        remaining_section = "\n".join(remaining_info)
+        # Generate sentence
+        gen_prompt = (
+            f"[PRACTICE MODE - GENERATE SENTENCE]\n"
+            f"Question {question_num}\n"
+            f"Difficulty level: {session.difficulty_num}/5 ({session.difficulty_label})\n\n"
+            f"TARGET WORDS for this question (use ALL of these):\n{group_section}\n\n"
+            f"Generate a SINGLE {direction_label} sentence that naturally uses ALL {len(group_cards)} "
+            f"target words: {', '.join(group_words)}.\n"
+            f"Do NOT reveal which {target_lang} words to use. Do NOT show the translation.\n"
+            f"IMPORTANT: Output ONLY the sentence to translate. NEVER mention target words, "
+            f"due words, or remaining words. No explanations, no commentary, no meta-text."
+        )
 
-        # Step 1: Ask Claude to generate a sentence using the grouped words
-        direction_label = "English" if session.direction == PracticeDirection.EN_TO_ES else "Spanish"
-        target_lang = "Spanish" if session.direction == PracticeDirection.EN_TO_ES else "English"
-
-        # Fix #44: Flag due words so Claude prioritizes them
-        due_note = ""
-        due_words = [_extract_word(gc) for gc in group_cards if gc.is_due]
-        if due_words:
-            due_note = f"\nNote: Words marked [DUE] are due for Anki review - prioritize testing these.\n"
-
-        if len(group_cards) > 1:
-            gen_prompt = (
-                f"[PRACTICE MODE - GENERATE SENTENCE]\n"
-                f"Question {question_display_num}\n"
-                f"Difficulty level: {session.difficulty_num}/5 ({session.difficulty_label})\n\n"
-                f"TARGET WORDS for this question (use ALL of these):\n{group_section}\n"
-                f"{due_note}\n"
-                f"Other upcoming words for context:\n{remaining_section}\n\n"
-                f"Generate a SINGLE {direction_label} sentence that naturally uses ALL {len(group_cards)} "
-                f"target words: {', '.join(group_words)}.\n"
-                f"Do NOT reveal which {target_lang} words to use. Do NOT show the translation.\n"
-                f"IMPORTANT: Output ONLY the sentence to translate. NEVER mention which words you are testing, which words are due, or which words are remaining. No explanations, no commentary, no meta-text."
-            )
-        else:
-            gen_prompt = (
-                f"[PRACTICE MODE - GENERATE SENTENCE]\n"
-                f"Question {question_display_num}\n"
-                f"Difficulty level: {session.difficulty_num}/5 ({session.difficulty_label})\n\n"
-                f"TARGET WORD: {group_words[0]}"
-                f"{' [DUE]' if group_cards[0].is_due else ''}\n"
-                f"{due_note}\n"
-                f"Other upcoming words for context:\n{remaining_section}\n\n"
-                f"Generate a SINGLE {direction_label} sentence using the target word.\n"
-                f"Do NOT reveal the {target_lang} translation.\n"
-                f"IMPORTANT: Output ONLY the sentence to translate. NEVER mention which words you are testing, which words are due, or which words are remaining. No explanations, no commentary, no meta-text."
-            )
-
-        # Get Claude's generated sentence
         generated_sentence = ""
         try:
             with console.status("[cyan]Generating sentence...[/cyan]", spinner="dots"):
@@ -844,133 +817,68 @@ def run_practice_loop(
                     if event["type"] == "text_delta":
                         generated_sentence += event["content"]
         except Exception as e:
-            console.print(f"[red]Error generating sentence: {e}[/red]")
-            # Fall back to showing card directly
-            if session.direction == PracticeDirection.EN_TO_ES:
-                generated_sentence = card.front
-            else:
-                generated_sentence = card.back
+            console.print(f"[red]Error generating: {e}[/red]")
+            generated_sentence = group_cards[0].front
 
+        # Clean up generated sentence
         generated_sentence = generated_sentence.strip().strip('"').strip("'")
-
-        # Fix #37: Validate generated sentence - take only the first sentence,
-        # strip any meta-text or commentary Claude may have added
         if generated_sentence:
-            # Remove common prefixes like "Here's a sentence:" or "Sure:"
-            import re as _re_validate
-            generated_sentence = _re_validate.sub(
-                r'^(?:(?:Here(?:\'s| is) (?:a |the )?(?:sentence|translation|example)[:\.]?\s*)|(?:Sure[,!:]?\s*)|(?:Of course[,!:]?\s*))',
-                '', generated_sentence, flags=_re_validate.IGNORECASE
+            generated_sentence = _re.sub(
+                r'^(?:Here(?:\'s| is) (?:a |the )?(?:sentence|translation|example)[:\.]?\s*|Sure[,!:]?\s*|Of course[,!:]?\s*)',
+                '', generated_sentence, flags=_re.IGNORECASE
             ).strip()
-            # Take only the first sentence (split on . ! ? followed by space or end)
-            sent_match = _re_validate.match(r'^(.+?[.!?])(?:\s|$)', generated_sentence)
+            sent_match = _re.match(r'^(.+?[.!?])(?:\s|$)', generated_sentence)
             if sent_match:
                 generated_sentence = sent_match.group(1).strip()
-            # Strip any trailing commentary after a newline
-            generated_sentence = generated_sentence.split('\n')[0].strip()
-            # Re-strip quotes
-            generated_sentence = generated_sentence.strip('"').strip("'")
+            generated_sentence = generated_sentence.split('\n')[0].strip().strip('"').strip("'")
 
-        # Compute total display questions (approximate: how many question groups)
-        # Use a simple estimate based on group_size vs total cards
-        effective_group_size = 1 if session.difficulty_num <= 1 else min(3, max(1, session.questions_remaining))
-        total_display_questions = max(
-            question_display_num,
-            question_display_num + (session.questions_remaining - len(group_cards) + effective_group_size - 1) // max(1, effective_group_size),
-        )
-
-        # Show question panel with Claude's generated sentence (no target words shown)
-        any_due = any(gc.is_due for gc in group_cards)
+        # Show question (no target words shown)
         console.print(create_practice_question_panel(
-            question_num=question_display_num,
-            total=total_display_questions,
+            question_num=question_num,
+            total=0,  # no fixed total in continuous mode
             phrase=generated_sentence,
             direction=session.direction,
-            is_due=any_due,
+            is_due=any(gc.is_due for gc in group_cards),
             difficulty=session.difficulty_level,
-            target_words=f"{len(group_cards)} words" if len(group_cards) > 1 else "",
+            target_words=f"{len(group_cards)} words",
         ))
 
         # Get user answer
         try:
-            answer = prompt_session.prompt(
-                [("class:prompt", "Your translation: ")],
-            ).strip()
+            answer = prompt_session.prompt([("class:prompt", "Your translation: ")]).strip()
         except (KeyboardInterrupt, EOFError):
             answer = "/quit"
 
         if not answer:
-            # Fix #42: Cache generated sentence - don't re-generate on empty Enter
-            console.print("[dim]Please type your translation, or use /skip or /quit.[/dim]")
-            console.print()
-            console.print(create_practice_question_panel(
-                question_num=question_display_num,
-                total=total_display_questions,
-                phrase=generated_sentence,
-                direction=session.direction,
-                is_due=any_due,
-                difficulty=session.difficulty_level,
-                target_words=f"{len(group_cards)} words" if len(group_cards) > 1 else "",
-            ))
-            try:
-                answer = prompt_session.prompt(
-                    [("class:prompt", "Your translation: ")],
-                ).strip()
-            except (KeyboardInterrupt, EOFError):
-                answer = "/quit"
-            if not answer:
-                continue
+            console.print("[dim]Please type your translation, or /skip or /quit.[/dim]\n")
+            continue
 
-        # Handle practice commands
         if answer.lower() == "/quit":
             console.print("[dim]Ending practice session...[/dim]")
             break
 
         if answer.lower() == "/skip":
-            from .translation_practice import PracticeResult
-            for i_skip, gc in enumerate(group_cards):
-                is_last = (i_skip == len(group_cards) - 1)
-                session.record_result(PracticeResult(
-                    card_id=gc.card_id,
-                    front=gc.front,
-                    back=gc.back,
-                    user_answer="(skipped)",
-                    feedback_level=FeedbackLevel.INCORRECT,
-                    feedback_text="Skipped",
-                ), defer_difficulty=not is_last)
             console.print(f"[dim]Skipped {len(group_cards)} word(s).[/dim]\n")
             continue
 
         if answer.lower() == "/score":
             if session.results:
-                console.print(f"[bold]Current score:[/bold] {session.correct_count}/{session.questions_answered} correct ({session.score_percent:.0f}%)")
+                console.print(f"[bold]Score:[/bold] {session.correct_count}/{session.questions_answered} ({session.score_percent:.0f}%)")
             else:
                 console.print("[dim]No answers yet.[/dim]")
             console.print()
             continue
 
         if answer.lower() == "/hint":
-            # Fix #39: Show hints for ALL grouped cards, not just the first
-            import re
             hints = []
             for gc in group_cards:
-                if session.direction == PracticeDirection.EN_TO_ES:
-                    hint_source = gc.back
-                else:
-                    hint_source = gc.front
-                clean = re.sub(r'<[^>]+>', ' ', hint_source).strip()
-                hint = clean[:3] + "..." if len(clean) > 3 else clean
-                hints.append(hint)
+                src = gc.back if session.direction == PracticeDirection.EN_TO_ES else gc.front
+                clean = _re.sub(r'<[^>]+>', ' ', src).strip()
+                hints.append(clean[:3] + "...")
             console.print(f"[dim]Hint: {', '.join(hints)}[/dim]\n")
             continue
 
-        # Step 2: Ask Claude to evaluate the translation
-        per_word_instruction = ""
-        if len(group_cards) > 1:
-            per_word_instruction = (
-                f"\n\nPer-word results (for EACH target word, state if correct or incorrect):\n"
-                f"Format: \"word: correct\" or \"word: incorrect (should be ...)\"\n"
-            )
+        # Evaluate translation
         eval_prompt = (
             f"[PRACTICE MODE - EVALUATE TRANSLATION]\n"
             f"The sentence was: {generated_sentence}\n"
@@ -978,7 +886,8 @@ def run_practice_loop(
             f"Target words being tested ({len(group_cards)}):\n{group_section}\n\n"
             f"Evaluate the translation. Score each 0-4:\n"
             f"Meaning: X/4\nGrammar: X/4\nNaturalness: X/4\nVocabulary: X/4\n"
-            f"{per_word_instruction}"
+            f"\nPer-word results (for EACH target word, state if correct or incorrect):\n"
+            f"Format: \"word: correct\" or \"word: incorrect (should be ...)\"\n"
             f"Show the correct translation if wrong."
         )
 
@@ -1003,25 +912,19 @@ def run_practice_loop(
                 elif event["type"] == "tool_result":
                     console.print(create_result_panel(event["name"], event["result"]))
                 elif event["type"] == "context_status":
-                    pass  # Suppress context bar during practice
+                    pass
 
             if spinner_active and status_ctx:
                 status_ctx.stop()
         except Exception as e:
             if spinner_active and status_ctx:
                 status_ctx.stop()
-            console.print(f"[red]Error during evaluation: {e}[/red]")
-            response_text = "Could not evaluate. Moving to next question."
+            console.print(f"[red]Error evaluating: {e}[/red]")
+            response_text = "Could not evaluate."
 
-        # Parse Claude's evaluation from the response text
-        # Try to extract scores from the response
-        import re
-        meaning = grammar = naturalness = vocabulary = 2  # Default middle scores
+        # Parse scores
+        meaning = grammar = naturalness = vocabulary = 2
         feedback_level = FeedbackLevel.PARTIAL
-
-        # Fix #33: More flexible score regex patterns
-        # Handles: "Meaning: 4/4", "**Meaning**: 4/4", "Meaning: 4",
-        #          "Meaning (4/4)", "Meaning — 4/4", "**Meaning** 3/4"
         score_patterns = [
             (r'\*{0,2}[Mm]eaning\*{0,2}\s*[:\-—]\s*(\d)(?:/4)?', 'meaning'),
             (r'\*{0,2}[Mm]eaning\*{0,2}\s*\((\d)(?:/4)?\)', 'meaning'),
@@ -1033,166 +936,87 @@ def run_practice_loop(
             (r'\*{0,2}[Vv]ocabulary\*{0,2}\s*\((\d)(?:/4)?\)', 'vocabulary'),
         ]
         for pattern, key in score_patterns:
-            match = re.search(pattern, response_text)
+            match = _re.search(pattern, response_text)
             if match:
-                # Fix #43: Clamp scores to 0-4 range
                 val = max(0, min(4, int(match.group(1))))
-                if key == 'meaning':
-                    meaning = val
-                elif key == 'grammar':
-                    grammar = val
-                elif key == 'naturalness':
-                    naturalness = val
-                elif key == 'vocabulary':
-                    vocabulary = val
+                if key == 'meaning': meaning = val
+                elif key == 'grammar': grammar = val
+                elif key == 'naturalness': naturalness = val
+                elif key == 'vocabulary': vocabulary = val
 
-        # Determine feedback level from scores
-        total = meaning + grammar + naturalness + vocabulary
-        if total >= 14:
+        total_score = meaning + grammar + naturalness + vocabulary
+        if total_score >= 14:
             feedback_level = FeedbackLevel.CORRECT
-        elif total >= 8:
+        elif total_score >= 8:
             feedback_level = FeedbackLevel.PARTIAL
         else:
             feedback_level = FeedbackLevel.INCORRECT
 
         # Show feedback panel
         console.print()
-        # Fix #40: Combine correct answers from ALL grouped cards, not just the first
-        import re as _re_clean
-        correct_parts = []
-        for gc in group_cards:
-            if session.direction == PracticeDirection.EN_TO_ES:
-                part = _re_clean.sub(r'<[^>]+>', ' ', gc.back).strip()
-            else:
-                part = _re_clean.sub(r'<[^>]+>', ' ', gc.front).strip()
-            correct_parts.append(part)
-        correct_ans = " / ".join(correct_parts)
-
+        correct_parts = [_re.sub(r'<[^>]+>', ' ', gc.back).strip() for gc in group_cards]
         console.print(create_practice_feedback_panel(
             feedback_level=feedback_level,
             feedback_text=response_text[:300] if len(response_text) > 300 else response_text,
-            scores={
-                "Meaning": meaning,
-                "Grammar": grammar,
-                "Natural": naturalness,
-                "Vocab": vocabulary,
-            },
+            scores={"Meaning": meaning, "Grammar": grammar, "Natural": naturalness, "Vocab": vocabulary},
             user_answer=answer,
-            correct_answer=correct_ans,
+            correct_answer=" / ".join(correct_parts),
         ))
 
-        # Fix #31: Parse per-word feedback for multi-word groups
-        # Try to extract per-word correctness from Claude's evaluation
-        from .translation_practice import PracticeResult
-        per_word_correct = {}  # word -> bool
-        if len(group_cards) > 1:
+        # Record results for session tracking
+        for gc in group_cards:
+            session.record_result(PracticeResult(
+                card_id=gc.card_id, front=gc.front, back=gc.back,
+                user_answer=answer, feedback_level=feedback_level,
+                feedback_text=response_text,
+                meaning_score=meaning, grammar_score=grammar,
+                naturalness_score=naturalness, vocabulary_score=vocabulary,
+                is_due_for_review=gc.is_due,
+            ))
+
+        # Mark all used cards in Anki via batched answerCards
+        ease_for_level = feedback_to_ease(feedback_level)
+        note_ease_pairs = [(int(gc.card_id), ease_for_level) for gc in group_cards]
+        try:
+            results = assistant.anki.answer_cards_batch(note_ease_pairs)
+            ease_labels = {1: "Again", 2: "Hard", 3: "Good", 4: "Easy"}
+            marked = []
+            manual = []
             for gc in group_cards:
                 word = _extract_word(gc)
-                # Look for patterns like "hablar: correct", "hablar - incorrect",
-                # "✓ hablar", "✗ hablar", "hablar ✓", "hablar: wrong"
-                word_escaped = re.escape(word)
-                correct_patterns = [
-                    rf'{word_escaped}\s*[:\-—]\s*(?:correct|right|good|✓|✅)',
-                    rf'(?:✓|✅|correct|right)\s*[:\-—]?\s*{word_escaped}',
-                    rf'{word_escaped}.*?(?:correctly|properly|right)',
-                ]
-                incorrect_patterns = [
-                    rf'{word_escaped}\s*[:\-—]\s*(?:incorrect|wrong|missing|✗|❌|not used)',
-                    rf'(?:✗|❌|incorrect|wrong|missing)\s*[:\-—]?\s*{word_escaped}',
-                    rf'{word_escaped}.*?(?:incorrectly|wrong|missing|not (?:used|included))',
-                ]
-                is_correct = any(re.search(p, response_text, re.IGNORECASE) for p in correct_patterns)
-                is_incorrect = any(re.search(p, response_text, re.IGNORECASE) for p in incorrect_patterns)
-                if is_correct and not is_incorrect:
-                    per_word_correct[word] = True
-                elif is_incorrect and not is_correct:
-                    per_word_correct[word] = False
-                # If ambiguous, leave out and use overall score
-
-        # Fix #41: Record all group results, then update difficulty once at end
-        for i_gc, gc in enumerate(group_cards):
-            word = _extract_word(gc)
-            # Determine per-card feedback level
-            card_feedback_level = feedback_level
-            card_vocab_score = vocabulary
-            if word in per_word_correct:
-                if per_word_correct[word]:
-                    card_vocab_score = max(vocabulary, 3)  # At least 3 if correct
-                    if feedback_level == FeedbackLevel.INCORRECT:
-                        card_feedback_level = FeedbackLevel.PARTIAL
+                success, _ = results.get(int(gc.card_id), (False, ""))
+                label = ease_labels.get(ease_for_level, "Good")
+                if success:
+                    marked.append(f"{word} → {label}")
                 else:
-                    card_vocab_score = min(vocabulary, 1)  # At most 1 if wrong
-                    if feedback_level == FeedbackLevel.CORRECT:
-                        card_feedback_level = FeedbackLevel.PARTIAL
+                    manual.append(f"{word} → press {label}")
+            if marked:
+                console.print(f"[green]Marked: {', '.join(marked)}[/green]")
+            if manual:
+                console.print(f"[dim]Review in Anki: {', '.join(manual)}[/dim]")
+        except Exception:
+            pass
 
-            result = PracticeResult(
-                card_id=gc.card_id,
-                front=gc.front,
-                back=gc.back,
-                user_answer=answer,
-                feedback_level=card_feedback_level,
-                feedback_text=response_text,
-                meaning_score=meaning,
-                grammar_score=grammar,
-                naturalness_score=naturalness,
-                vocabulary_score=card_vocab_score,
-                is_due_for_review=gc.is_due,
-            )
-
-            # Defer difficulty update for all but the last card in the group
-            is_last = (i_gc == len(group_cards) - 1)
-            session.record_result(result, defer_difficulty=not is_last)
-
-        # Skip ahead past the grouped cards (first one was already advanced by record_result)
-        # record_result increments current_index, so after recording all group_cards,
-        # current_index is already at the right position
         console.print()
 
     # Show session summary
     if session.results:
         console.print(create_practice_summary_panel(session))
 
-        # Show Anki review recommendations for due cards
-        due_results = [r for r in session.results if r.is_due_for_review]
-        if due_results:
-            import re as _re_review
-            ease_labels = {1: "Again", 2: "Hard", 3: "Good", 4: "Easy"}
-            console.print()
-            console.print("[bold cyan]Anki Review Suggestions:[/bold cyan]")
-            console.print("[dim]When you review these in Anki, I suggest pressing:[/dim]")
-            for r in due_results:
-                clean_word = _re_review.sub(r'<[^>]+>', '', r.back).strip()[:30]
-                suggested = feedback_to_ease(r.feedback_level)
-                label = ease_labels.get(suggested, "Good")
-                if r.feedback_level == FeedbackLevel.CORRECT:
-                    reason = "got it right"
-                elif r.feedback_level == FeedbackLevel.PARTIAL:
-                    reason = "partially correct"
-                else:
-                    reason = "needs more practice"
-                console.print(f"  [cyan]{clean_word}[/cyan] → [bold]{label}[/bold] [dim]({reason})[/dim]")
-            console.print()
-
-        # Log the session via Claude
+        # Log via Claude
         summary = session.get_summary_dict()
         log_prompt = (
             f"[PRACTICE SESSION COMPLETE - LOG IT]\n"
             f"Please call log_practice_session with these results:\n"
-            f"practice_type: translation\n"
-            f"direction: {summary['direction']}\n"
-            f"deck_name: {summary['deck_name']}\n"
-            f"phrases_attempted: {summary['total_questions']}\n"
-            f"correct: {summary['correct']}\n"
-            f"partial: {summary['partial']}\n"
-            f"incorrect: {summary['incorrect']}\n"
-            f"score_percent: {summary['score_percent']}\n"
-            f"weak_words: {summary['weak_words']}\n\n"
-            f"Also briefly summarize the practice session results to the user."
+            f"practice_type: translation, direction: {summary['direction']}, "
+            f"deck_name: {summary['deck_name']}, phrases_attempted: {summary['total_questions']}, "
+            f"correct: {summary['correct']}, partial: {summary['partial']}, "
+            f"incorrect: {summary['incorrect']}, score_percent: {summary['score_percent']}, "
+            f"weak_words: {summary['weak_words']}\n"
+            f"Briefly summarize the session results."
         )
-
-        # Run the logging through the assistant
-        response_text = ""
         try:
+            response_text = ""
             for event in assistant.chat(log_prompt):
                 if event["type"] == "text_delta":
                     response_text += event["content"]
@@ -1200,13 +1024,12 @@ def run_practice_loop(
                     console.print(create_tool_panel(event["name"], event["input"]))
                 elif event["type"] == "tool_result":
                     console.print(create_result_panel(event["name"], event["result"]))
-
             if response_text.strip():
                 from rich.markdown import Markdown as Md
                 console.print("[bold cyan]Assistant:[/bold cyan]")
                 console.print(Md(response_text))
-        except Exception as e:
-            console.print(f"[yellow]Could not log session: {e}[/yellow]")
+        except Exception:
+            pass
 
     console.print()
 
