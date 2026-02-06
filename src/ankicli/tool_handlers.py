@@ -345,12 +345,21 @@ def handle_check_word_exists(anki: AnkiClient, tool_input: dict, **ctx) -> str:
     word = tool_input["word"].lower().strip()
     deck_name = tool_input.get("deck_name")
 
-    tag = f"word::{word}"
-    query = f'tag:"{tag}"'
-    if deck_name:
-        query = f'deck:"{deck_name}" {query}'
+    # Try exact tag, then underscore/space variants for multi-word phrases
+    candidates = [f"word::{word}"]
+    if " " in word:
+        candidates.append(f"word::{word.replace(' ', '_')}")
+    if "_" in word:
+        candidates.append(f"word::{word.replace('_', ' ')}")
 
-    cards = anki.search_cards(query, limit=10)
+    cards = []
+    for tag in candidates:
+        query = f'tag:"{tag}"'
+        if deck_name:
+            query = f'deck:"{deck_name}" {query}'
+        cards = anki.search_cards(query, limit=10)
+        if cards:
+            break
 
     if not cards:
         return f"NOT FOUND: '{word}' does not exist in {'deck ' + deck_name if deck_name else 'any deck'}. Safe to add."
@@ -375,13 +384,24 @@ def handle_check_words_exist(anki: AnkiClient, tool_input: dict, **ctx) -> str:
 
     for word in words:
         w = word.lower().strip()
-        tag = f"word::{w}"
-        query = f'tag:"{tag}"'
-        if deck_name:
-            query = f'deck:"{deck_name}" {query}'
+        # Try exact tag, then underscore/space variants
+        candidates = [f"word::{w}"]
+        if " " in w:
+            candidates.append(f"word::{w.replace(' ', '_')}")
+        if "_" in w:
+            candidates.append(f"word::{w.replace('_', ' ')}")
 
-        cards = anki.search_cards(query, limit=1)
-        if cards:
+        found = False
+        for tag in candidates:
+            query = f'tag:"{tag}"'
+            if deck_name:
+                query = f'deck:"{deck_name}" {query}'
+            cards = anki.search_cards(query, limit=1)
+            if cards:
+                found = True
+                break
+
+        if found:
             found_words.append(word)
         else:
             not_found_words.append(word)
@@ -400,12 +420,21 @@ def handle_find_card_by_word(anki: AnkiClient, tool_input: dict, **ctx) -> str:
     word = tool_input["word"].lower().strip()
     deck_name = tool_input.get("deck_name")
 
-    tag = f"word::{word}"
-    query = f'tag:"{tag}"'
-    if deck_name:
-        query = f'deck:"{deck_name}" {query}'
+    # Try exact tag, then underscore variant for multi-word phrases
+    candidates = [f"word::{word}"]
+    if " " in word:
+        candidates.append(f"word::{word.replace(' ', '_')}")
+    if "_" in word:
+        candidates.append(f"word::{word.replace('_', ' ')}")
 
-    cards = anki.search_cards(query, limit=5)
+    cards = []
+    for tag in candidates:
+        query = f'tag:"{tag}"'
+        if deck_name:
+            query = f'deck:"{deck_name}" {query}'
+        cards = anki.search_cards(query, limit=5)
+        if cards:
+            break
 
     if not cards:
         return f"NOT FOUND: No card with tag 'word::{word}'. Safe to add."
@@ -427,13 +456,23 @@ def handle_find_cards_by_words(anki: AnkiClient, tool_input: dict, **ctx) -> str
     not_found_words = []
 
     for word in words:
-        tag = f"word::{word}"
-        query = f'tag:"{tag}"'
-        if deck_name:
-            query = f'deck:"{deck_name}" {query}'
+        candidates = [f"word::{word}"]
+        if " " in word:
+            candidates.append(f"word::{word.replace(' ', '_')}")
+        if "_" in word:
+            candidates.append(f"word::{word.replace('_', ' ')}")
 
-        cards = anki.search_cards(query, limit=1)
-        if cards:
+        found = False
+        for tag in candidates:
+            query = f'tag:"{tag}"'
+            if deck_name:
+                query = f'deck:"{deck_name}" {query}'
+            cards = anki.search_cards(query, limit=1)
+            if cards:
+                found = True
+                break
+
+        if found:
             found_words.append(word)
         else:
             not_found_words.append(word)

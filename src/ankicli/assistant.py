@@ -84,8 +84,15 @@ _GENERAL_GUIDELINES = """## General Guidelines
 
 When creating flashcards:
 - For bulk operations, use add_multiple_cards to add many cards at once (10, 20, 50+ cards)
-- Before adding, use check_words_exist to avoid duplicates
+- Before adding, use find_cards_by_words (exact tag matching) to avoid duplicates
 - Suggest tags when relevant (e.g., "verb", "noun", "adjective", "irregular")
+
+CRITICAL tagging rule for word:: tags:
+- Every card MUST have a word:: tag with the FULL phrase, using underscores for spaces
+- Single words: word::correr, word::libro, word::grande
+- Multi-word phrases: word::tal_vez, word::sin_embargo, word::a_menudo, word::de_repente
+- NEVER tag just one word of a phrase (word::vez for "tal vez" is WRONG)
+- This tag is how the system looks up cards — wrong tags = card not found
 
 When editing cards:
 - First search to find the cards and get their note IDs
