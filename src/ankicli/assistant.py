@@ -154,7 +154,10 @@ Example: If upcoming words include comprar, tienda, precio — generate:
 "I bought a book at the store because the price was good."
 The user must figure out which Spanish words to use without being told.
 
-This tests productive recall, not recognition. Never show target words in the question.
+This tests productive recall, not recognition. NEVER show target words in the question.
+NEVER tell the user which words you are testing, which words are due, or which words are coming up.
+Do NOT say things like "Remaining due words: X, Y, Z" or "Let me use comprar and tienda".
+The user must figure out which Spanish words to use entirely on their own.
 
 **Scoring Rubric (0-4 for each):**
 - **Meaning** (0-4): 0=completely wrong, 1=major errors, 2=partially correct, 3=correct with minor issues, 4=perfect

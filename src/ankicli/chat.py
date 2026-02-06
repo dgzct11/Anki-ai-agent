@@ -820,7 +820,7 @@ def run_practice_loop(
                 f"Generate a SINGLE {direction_label} sentence that naturally uses ALL {len(group_cards)} "
                 f"target words: {', '.join(group_words)}.\n"
                 f"Do NOT reveal which {target_lang} words to use. Do NOT show the translation.\n"
-                f"IMPORTANT: Output ONLY the sentence. No explanations, no commentary, no extra text."
+                f"IMPORTANT: Output ONLY the sentence to translate. NEVER mention which words you are testing, which words are due, or which words are remaining. No explanations, no commentary, no meta-text."
             )
         else:
             gen_prompt = (
@@ -833,7 +833,7 @@ def run_practice_loop(
                 f"Other upcoming words for context:\n{remaining_section}\n\n"
                 f"Generate a SINGLE {direction_label} sentence using the target word.\n"
                 f"Do NOT reveal the {target_lang} translation.\n"
-                f"IMPORTANT: Output ONLY the sentence. No explanations, no commentary, no extra text."
+                f"IMPORTANT: Output ONLY the sentence to translate. NEVER mention which words you are testing, which words are due, or which words are remaining. No explanations, no commentary, no meta-text."
             )
 
         # Get Claude's generated sentence
