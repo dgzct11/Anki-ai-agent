@@ -1752,8 +1752,10 @@ def handle_get_session_due_words(anki: AnkiClient, tool_input: dict, **ctx) -> s
     # Match words to due cards using word:: tags (precise) instead of
     # text search (which falsely matches words in example sentences)
     due_word_map: dict[str, str] = {}
+    match_method: dict[str, str] = {}  # track how each word was matched
     for word in session_words:
         word_lower = word.lower().strip()
+        matched = False
         for card in due_cards:
             # Check word:: tag first (most reliable)
             has_word_tag = any(
@@ -1761,17 +1763,19 @@ def handle_get_session_due_words(anki: AnkiClient, tool_input: dict, **ctx) -> s
             )
             if has_word_tag:
                 due_word_map[word] = card.id
+                match_method[word] = "tag"
+                matched = True
                 break
-        else:
+        if not matched:
             # Fallback: check if the word is the MAIN word on the card back
             # (first bold word, not in example sentences)
             import re
             for card in due_cards:
-                # Extract just the first line / bold word from back
                 back_text = re.sub(r'<[^>]+>', ' ', card.back).strip()
                 main_word = back_text.split('\n')[0].split('(')[0].strip().lower()
                 if word_lower == main_word:
                     due_word_map[word] = card.id
+                    match_method[word] = "fallback (matched card back, no word:: tag found)"
                     break
 
     if not due_word_map:
@@ -1803,9 +1807,12 @@ def handle_get_session_due_words(anki: AnkiClient, tool_input: dict, **ctx) -> s
             suggested_ease = 3
             suggested_label = "Good"
 
+        method = match_method.get(word, "tag")
         lines.append(f"  {word} (card ID: {card_id})")
         lines.append(f"    Suggested: {suggested_label} ({suggested_ease})")
         lines.append(f"    Intervals: Again={intervals['again']}, Hard={intervals['hard']}, Good={intervals['good']}, Easy={intervals['easy']}")
+        if method != "tag":
+            lines.append(f"    WARNING: Matched via {method} — card may not be the exact word. Verify before marking.")
         lines.append("")
 
     lines.extend([
