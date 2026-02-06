@@ -183,10 +183,29 @@ _ERROR_JOURNAL_GUIDE = """## Error Journal
 You have access to a persistent error journal that tracks the user's recurring mistakes across practice and quiz sessions.
 
 **When to log errors:**
-- During translation practice: if the user makes a grammar mistake (gender agreement, verb form, preposition, etc.), call log_error
+- During translation practice: if the user makes a STRUCTURAL mistake, call log_error
 - During grammar quizzes: if the user gets a question wrong, log the specific error pattern
-- During conversation simulations: if you correct a mistake, log it
-- Use consistent error_type labels: gender_agreement, ser_vs_estar, accent_missing, verb_conjugation, word_order, preposition_choice, article_usage, subjunctive_needed, preterite_vs_imperfect, false_friend, spelling
+- During conversation simulations: if you correct a structural mistake, log it
+
+**What to log (structural/grammatical issues only):**
+- verb_conjugation: wrong tense, person, or form (e.g., "corrí" vs "corría")
+- ser_vs_estar: using the wrong "to be"
+- por_vs_para: wrong preposition choice
+- preposition_choice: other preposition errors (a/en/de/con)
+- gender_agreement: wrong article or adjective gender
+- article_usage: missing or wrong article (el/la/los/las/un/una)
+- subjunctive_needed: indicative used where subjunctive is required
+- preterite_vs_imperfect: wrong past tense
+- word_order: incorrect sentence structure
+- false_friend: used a false cognate incorrectly
+- reflexive_verb: missing or wrong reflexive pronoun
+- direct_vs_indirect_object: wrong object pronoun (lo/la/le)
+
+**What NOT to log (ignore these):**
+- Accent/tilde mistakes (día vs dia, qué vs que)
+- Spelling errors or typos
+- Capitalization issues
+- Minor punctuation differences
 
 **When to check errors:**
 - At the start of practice/quiz sessions, call get_error_patterns to see what the user struggles with
