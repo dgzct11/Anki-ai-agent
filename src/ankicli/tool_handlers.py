@@ -1891,24 +1891,36 @@ def handle_mark_cards_reviewed(anki: AnkiClient, tool_input: dict, **ctx) -> str
         return "No card IDs provided."
 
     ease_labels = {1: "Again", 2: "Hard", 3: "Good", 4: "Easy"}
-    marked = []
-    review_in_anki = []
 
+    # Build batch of (note_id, ease) pairs
+    note_ease_pairs = []
+    note_to_word: dict[int, str] = {}
+    note_to_ease: dict[int, int] = {}
     for cid in card_ids:
         cid_str = str(cid)
         card_ease = per_card_ease.get(cid_str, default_ease)
         if card_ease not in (1, 2, 3, 4):
             card_ease = default_ease
-        word = card_words.get(str(cid), str(cid))
-        ease_label = ease_labels.get(card_ease, "Good")
+        note_id = int(cid)
+        note_ease_pairs.append((note_id, card_ease))
+        note_to_word[note_id] = card_words.get(cid_str, cid_str)
+        note_to_ease[note_id] = card_ease
 
-        try:
-            success, message = anki.answer_card(int(cid), card_ease)
-            if success:
-                marked.append(f"  {word} → {ease_label}")
-            else:
-                review_in_anki.append(f"  {word} → press {ease_label}")
-        except Exception:
+    # Single batched API call
+    try:
+        results = anki.answer_cards_batch(note_ease_pairs)
+    except Exception:
+        results = {nid: (False, "API error") for nid, _ in note_ease_pairs}
+
+    marked = []
+    review_in_anki = []
+    for note_id, card_ease in note_ease_pairs:
+        word = note_to_word[note_id]
+        ease_label = ease_labels.get(card_ease, "Good")
+        success, _ = results.get(note_id, (False, ""))
+        if success:
+            marked.append(f"  {word} → {ease_label}")
+        else:
             review_in_anki.append(f"  {word} → press {ease_label}")
 
     # Record study activity for streaks

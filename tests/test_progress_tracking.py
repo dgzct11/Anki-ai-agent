@@ -512,19 +512,24 @@ class TestMarkCardsReviewedHandler:
         handler_fn = HANDLERS["mark_cards_reviewed"]
 
         mock_anki = MagicMock()
-        mock_anki.answer_card.return_value = (True, "OK")
+        mock_anki.answer_cards_batch.return_value = {
+            123: (True, "OK"),
+            456: (True, "OK"),
+        }
 
         result = handler_fn(mock_anki, {"card_ids": ["123", "456"], "ease": 3})
         assert "Marked in Anki" in result
         assert "Good" in result
-        assert mock_anki.answer_card.call_count == 2
 
     def test_mark_with_failures(self):
         from ankicli.tool_handlers import HANDLERS
         handler_fn = HANDLERS["mark_cards_reviewed"]
 
         mock_anki = MagicMock()
-        mock_anki.answer_card.side_effect = [(True, "OK"), (False, "not in queue")]
+        mock_anki.answer_cards_batch.return_value = {
+            123: (True, "OK"),
+            456: (False, "not in queue"),
+        }
 
         result = handler_fn(mock_anki, {"card_ids": ["123", "456"], "ease": 3})
         assert "Marked in Anki" in result
@@ -551,10 +556,12 @@ class TestMarkCardsReviewedHandler:
         handler_fn = HANDLERS["mark_cards_reviewed"]
 
         mock_anki = MagicMock()
-        mock_anki.answer_card.return_value = (True, "OK")
+        mock_anki.answer_cards_batch.return_value = {123: (True, "OK")}
 
         result = handler_fn(mock_anki, {"card_ids": ["123"]})
-        mock_anki.answer_card.assert_called_once_with(123, 3)
+        # Verify batch was called with ease=3 (Good)
+        call_args = mock_anki.answer_cards_batch.call_args[0][0]
+        assert call_args[0] == (123, 3)
         assert "Good" in result
 
 

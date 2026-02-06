@@ -494,22 +494,67 @@ class AnkiClient:
         if not card_ids:
             return False, f"No card found for note ID {note_id}"
 
-        for cid in card_ids:
-            try:
-                result = _request("answerCards", answers=[{"cardId": cid, "ease": ease}])
-                if isinstance(result, list) and result and result[0] is True:
-                    return True, "OK"
-            except AnkiConnectError as e:
-                error_msg = str(e)
-                if "not at top of queue" in error_msg.lower() or "queue" in error_msg.lower():
-                    return False, (
-                        "Card is not in Anki's active review queue. "
-                        "To mark it, open Anki and review it there — "
-                        "answerCards only works for the card currently shown in the reviewer."
-                    )
-                return False, f"AnkiConnect error: {error_msg}"
+        try:
+            result = _request("answerCards", answers=[{"cardId": card_ids[0], "ease": ease}])
+            if isinstance(result, list) and result and result[0] is True:
+                return True, "OK"
+            return False, "Card could not be answered"
+        except AnkiConnectError as e:
+            return False, str(e)
 
-        return False, "answerCards returned no result"
+    def answer_cards_batch(self, note_ease_pairs: list[tuple[int, int]]) -> dict[int, tuple[bool, str]]:
+        """Answer multiple cards in a single answerCards API call.
+
+        Batching all cards in one call lets Anki's scheduler process them
+        sequentially, which is more reliable than separate calls where
+        the queue state changes between requests.
+
+        Args:
+            note_ease_pairs: List of (note_id, ease) tuples.
+
+        Returns:
+            Dict mapping note_id -> (success, message).
+        """
+        # Resolve all note IDs to card IDs first
+        answers = []
+        note_to_card: dict[int, int] = {}
+        for note_id, ease in note_ease_pairs:
+            card_ids = _request("findCards", query=f"nid:{note_id}")
+            if card_ids:
+                answers.append({"cardId": card_ids[0], "ease": ease})
+                note_to_card[note_id] = card_ids[0]
+
+        if not answers:
+            return {nid: (False, "No card found") for nid, _ in note_ease_pairs}
+
+        # Single batched API call
+        try:
+            results = _request("answerCards", answers=answers)
+        except AnkiConnectError as e:
+            return {nid: (False, str(e)) for nid, _ in note_ease_pairs}
+
+        # Map results back to note IDs
+        output: dict[int, tuple[bool, str]] = {}
+        card_to_note = {cid: nid for nid, cid in note_to_card.items()}
+
+        if isinstance(results, list):
+            for i, answer in enumerate(answers):
+                cid = answer["cardId"]
+                nid = card_to_note.get(cid, cid)
+                if i < len(results) and results[i] is True:
+                    output[nid] = (True, "OK")
+                else:
+                    output[nid] = (False, "Card could not be answered")
+        else:
+            for nid, _ in note_ease_pairs:
+                output[nid] = (False, "Unexpected response from answerCards")
+
+        # Fill in any note IDs that weren't in the batch (no card found)
+        for nid, _ in note_ease_pairs:
+            if nid not in output:
+                output[nid] = (False, "No card found")
+
+        return output
 
     def get_card_reviews(self, deck_name: str | None = None) -> list[dict]:
         """
