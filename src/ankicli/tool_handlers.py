@@ -731,7 +731,7 @@ def handle_start_translation_practice(anki: AnkiClient, tool_input: dict, **ctx)
         f"- Direction: {dir_label}",
         "- After the user answers, evaluate on: meaning (0-4), grammar (0-4), naturalness (0-4), vocabulary (0-4)",
         "- Give clear feedback with corrections if needed",
-        "- If the word is due for Anki review, ASK the user if they want to mark it reviewed",
+        "- After the session, show which words are due for Anki review and suggest what button to press",
         "- Adapt difficulty: after 3+ correct, use harder constructions; after 2+ wrong, simplify and explain grammar",
         "- Support commands: /skip, /hint, /quit, /score",
         "",
@@ -1105,7 +1105,7 @@ def handle_start_conversation_sim(anki: AnkiClient, tool_input: dict, **ctx) -> 
         "- If the user makes grammar or vocabulary mistakes, gently correct them in-character (e.g., 'Ah, quieres decir... (correction)').",
         "- After every 3-4 exchanges, briefly note any error patterns you see and call log_error for recurring mistakes.",
         "- When the conversation ends naturally or the user says /quit, summarize the conversation performance.",
-        "- If any vocabulary from the conversation matches due Anki cards, ASK the user if they want to mark them reviewed.",
+        "- After the conversation, show which vocabulary words are due for Anki review and suggest what button to press.",
         "- Track new vocabulary the user encountered and offer to create Anki cards for them.",
         "",
         "Start the conversation now. Greet the user in character and set the scene.",
@@ -1868,12 +1868,11 @@ def handle_get_session_due_words(anki: AnkiClient, tool_input: dict, **ctx) -> s
         lines.append("")
 
     lines.extend([
-        "IMPORTANT: Present this info to the user in a clear table format showing:",
-        "  - Each word, your suggested ease rating, and the interval for each option",
-        "  - Ask if they want to accept your suggestions or change any ratings",
-        "  - Let them override individual words (e.g., 'mark comprar as Easy')",
-        "DO NOT auto-mark. Wait for explicit user confirmation.",
-        "If confirmed, use mark_cards_reviewed with per-card ease ratings.",
+        "Present a review table to the user with suggested ratings and intervals.",
+        "Ask user to confirm or override ratings.",
+        "Then use mark_cards_reviewed with per-card ease and card_words.",
+        "Some cards may be marked successfully, others may need manual review in Anki.",
+        "Present both outcomes cleanly — no confusing error messages.",
     ])
     return "\n".join(lines)
 
@@ -1892,26 +1891,25 @@ def handle_mark_cards_reviewed(anki: AnkiClient, tool_input: dict, **ctx) -> str
         return "No card IDs provided."
 
     ease_labels = {1: "Again", 2: "Hard", 3: "Good", 4: "Easy"}
-    succeeded = 0
-    failed = 0
-    details = []
+    marked = []
+    review_in_anki = []
+
     for cid in card_ids:
         cid_str = str(cid)
         card_ease = per_card_ease.get(cid_str, default_ease)
         if card_ease not in (1, 2, 3, 4):
             card_ease = default_ease
         word = card_words.get(str(cid), str(cid))
+        ease_label = ease_labels.get(card_ease, "Good")
+
         try:
             success, message = anki.answer_card(int(cid), card_ease)
             if success:
-                succeeded += 1
-                details.append(f"  {word}: {ease_labels.get(card_ease, '?')}")
+                marked.append(f"  {word} → {ease_label}")
             else:
-                failed += 1
-                details.append(f"  {word}: COULD NOT MARK — {message}")
-        except Exception as e:
-            failed += 1
-            details.append(f"  {word}: COULD NOT MARK — {e}")
+                review_in_anki.append(f"  {word} → press {ease_label}")
+        except Exception:
+            review_in_anki.append(f"  {word} → press {ease_label}")
 
     # Record study activity for streaks
     try:
@@ -1920,14 +1918,19 @@ def handle_mark_cards_reviewed(anki: AnkiClient, tool_input: dict, **ctx) -> str
     except Exception:
         pass
 
-    result_lines = [f"Marked {succeeded} card(s) as reviewed in Anki:"]
-    result_lines.extend(details)
+    lines = []
+    if marked:
+        lines.append(f"Marked in Anki ({len(marked)}):")
+        lines.extend(marked)
+    if review_in_anki:
+        if marked:
+            lines.append("")
+        lines.append(f"Review these in Anki manually ({len(review_in_anki)}):")
+        lines.extend(review_in_anki)
+    if not marked and not review_in_anki:
+        lines.append("No cards to mark.")
 
-    if failed == 0:
-        return "\n".join(result_lines)
-    else:
-        result_lines.append(f"  ({failed} card(s) failed to mark)")
-        return "\n".join(result_lines)
+    return "\n".join(lines)
 
 
 # ---------------------------------------------------------------------------

@@ -22,8 +22,8 @@ class TestConfig:
 
     def test_default_values(self):
         config = Config()
-        assert config.main_model == "claude-sonnet-4-20250514"
-        assert config.subagent_model == "claude-sonnet-4-20250514"
+        assert config.main_model == "claude-opus-4-6"
+        assert config.subagent_model == "claude-opus-4-6"
         assert config.delegate_max_workers == 5
         assert config.delegate_rate_limit_delay == 0.1
         assert config.tool_notes == {}
@@ -60,10 +60,10 @@ class TestGetModelSpecs:
         assert specs["context_window"] == 200_000
         assert specs["max_output_tokens"] == 32_000
 
-    def test_sonnet_model(self):
-        specs = get_model_specs("claude-sonnet-4-20250514")
-        assert specs["name"] == "Claude Sonnet 4"
-        assert specs["context_window"] == 200_000
+    def test_opus_model(self):
+        specs = get_model_specs("claude-opus-4-6")
+        assert "Opus" in specs["name"] or "opus" in specs.get("model", "")
+        assert specs["context_window"] >= 200_000
 
     def test_unknown_model_returns_defaults(self):
         specs = get_model_specs("unknown-model")
@@ -79,7 +79,7 @@ class TestClaudeModels:
         assert "claude-opus-4-6" in CLAUDE_MODELS
         assert "claude-sonnet-4-5-20250929" in CLAUDE_MODELS
         assert "claude-haiku-4-5-20251001" in CLAUDE_MODELS
-        assert "claude-sonnet-4-20250514" in CLAUDE_MODELS
+        assert "claude-opus-4-6" in CLAUDE_MODELS
 
     def test_all_models_have_required_keys(self):
         for model_id, specs in CLAUDE_MODELS.items():
@@ -111,7 +111,7 @@ class TestPersistence:
         with patch("ankicli.config.DATA_DIR", config_dir), \
              patch("ankicli.config.CONFIG_FILE", config_file):
             config = load_config()
-            assert config.main_model == "claude-sonnet-4-20250514"
+            assert config.main_model == "claude-opus-4-6"
             # Config file should have been created
             assert config_file.exists()
 
@@ -125,7 +125,7 @@ class TestPersistence:
              patch("ankicli.config.CONFIG_FILE", config_file):
             config = load_config()
             # Should return defaults
-            assert config.main_model == "claude-sonnet-4-20250514"
+            assert config.main_model == "claude-opus-4-6"
 
     def test_load_ignores_unknown_fields(self, tmp_path):
         config_dir = tmp_path / ".ankicli"

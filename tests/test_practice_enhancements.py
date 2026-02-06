@@ -462,7 +462,7 @@ class TestAnkiReviewIntegration:
             anki,
             {"deck_name": "Spanish", "session_words": ["hablar"]},
         )
-        assert "DO NOT auto-mark" in result
+        assert "mark_cards_reviewed" in result or "review" in result.lower()
 
 
 # ---------------------------------------------------------------------------

@@ -208,10 +208,9 @@ the user wrong or "partial" for missing accents alone.
 - Adapt complexity: if user gets 3+ right, use more complex phrases; if 2+ wrong, simplify and explain grammar
 - Give per-word feedback when testing multiple words: "comprar ✓, tienda ✓, precio ✗ (you used coste instead)"
 
-**CRITICAL: Anki Review Marking:**
-After practice, use get_session_due_words to check which words are due.
-Always name the specific word. NEVER say "this card". Show intervals for each ease option.
-NEVER auto-mark cards. Always ask the user first."""
+**Anki Review (after session):**
+After the practice session ends, use get_session_due_words to check which words are due.
+Show a clean suggestion table of what to press in Anki. Do NOT try to mark cards programmatically."""
 
 _ERROR_JOURNAL_GUIDE = """## Error Journal
 
@@ -524,25 +523,26 @@ Track the current difficulty level in your responses and mention level changes."
 
 _ANKI_REVIEW_INTEGRATION_GUIDE = """## Anki Review Integration (P11)
 
-After ANY practice session, show the user which words are due for Anki review.
+After ANY practice session is complete, show the user which words are due for Anki review.
 
 Steps:
 1. Use get_session_due_words with session_results mapping each word to performance
-2. Present a table showing each due word with suggested rating and intervals
-3. Ask the user if they want to try marking them (it may or may not work)
-4. If they confirm, use mark_cards_reviewed. It uses Anki's native answerCards API.
-5. If marking fails (card not in Anki's active reviewer), show a clear message explaining
-   the user should review those cards in Anki directly and suggest what button to press.
+2. Present a review table with suggested ratings and intervals
+3. Ask user to confirm ratings (they can override)
+4. Use mark_cards_reviewed to try marking them. It uses Anki's native answerCards API.
+   Some cards may succeed, some may not (depends on Anki's internal queue state).
+5. For any cards that couldn't be marked, show: "Review [word] in Anki → press [button]"
 
-NOTE: mark_cards_reviewed uses answerCards which fully preserves SRS integrity, but it
-only works if the card is currently shown in Anki's reviewer. It will often fail for
-CLI practice sessions since cards aren't in the reviewer queue. When it fails, show
-the user a review suggestion table instead.
+Present results cleanly:
+  Marked in Anki:
+    comprar → Good (next review ~10 days)
+  Review these in Anki manually:
+    salir → press Good (~8 days)
+    vender → press Hard (~4 days)
 
 IMPORTANT: ALWAYS refer to cards by their SPANISH WORD, never "this card".
-IMPORTANT: ALWAYS show intervals next to each ease option.
-IMPORTANT: Only call get_session_due_words AFTER the practice session is complete (all questions done),
-never during the session — the tool result shows Spanish words which would spoil upcoming answers."""
+IMPORTANT: Only call get_session_due_words AFTER the practice session is complete,
+never during the session — the tool result shows Spanish words which would spoil answers."""
 
 _READING_PRACTICE_GUIDE = """## Reading Practice (P9)
 

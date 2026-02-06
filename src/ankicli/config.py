@@ -44,8 +44,8 @@ def get_model_specs(model_id: str) -> dict:
 class Config:
     """Application configuration."""
 
-    main_model: str = "claude-sonnet-4-20250514"
-    subagent_model: str = "claude-sonnet-4-20250514"
+    main_model: str = "claude-opus-4-6"
+    subagent_model: str = "claude-opus-4-6"
     delegate_max_workers: int = 5
     delegate_rate_limit_delay: float = 0.1
     tool_notes: dict[str, str] = field(default_factory=dict)

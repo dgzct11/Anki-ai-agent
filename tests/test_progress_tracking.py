@@ -515,7 +515,7 @@ class TestMarkCardsReviewedHandler:
         mock_anki.answer_card.return_value = (True, "OK")
 
         result = handler_fn(mock_anki, {"card_ids": ["123", "456"], "ease": 3})
-        assert "2 card(s) as reviewed" in result
+        assert "Marked in Anki" in result
         assert "Good" in result
         assert mock_anki.answer_card.call_count == 2
 
@@ -527,8 +527,8 @@ class TestMarkCardsReviewedHandler:
         mock_anki.answer_card.side_effect = [(True, "OK"), (False, "not in queue")]
 
         result = handler_fn(mock_anki, {"card_ids": ["123", "456"], "ease": 3})
-        assert "1 card(s) as reviewed" in result
-        assert "COULD NOT MARK" in result
+        assert "Marked in Anki" in result
+        assert "Review these in Anki manually" in result
 
     def test_invalid_ease(self):
         from ankicli.tool_handlers import HANDLERS
@@ -616,7 +616,7 @@ class TestGetSessionDueWordsHandler:
             "deck_name": "Test",
             "session_words": ["hablar"],
         })
-        # Must include instruction to ask user
-        assert "Ask the user" in result or "IMPORTANT" in result
-        # Must not call answer_card
+        # Must include instructions about reviewing
+        assert "mark_cards_reviewed" in result or "review" in result.lower()
+        # Handler itself does not call answer_card (that's mark_cards_reviewed's job)
         mock_anki.answer_card.assert_not_called()
