@@ -947,16 +947,11 @@ def run_practice_loop(
         else:
             feedback_level = FeedbackLevel.INCORRECT
 
-        # Show feedback panel
+        # Show feedback
         console.print()
-        correct_parts = [_re.sub(r'<[^>]+>', ' ', gc.back).strip() for gc in group_cards]
-        console.print(create_practice_feedback_panel(
-            feedback_level=feedback_level,
-            feedback_text=response_text[:300] if len(response_text) > 300 else response_text,
-            scores={"Meaning": meaning, "Grammar": grammar, "Natural": naturalness, "Vocab": vocabulary},
-            user_answer=answer,
-            correct_answer=" / ".join(correct_parts),
-        ))
+        if response_text.strip():
+            from rich.markdown import Markdown as _Md
+            console.print(_Md(response_text))
 
         # Record results for session tracking
         for gc in group_cards:
@@ -969,28 +964,51 @@ def run_practice_loop(
                 is_due_for_review=gc.is_due,
             ))
 
-        # Mark all used cards in Anki via batched answerCards
-        ease_for_level = feedback_to_ease(feedback_level)
-        note_ease_pairs = [(int(gc.card_id), ease_for_level) for gc in group_cards]
+        # Prompt user to mark the cards used in this question
+        ease_labels = {1: "Again", 2: "Hard", 3: "Good", 4: "Easy"}
+        suggested_ease = feedback_to_ease(feedback_level)
+        suggested_label = ease_labels.get(suggested_ease, "Good")
+        card_words_list = [_extract_word(gc) for gc in group_cards]
+
+        console.print(f"[cyan]Words: {', '.join(card_words_list)}[/cyan] → Suggested: [bold]{suggested_label}[/bold]")
         try:
-            results = assistant.anki.answer_cards_batch(note_ease_pairs)
-            ease_labels = {1: "Again", 2: "Hard", 3: "Good", 4: "Easy"}
-            marked = []
-            manual = []
-            for gc in group_cards:
-                word = _extract_word(gc)
-                success, _ = results.get(int(gc.card_id), (False, ""))
-                label = ease_labels.get(ease_for_level, "Good")
-                if success:
-                    marked.append(f"{word} → {label}")
-                else:
-                    manual.append(f"{word} → press {label}")
-            if marked:
-                console.print(f"[green]Marked: {', '.join(marked)}[/green]")
-            if manual:
-                console.print(f"[dim]Review in Anki: {', '.join(manual)}[/dim]")
-        except Exception:
-            pass
+            mark_answer = prompt_session.prompt(
+                [("class:prompt", f"Mark in Anki? ({suggested_label}/1-4/n): ")],
+            ).strip().lower()
+        except (KeyboardInterrupt, EOFError):
+            mark_answer = "n"
+
+        if mark_answer not in ("n", "no", ""):
+            # Parse ease
+            ease_map = {"again": 1, "hard": 2, "good": 3, "easy": 4, "y": suggested_ease, "yes": suggested_ease}
+            if mark_answer in ease_map:
+                chosen_ease = ease_map[mark_answer]
+            elif mark_answer.isdigit() and int(mark_answer) in (1, 2, 3, 4):
+                chosen_ease = int(mark_answer)
+            else:
+                chosen_ease = suggested_ease
+
+            note_ease_pairs = [(int(gc.card_id), chosen_ease) for gc in group_cards]
+            try:
+                results = assistant.anki.answer_cards_batch(note_ease_pairs)
+                marked = []
+                manual = []
+                for gc in group_cards:
+                    word = _extract_word(gc)
+                    success, _ = results.get(int(gc.card_id), (False, ""))
+                    label = ease_labels.get(chosen_ease, "Good")
+                    if success:
+                        marked.append(f"{word}")
+                    else:
+                        manual.append(f"{word}")
+                if marked:
+                    console.print(f"[green]Marked {ease_labels.get(chosen_ease, 'Good')}: {', '.join(marked)}[/green]")
+                if manual:
+                    console.print(f"[dim]Review in Anki: {', '.join(manual)}[/dim]")
+            except Exception:
+                console.print("[dim]Could not mark. Review in Anki manually.[/dim]")
+        else:
+            console.print("[dim]Skipped marking.[/dim]")
 
         console.print()
 
@@ -1011,18 +1029,18 @@ def run_practice_loop(
             f"Briefly summarize the session results."
         )
         try:
-            response_text = ""
+            resp = ""
             for event in assistant.chat(log_prompt):
                 if event["type"] == "text_delta":
-                    response_text += event["content"]
+                    resp += event["content"]
                 elif event["type"] == "tool_use":
                     console.print(create_tool_panel(event["name"], event["input"]))
                 elif event["type"] == "tool_result":
                     console.print(create_result_panel(event["name"], event["result"]))
-            if response_text.strip():
+            if resp.strip():
                 from rich.markdown import Markdown as Md
                 console.print("[bold cyan]Assistant:[/bold cyan]")
-                console.print(Md(response_text))
+                console.print(Md(resp))
         except Exception:
             pass
 
@@ -2159,15 +2177,16 @@ def run_chat():
 
                     if spinner_active and status_ctx:
                         status_ctx.stop()
-                    if response_text.strip():
-                        console.print("[bold cyan]Assistant:[/bold cyan]")
-                        console.print(Markdown(response_text))
 
                     # Check if a practice session was created on the assistant
                     practice_session = getattr(assistant, "_practice_session", None)
                     if practice_session:
+                        # Don't show Claude's text response — practice loop takes over
                         run_practice_loop(console, assistant, practice_session, session)
                         assistant._practice_session = None
+                    elif response_text.strip():
+                        console.print("[bold cyan]Assistant:[/bold cyan]")
+                        console.print(Markdown(response_text))
                     else:
                         console.print("[yellow]Could not start practice session. Try specifying a deck name.[/yellow]")
 
