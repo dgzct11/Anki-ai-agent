@@ -684,73 +684,46 @@ def handle_card_subset_delegate(anki: AnkiClient, tool_input: dict, **ctx) -> st
 
 @handler("start_translation_practice")
 def handle_start_translation_practice(anki: AnkiClient, tool_input: dict, **ctx) -> str:
-    from .translation_practice import (
-        PracticeDirection,
-        CardSource,
-        PracticeSession,
-        load_practice_cards,
-    )
+    from .translation_practice import PracticeDirection, PracticeSession
 
     deck_name = tool_input["deck_name"]
-    count = tool_input.get("count", 10)
     direction_str = tool_input.get("direction", "en_to_es")
-    source_str = tool_input.get("card_source", "mixed")
-
     direction = PracticeDirection(direction_str)
-    source = CardSource(source_str)
 
-    cards = load_practice_cards(anki, deck_name, source, count)
-    if not cards:
-        return f"No cards found in deck '{deck_name}' matching source '{source_str}'. Make sure the deck exists and has cards."
+    # Check deck exists and has cards
+    try:
+        due_cards = anki.get_due_cards(deck_name, limit=5)
+        new_cards = anki.get_new_cards(deck_name, limit=5)
+    except Exception:
+        return f"Could not access deck '{deck_name}'. Make sure it exists and Anki is running."
 
+    if not due_cards and not new_cards:
+        return f"No cards to practice in '{deck_name}'. All caught up!"
+
+    # Create a minimal session — the practice loop pulls fresh cards each question
     session = PracticeSession(
         deck_name=deck_name,
         direction=direction,
-        cards=cards,
+        cards=[],  # Empty — loop pulls fresh cards dynamically
     )
 
-    # Store session on the assistant for the practice sub-loop to use
     assistant = ctx.get("assistant")
     if assistant:
         assistant._practice_session = session
 
-    # Build a summary for Claude to use
     dir_label = "English -> Spanish" if direction == PracticeDirection.EN_TO_ES else "Spanish -> English"
-    due_count = sum(1 for c in cards if c.is_due)
-    new_count = sum(1 for c in cards if c.is_new)
+    due_count = len(due_cards)
+    new_count = len(new_cards)
 
-    lines = [
-        f"Practice session ready: {len(cards)} cards from '{deck_name}'",
-        f"Direction: {dir_label}",
-        f"Cards: {due_count} due for review, {new_count} new",
-        "",
-        "The chat UI will now enter practice mode. Present the first question.",
-        "",
-        "INSTRUCTIONS FOR PRACTICE MODE:",
-        "- Present one phrase at a time for the user to translate",
-        f"- Direction: {dir_label}",
-        "- After the user answers, evaluate on: meaning (0-4), grammar (0-4), naturalness (0-4), vocabulary (0-4)",
-        "- Give clear feedback with corrections if needed",
-        "- After the session, show which words are due for Anki review and suggest what button to press",
-        "- Adapt difficulty: after 3+ correct, use harder constructions; after 2+ wrong, simplify and explain grammar",
-        "- Support commands: /skip, /hint, /quit, /score",
-        "",
-        "FIRST CARD:",
-    ]
-
-    card = session.current_card
-    if card:
-        if direction == PracticeDirection.EN_TO_ES:
-            lines.append(f"English (front): {card.front}")
-            lines.append(f"Spanish answer (back): {card.back}")
-        else:
-            lines.append(f"Spanish (back): {card.back}")
-            lines.append(f"English answer (front): {card.front}")
-        if card.is_due:
-            lines.append("(This card IS due for Anki review)")
-        lines.append(f"Tags: {', '.join(card.tags) if card.tags else 'none'}")
-
-    return "\n".join(lines)
+    return (
+        f"Practice session starting for deck '{deck_name}'\n"
+        f"Direction: {dir_label}\n"
+        f"Available: {due_count}+ due, {new_count}+ new\n\n"
+        f"The practice loop will now take over. It pulls fresh due cards before each question,\n"
+        f"generates sentences testing 3-5 words, evaluates translations, and marks cards automatically.\n"
+        f"Do NOT generate any questions yourself — the practice loop handles everything.\n"
+        f"Just acknowledge the session is starting."
+    )
 
 
 @handler("log_practice_session")

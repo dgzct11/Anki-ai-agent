@@ -533,8 +533,11 @@ def create_practice_question_panel(
     """Create a styled panel for a practice question."""
     content = Text()
 
-    # U2: Progress bar in header
-    content.append_text(create_session_progress_bar(question_num, total))
+    # Header: question number (no progress bar in continuous mode)
+    if total > 0:
+        content.append_text(create_session_progress_bar(question_num, total))
+    else:
+        content.append(f"Question {question_num}", style="bold")
     if difficulty == "harder":
         content.append("  [HARDER]", style="bold magenta")
     elif difficulty == "easier":
@@ -547,14 +550,6 @@ def create_practice_question_panel(
         content.append("Translate to English:\n", style="dim")
 
     content.append(f"  {phrase}", style="bold white")
-
-    if target_words:
-        content.append("\n")
-        content.append(f"  Target words: {target_words}", style="cyan")
-
-    if is_due:
-        content.append("\n")
-        content.append("  (due for Anki review)", style="dim italic")
 
     return Panel(
         content,
@@ -840,7 +835,7 @@ def run_practice_loop(
             direction=session.direction,
             is_due=any(gc.is_due for gc in group_cards),
             difficulty=session.difficulty_level,
-            target_words=f"{len(group_cards)} words",
+            target_words="",  # Don't reveal how many words are tested
         ))
 
         # Get user answer
@@ -2170,11 +2165,10 @@ def run_chat():
 
                     # Check if a practice session was created on the assistant
                     practice_session = getattr(assistant, "_practice_session", None)
-                    if practice_session and not practice_session.is_finished:
+                    if practice_session:
                         run_practice_loop(console, assistant, practice_session, session)
-                        # Clean up
                         assistant._practice_session = None
-                    elif not practice_session:
+                    else:
                         console.print("[yellow]Could not start practice session. Try specifying a deck name.[/yellow]")
 
                     if context_status:
