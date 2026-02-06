@@ -1065,9 +1065,9 @@ def run_practice_loop(
                         else:
                             manual.append(f"{word}→{label}")
                     if marked:
-                        console.print(f"[green]Marked: {', '.join(marked)}[/green]")
+                        console.print(f"[green]  ✓ Marked in Anki: {', '.join(marked)}[/green]")
                     if manual:
-                        console.print(f"[dim]Review in Anki: {', '.join(manual)}[/dim]")
+                        console.print(f"[yellow]  ✗ Could not mark (review in Anki): {', '.join(manual)}[/yellow]")
                 except Exception:
                     console.print("[dim]Could not mark. Review in Anki manually.[/dim]")
             if skip_ids:
