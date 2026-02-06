@@ -745,8 +745,10 @@ def daily(force: bool) -> None:
     challenge_word = None
     challenge_level = None
     for level_key in ("A1", "A2", "B1", "B2", "C1", "C2"):
-        level_data = progress.get(level_key, {})
-        unknown = level_data.get("unknown_words", [])
+        level_data = progress.get(level_key)
+        if not level_data:
+            continue
+        unknown = level_data.unknown_words if hasattr(level_data, 'unknown_words') else []
         if unknown:
             yesterday_word = state.get("word", "")
             candidates = [w for w in unknown if w != yesterday_word]
@@ -776,8 +778,8 @@ def daily(force: bool) -> None:
         "category": category,
         "completed": False,
     }
-    with open(DAILY_CHALLENGE_FILE, "w") as f:
-        _json.dump(state, f, indent=2, ensure_ascii=False)
+    from .paths import atomic_json_write
+    atomic_json_write(DAILY_CHALLENGE_FILE, state)
 
     console.print(f"\n[bold cyan]Daily Challenge - {today}[/bold cyan]")
     console.print(f"[bold]Word of the Day:[/bold] [green]{challenge_word}[/green]")

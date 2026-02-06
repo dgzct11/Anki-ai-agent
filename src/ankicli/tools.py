@@ -547,7 +547,7 @@ ANKI_TOOLS = [
     },
     {
         "name": "start_grammar_quiz",
-        "description": "Start an interactive grammar quiz session. Claude generates questions dynamically based on the topic and CEFR level. The quiz runs in the chat with Rich-formatted panels for each question. After the quiz, offers to create Anki cards for weak areas.",
+        "description": "Start an interactive grammar quiz session. Questions are generated dynamically based on the topic and CEFR level. The quiz runs in the chat with Rich-formatted panels. After the quiz, offers to create Anki cards for weak areas.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -672,7 +672,7 @@ ANKI_TOOLS = [
     },
     {
         "name": "start_translation_practice",
-        "description": "Start a translation practice session using cards from an Anki deck. Claude presents phrases in one language and the user translates to the other. Evaluates meaning, grammar, naturalness, and vocabulary. Can also mark due cards as reviewed in Anki (with user confirmation).",
+        "description": "Start a translation practice session using cards from an Anki deck. Presents phrases in one language and the user translates to the other. Evaluates meaning, grammar, naturalness, and vocabulary. After session, shows which words are due for Anki review.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -822,7 +822,7 @@ ANKI_TOOLS = [
     },
     {
         "name": "get_error_patterns",
-        "description": "Get the user's recurring error patterns from the error journal. Shows which mistakes they make most often (gender agreement, ser vs estar, accent marks, etc.). Use this to tailor practice sessions and provide targeted feedback.",
+        "description": "Get the user's recurring error patterns from the error journal. Shows which mistakes they make most often (gender agreement, ser vs estar, verb conjugation, etc.). Use this to tailor practice sessions and provide targeted feedback.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -840,13 +840,13 @@ ANKI_TOOLS = [
     },
     {
         "name": "log_error",
-        "description": "Log a mistake the user made during practice or quiz. Call this when you notice a recurring error pattern (gender agreement, verb conjugation, ser vs estar, accent marks, etc.). This builds a persistent error journal so you can track improvement over time.",
+        "description": "Log a mistake the user made during practice or quiz. Call this when you notice a recurring error pattern (gender agreement, verb conjugation, ser vs estar, verb conjugation, etc.). This builds a persistent error journal so you can track improvement over time.",
         "input_schema": {
             "type": "object",
             "properties": {
                 "error_type": {
                     "type": "string",
-                    "description": "Category of error. Use consistent snake_case labels: gender_agreement, ser_vs_estar, accent_missing, verb_conjugation, word_order, preposition_choice, article_usage, subjunctive_needed, preterite_vs_imperfect, false_friend, spelling, etc."
+                    "description": "Category of error. Use consistent snake_case labels: gender_agreement, ser_vs_estar, verb_conjugation, word_order, preposition_choice, article_usage, subjunctive_needed, preterite_vs_imperfect, false_friend, reflexive_verb, direct_vs_indirect_object. Do NOT log accent/spelling errors."
                 },
                 "example": {
                     "type": "string",
@@ -912,7 +912,7 @@ ANKI_TOOLS = [
     },
     {
         "name": "generate_contexts",
-        "description": "Generate contextual example sentences for a Spanish word/phrase. Claude creates natural sentences in different contexts (conversation, formal, narrative, email, academic). Can be used to enrich existing Anki cards with more examples.",
+        "description": "Generate contextual example sentences for a Spanish word/phrase in different contexts (conversation, formal, narrative, email, academic). Can be used to enrich existing Anki cards with more examples.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -954,7 +954,7 @@ ANKI_TOOLS = [
     },
     {
         "name": "start_reading_practice",
-        "description": "Start a reading practice session. Claude generates a short paragraph (100-150 words) using known vocabulary plus words due for review. This is READ-ONLY - no testing, no comprehension questions. Just reading exposure to reinforce vocabulary in context.",
+        "description": "Start a reading practice session. Generates a short paragraph (100-150 words) using known vocabulary plus words due for review. READ-ONLY — no testing, no comprehension questions. Just reading exposure to reinforce vocabulary in context.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -1064,7 +1064,7 @@ ANKI_TOOLS = [
     },
     {
         "name": "start_conversation_sim",
-        "description": "Start a conversation simulation where Claude role-plays a character (waiter, doctor, colleague, etc.) and the user responds in Spanish. Scenarios are tied to CEFR levels. After the conversation, offers to create Anki cards for new vocabulary encountered.",
+        "description": "Start a conversation simulation where a character (waiter, doctor, colleague, etc.) is role-played and the user responds in Spanish. Scenarios are tied to CEFR levels. After the conversation, offers to create Anki cards for new vocabulary.",
         "input_schema": {
             "type": "object",
             "properties": {

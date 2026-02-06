@@ -236,21 +236,31 @@ class TestSkillsRadar:
         assert radar["dimensions"]["productive_skill"] == 80.0
 
     def test_with_cefr_progress(self):
-        cefr_progress = {
-            "A1": {"percent": 80, "categories": {"food": {"percent": 90}, "travel": {"percent": 50}}},
-            "A2": {"percent": 40, "categories": {"work": {"percent": 20}}},
-        }
+        from unittest.mock import MagicMock
+        lp_a1 = MagicMock()
+        lp_a1.percent = 80
+        cat_food = MagicMock(); cat_food.percent = 90
+        cat_travel = MagicMock(); cat_travel.percent = 50
+        lp_a1.categories = {"food": cat_food, "travel": cat_travel}
+        lp_a2 = MagicMock()
+        lp_a2.percent = 40
+        cat_work = MagicMock(); cat_work.percent = 20
+        lp_a2.categories = {"work": cat_work}
+        cefr_progress = {"A1": lp_a1, "A2": lp_a2}
         radar = get_skills_radar(cefr_progress=cefr_progress)
         assert radar["dimensions"]["vocabulary_breadth"] > 0
         assert radar["dimensions"]["topic_coverage"] > 0
 
     def test_overall_is_average(self):
+        from unittest.mock import MagicMock
         stats = {"retention_rate": 100}
         quiz_results = [{"score": 100}]
         summary = {"practice_sessions": [{"score_percent": 100}]}
-        cefr_progress = {
-            "A1": {"percent": 100, "categories": {"food": {"percent": 100}}},
-        }
+        lp = MagicMock()
+        lp.percent = 100
+        cat = MagicMock(); cat.percent = 100
+        lp.categories = {"food": cat}
+        cefr_progress = {"A1": lp}
         radar = get_skills_radar(
             collection_stats=stats,
             quiz_results=quiz_results,

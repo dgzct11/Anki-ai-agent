@@ -760,12 +760,23 @@ def run_practice_loop(
 
         # Group 2-3 cards together for multi-word sentences
         # At difficulty 1 (single word), just use 1 card
+        # Prioritize due cards in the group
         group_size = 1 if session.difficulty_num <= 1 else min(3, session.questions_remaining)
-        group_cards = []
-        for offset in range(group_size):
+
+        # Collect remaining cards and sort: due cards first
+        remaining_for_group = []
+        for offset in range(min(group_size + 5, session.questions_remaining)):
             idx = session.current_index + offset
             if idx < len(session.cards):
-                group_cards.append(session.cards[idx])
+                remaining_for_group.append((offset, session.cards[idx]))
+
+        # Sort by: due first, then original order
+        remaining_for_group.sort(key=lambda x: (not x[1].is_due, x[0]))
+
+        # Take the first group_size cards (due cards will be first)
+        group_cards = [c for _, c in remaining_for_group[:group_size]]
+        if not group_cards:
+            group_cards = [card]  # fallback to current card
 
         question_display_num += 1
 

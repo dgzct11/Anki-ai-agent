@@ -222,8 +222,8 @@ def get_skills_radar(
         weights = {"A1": 3, "A2": 2.5, "B1": 2, "B2": 1.5, "C1": 1, "C2": 0.5}
         total_weight = 0.0
         for level_key, weight in weights.items():
-            level_data = cefr_progress.get(level_key, {})
-            pct = level_data.get("percent", 0)
+            level_data = cefr_progress.get(level_key)
+            pct = level_data.percent if level_data and hasattr(level_data, 'percent') else 0
             total_pct += pct * weight
             total_weight += weight
             count += 1
@@ -256,11 +256,14 @@ def get_skills_radar(
         total_cats = 0
         cats_with_progress = 0
         for level_key in ("A1", "A2", "B1", "B2"):
-            level_data = cefr_progress.get(level_key, {})
-            categories = level_data.get("categories", {})
+            level_data = cefr_progress.get(level_key)
+            if not level_data:
+                continue
+            categories = level_data.categories if hasattr(level_data, 'categories') else {}
             for cat_name, cat_data in categories.items():
                 total_cats += 1
-                if cat_data.get("percent", 0) > 10:  # at least 10% covered
+                cat_pct = cat_data.percent if hasattr(cat_data, 'percent') else 0
+                if cat_pct > 10:  # at least 10% covered
                     cats_with_progress += 1
         if total_cats > 0:
             topic_score = (cats_with_progress / total_cats) * 100

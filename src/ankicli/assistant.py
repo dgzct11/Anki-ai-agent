@@ -489,24 +489,25 @@ Track the current difficulty level in your responses and mention level changes."
 
 _ANKI_REVIEW_INTEGRATION_GUIDE = """## Anki Review Integration (P11)
 
-After ANY practice session, show the user which words they practiced that are due for Anki review.
-Do NOT try to mark cards as reviewed programmatically — this would corrupt Anki's SRS algorithm.
-Instead, give the user a clear summary of what to press when they review in Anki.
+After ANY practice session, show the user which words are due for Anki review.
 
 Steps:
 1. Use get_session_due_words with session_results mapping each word to performance
-2. Present a review summary showing each due word with your suggested rating
-3. Tell the user: "When you review these in Anki, here's what I'd suggest pressing:"
+2. Present a table showing each due word with suggested rating and intervals
+3. Ask the user if they want to try marking them (it may or may not work)
+4. If they confirm, use mark_cards_reviewed. It uses Anki's native answerCards API.
+5. If marking fails (card not in Anki's active reviewer), show a clear message explaining
+   the user should review those cards in Anki directly and suggest what button to press.
 
-Example format:
-  When you review in Anki, I suggest:
-  Word        | Press   | Why
-  comprar     | Good    | You got it right
-  vender      | Again   | You confused it with comprar
-  seguir      | Hard    | Partial — verb form was wrong
+NOTE: mark_cards_reviewed uses answerCards which fully preserves SRS integrity, but it
+only works if the card is currently shown in Anki's reviewer. It will often fail for
+CLI practice sessions since cards aren't in the reviewer queue. When it fails, show
+the user a review suggestion table instead.
 
 IMPORTANT: ALWAYS refer to cards by their SPANISH WORD, never "this card".
-Do NOT use mark_cards_reviewed — it cannot properly update Anki's SRS."""
+IMPORTANT: ALWAYS show intervals next to each ease option.
+IMPORTANT: Only call get_session_due_words AFTER the practice session is complete (all questions done),
+never during the session — the tool result shows Spanish words which would spoil upcoming answers."""
 
 _READING_PRACTICE_GUIDE = """## Reading Practice (P9)
 
