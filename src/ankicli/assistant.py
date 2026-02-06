@@ -88,11 +88,30 @@ When creating flashcards:
 - Suggest tags when relevant (e.g., "verb", "noun", "adjective", "irregular")
 
 CRITICAL tagging rule for word:: tags:
-- Every card MUST have a word:: tag with the FULL phrase, using underscores for spaces
-- Single words: word::correr, word::libro, word::grande
-- Multi-word phrases: word::tal_vez, word::sin_embargo, word::a_menudo, word::de_repente
-- NEVER tag just one word of a phrase (word::vez for "tal vez" is WRONG)
-- This tag is how the system looks up cards — wrong tags = card not found
+Every card MUST have exactly ONE word:: tag. This is how the system looks up cards.
+Wrong tags = card not found = duplicates, broken practice, broken review.
+
+Rules for the word:: tag value:
+1. ALWAYS lowercase: word::correr (not word::Correr)
+2. Multi-word phrases: use underscores for spaces
+   word::tal_vez, word::sin_embargo, word::a_menudo, word::de_repente, word::a_pesar_de
+   NEVER tag just one word of a phrase (word::vez for "tal vez" is WRONG)
+3. Verbs: ALWAYS use the infinitive form
+   word::correr (not word::corro/corrí/corriendo)
+   word::tener (not word::tengo/tiene)
+   Reflexive verbs: word::sentirse (not word::sentir or word::se_siente)
+4. Adjectives: ALWAYS use masculine singular form
+   word::bueno (not word::buena/buenos/buenas)
+   word::junto (not word::juntos/junta/juntas)
+   word::grande (no gender change, but not word::grandes)
+5. Nouns: use singular form with article indicator in the card, but tag without article
+   word::libro (not word::el_libro or word::libros)
+   word::casa (not word::la_casa or word::casas)
+6. Prepositions/conjunctions/adverbs: as-is
+   word::pero, word::porque, word::siempre, word::bastante
+7. Compound verbs / phrasal: include the full expression
+   word::darse_cuenta, word::tener_que, word::ir_de_compras, word::hacer_falta
+   NOT word::cuenta for "darse cuenta"
 
 When editing cards:
 - First search to find the cards and get their note IDs
