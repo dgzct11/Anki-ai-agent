@@ -714,10 +714,12 @@ def create_practice_commands_panel() -> Panel:
     content.append(" skip  ", style="dim")
     content.append("/hint", style="cyan")
     content.append(" hint  ", style="dim")
+    content.append("?", style="cyan")
+    content.append(" ask question  ", style="dim")
     content.append("/score", style="cyan")
     content.append(" scores  ", style="dim")
-    content.append("/quit", style="cyan")
-    content.append(" end session", style="dim")
+    content.append("exit", style="cyan")
+    content.append(" quit", style="dim")
     return Panel(content, border_style="dim", box=box.ROUNDED, padding=(0, 1))
 
 
@@ -875,6 +877,44 @@ def run_practice_loop(
                 clean = _re.sub(r'<[^>]+>', ' ', src).strip()
                 hints.append(clean[:3] + "...")
             console.print(f"[dim]Hint: {', '.join(hints)}[/dim]\n")
+            continue
+
+        # Handle questions (? prefix or /ask) — answer without revealing target words
+        if answer.startswith("?") or answer.lower().startswith("/ask "):
+            question = answer.lstrip("?").lstrip()
+            if answer.lower().startswith("/ask "):
+                question = answer[5:].strip()
+            if question:
+                ask_prompt = (
+                    f"[PRACTICE MODE - USER QUESTION]\n"
+                    f"The user is asking a question while working on a translation.\n"
+                    f"Question: {question}\n\n"
+                    f"Answer their question helpfully. You may provide vocabulary, "
+                    f"grammar explanations, or clarifications.\n"
+                    f"CRITICAL: Do NOT reveal which Spanish words are being tested. "
+                    f"Do NOT list target words. Do NOT give away the answer. "
+                    f"Only provide the specific information they asked for."
+                )
+                resp = ""
+                try:
+                    with console.status("[cyan]...[/cyan]", spinner="dots"):
+                        for event in assistant.chat(ask_prompt):
+                            if event["type"] == "text_delta":
+                                resp += event["content"]
+                except Exception:
+                    pass
+                if resp.strip():
+                    from rich.markdown import Markdown as _Md
+                    console.print(_Md(resp))
+                # Re-show the question
+                console.print()
+                console.print(create_practice_question_panel(
+                    question_num=question_num, total=0,
+                    phrase=generated_sentence,
+                    direction=session.direction,
+                    is_due=any(gc.is_due for gc in group_cards),
+                    difficulty=session.difficulty_level,
+                ))
             continue
 
         # Evaluate translation
