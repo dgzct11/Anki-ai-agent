@@ -1096,18 +1096,21 @@ def run_practice_loop(
                     marked = []
                     manual = []
                     for cid, ease in per_card_ease.items():
-                        # Find word for this card
                         word = next((w for w, (gc, _) in word_ease_map.items() if gc.card_id == str(cid) or gc.card_id == cid), str(cid))
-                        success, _ = results.get(int(cid), (False, ""))
+                        success, msg = results.get(int(cid), (False, "unknown error"))
                         label = ease_labels.get(ease, "Good")
                         if success:
                             marked.append(f"{word}→{label}")
                         else:
-                            manual.append(f"{word}→{label}")
+                            manual.append((word, label, msg))
                     if marked:
                         console.print(f"[green]  ✓ Marked in Anki: {', '.join(marked)}[/green]")
                     if manual:
-                        console.print(f"[yellow]  ✗ Could not mark (review in Anki): {', '.join(manual)}[/yellow]")
+                        console.print(f"[yellow]  ✗ Could not mark — card not in Anki's review queue.[/yellow]")
+                        console.print(f"[yellow]    (answerCards only works for the card Anki is currently showing)[/yellow]")
+                        console.print(f"[dim]    When you review in Anki, press:[/dim]")
+                        for word, label, _ in manual:
+                            console.print(f"[dim]      {word} → {label}[/dim]")
                 except Exception:
                     console.print("[dim]Could not mark. Review in Anki manually.[/dim]")
             if skip_ids:
