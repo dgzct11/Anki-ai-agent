@@ -968,51 +968,109 @@ def run_practice_loop(
                 is_due_for_review=gc.is_due,
             ))
 
-        # Prompt user to mark the cards used in this question
+        # Show per-word suggested ratings and prompt user
         ease_labels = {1: "Again", 2: "Hard", 3: "Good", 4: "Easy"}
+        ease_reverse = {"again": 1, "hard": 2, "good": 3, "easy": 4, "g": 3, "h": 2, "a": 1, "e": 4}
         suggested_ease = feedback_to_ease(feedback_level)
         suggested_label = ease_labels.get(suggested_ease, "Good")
-        card_words_list = [_extract_word(gc) for gc in group_cards]
 
-        console.print(f"\n[cyan]Mark:[/cyan] {', '.join(card_words_list)} → [bold]{suggested_label}[/bold]")
+        console.print()
+        word_ease_map = {}  # word -> (card, suggested_ease)
+        for gc in group_cards:
+            word = _extract_word(gc)
+            word_ease_map[word.lower()] = (gc, suggested_ease)
+            console.print(f"  [cyan]{word}[/cyan] → {suggested_label}")
+
         try:
-            mark_answer = prompt_session.prompt(
-                [("class:prompt", f"Mark in Anki? ({suggested_label}/1-4/n): ")],
+            console.print(f"[dim]  (enter per word: 'word ease', or 'all good', or 'n' to skip)[/dim]")
+            mark_input = prompt_session.prompt(
+                [("class:prompt", "Mark: ")],
             ).strip().lower()
         except (KeyboardInterrupt, EOFError):
-            mark_answer = "n"
+            mark_input = "n"
 
-        if mark_answer not in ("n", "no", ""):
-            # Parse ease
-            ease_map = {"again": 1, "hard": 2, "good": 3, "easy": 4, "y": suggested_ease, "yes": suggested_ease}
-            if mark_answer in ease_map:
-                chosen_ease = ease_map[mark_answer]
-            elif mark_answer.isdigit() and int(mark_answer) in (1, 2, 3, 4):
-                chosen_ease = int(mark_answer)
-            else:
-                chosen_ease = suggested_ease
-
-            note_ease_pairs = [(int(gc.card_id), chosen_ease) for gc in group_cards]
-            try:
-                results = assistant.anki.answer_cards_batch(note_ease_pairs)
-                marked = []
-                manual = []
-                for gc in group_cards:
-                    word = _extract_word(gc)
-                    success, _ = results.get(int(gc.card_id), (False, ""))
-                    label = ease_labels.get(chosen_ease, "Good")
-                    if success:
-                        marked.append(f"{word}")
-                    else:
-                        manual.append(f"{word}")
-                if marked:
-                    console.print(f"[green]Marked {ease_labels.get(chosen_ease, 'Good')}: {', '.join(marked)}[/green]")
-                if manual:
-                    console.print(f"[dim]Review in Anki: {', '.join(manual)}[/dim]")
-            except Exception:
-                console.print("[dim]Could not mark. Review in Anki manually.[/dim]")
-        else:
+        if mark_input in ("n", "no", ""):
             console.print("[dim]Skipped marking.[/dim]")
+        else:
+            # Parse per-word overrides: "siempre again, tarde good, anoche n"
+            # Or "all good", "all 3", "y" (accept all suggestions)
+            per_card_ease = {}  # card_id -> ease
+            skip_ids = set()
+
+            if mark_input in ("y", "yes"):
+                # Accept all suggestions
+                for word, (gc, ease) in word_ease_map.items():
+                    per_card_ease[gc.card_id] = ease
+            elif mark_input.startswith("all "):
+                # "all good", "all 3", "all again"
+                rating_str = mark_input[4:].strip()
+                if rating_str in ease_reverse:
+                    all_ease = ease_reverse[rating_str]
+                elif rating_str.isdigit() and int(rating_str) in (1, 2, 3, 4):
+                    all_ease = int(rating_str)
+                else:
+                    all_ease = suggested_ease
+                for word, (gc, _) in word_ease_map.items():
+                    per_card_ease[gc.card_id] = all_ease
+            else:
+                # Parse "siempre again, tarde good, anoche n"
+                # First, set all to suggested as default
+                for word, (gc, ease) in word_ease_map.items():
+                    per_card_ease[gc.card_id] = ease
+
+                # Then parse overrides
+                parts = [p.strip() for p in mark_input.replace(",", " ").split() if p.strip()]
+                i = 0
+                while i < len(parts):
+                    token = parts[i]
+                    # Find which word this matches
+                    matched_word = None
+                    for w in word_ease_map:
+                        if w.startswith(token) or token.startswith(w[:3]):
+                            matched_word = w
+                            break
+
+                    if matched_word and i + 1 < len(parts):
+                        rating_str = parts[i + 1]
+                        gc, _ = word_ease_map[matched_word]
+                        if rating_str in ("n", "no", "skip"):
+                            skip_ids.add(gc.card_id)
+                            if gc.card_id in per_card_ease:
+                                del per_card_ease[gc.card_id]
+                        elif rating_str in ease_reverse:
+                            per_card_ease[gc.card_id] = ease_reverse[rating_str]
+                        elif rating_str.isdigit() and int(rating_str) in (1, 2, 3, 4):
+                            per_card_ease[gc.card_id] = int(rating_str)
+                        i += 2
+                    else:
+                        i += 1
+
+            # Batch mark all non-skipped cards
+            if per_card_ease:
+                note_ease_pairs = [(int(cid), ease) for cid, ease in per_card_ease.items()]
+                try:
+                    results = assistant.anki.answer_cards_batch(note_ease_pairs)
+                    marked = []
+                    manual = []
+                    for cid, ease in per_card_ease.items():
+                        # Find word for this card
+                        word = next((w for w, (gc, _) in word_ease_map.items() if gc.card_id == str(cid) or gc.card_id == cid), str(cid))
+                        success, _ = results.get(int(cid), (False, ""))
+                        label = ease_labels.get(ease, "Good")
+                        if success:
+                            marked.append(f"{word}→{label}")
+                        else:
+                            manual.append(f"{word}→{label}")
+                    if marked:
+                        console.print(f"[green]Marked: {', '.join(marked)}[/green]")
+                    if manual:
+                        console.print(f"[dim]Review in Anki: {', '.join(manual)}[/dim]")
+                except Exception:
+                    console.print("[dim]Could not mark. Review in Anki manually.[/dim]")
+            if skip_ids:
+                skipped_words = [w for w, (gc, _) in word_ease_map.items() if gc.card_id in skip_ids or int(gc.card_id) in skip_ids]
+                if skipped_words:
+                    console.print(f"[dim]Skipped: {', '.join(skipped_words)}[/dim]")
 
         console.print()
 
