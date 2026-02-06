@@ -1905,6 +1905,122 @@ def run_conversation_loop(
     console.print()
 
 
+def stream_chat_response(
+    console: Console,
+    assistant: "AnkiAssistant",
+    user_input: str,
+    show_context_bar: bool = True,
+) -> str:
+    """Stream a chat response from the assistant with full UI handling.
+
+    Handles all event types: text, tool calls, tool results, delegate progress,
+    errors, and context status. Used by both run_chat and run_worker to avoid
+    duplicating the streaming UI logic.
+
+    Returns the full response text.
+    """
+    from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
+    from rich.markdown import Markdown
+
+    response_text = ""
+    full_response = ""
+    spinner_active = False
+    status_ctx = None
+    delegate_progress = None
+    delegate_task = None
+    context_status = None
+
+    try:
+        for event in assistant.chat(user_input):
+            if event["type"] == "text_delta":
+                if not spinner_active:
+                    status_ctx = console.status("[cyan]Thinking...[/cyan]", spinner="dots")
+                    status_ctx.start()
+                    spinner_active = True
+                response_text += event["content"]
+                full_response += event["content"]
+
+            elif event["type"] == "tool_use":
+                if spinner_active and status_ctx:
+                    status_ctx.stop()
+                    spinner_active = False
+                    if response_text.strip():
+                        console.print("[bold cyan]Assistant:[/bold cyan]")
+                        console.print(Markdown(response_text))
+                    response_text = ""
+                console.print()
+                console.print(create_tool_panel(event["name"], event["input"]))
+
+            elif event["type"] == "delegate_progress":
+                if delegate_progress is None:
+                    delegate_progress = Progress(
+                        SpinnerColumn(),
+                        TextColumn("[cyan]{task.description}"),
+                        BarColumn(),
+                        TaskProgressColumn(),
+                        TextColumn("{task.completed}/{task.total}"),
+                        console=console,
+                    )
+                    delegate_progress.start()
+                    delegate_task = delegate_progress.add_task(
+                        "Processing cards...",
+                        total=event["total"]
+                    )
+
+                delegate_progress.update(
+                    delegate_task,
+                    completed=event["completed"],
+                    description=f"Processing: {event['current_card'][:30]}..."
+                    if event.get("current_card")
+                    else "Processing cards..."
+                )
+
+                if event["completed"] == event["total"]:
+                    delegate_progress.stop()
+                    delegate_progress = None
+                    delegate_task = None
+
+            elif event["type"] == "tool_result":
+                if delegate_progress is not None:
+                    delegate_progress.stop()
+                    delegate_progress = None
+                    delegate_task = None
+                console.print(create_result_panel(event["name"], event["result"]))
+                console.print()
+
+            elif event["type"] == "error":
+                if spinner_active and status_ctx:
+                    status_ctx.stop()
+                    spinner_active = False
+                if delegate_progress is not None:
+                    delegate_progress.stop()
+                    delegate_progress = None
+                console.print(f"[yellow]{event['content']}[/yellow]")
+
+            elif event["type"] == "context_status":
+                context_status = event["status"]
+
+        # Cleanup
+        if delegate_progress is not None:
+            delegate_progress.stop()
+        if spinner_active and status_ctx:
+            status_ctx.stop()
+        if response_text.strip():
+            console.print("[bold cyan]Assistant:[/bold cyan]")
+            console.print(Markdown(response_text))
+        if show_context_bar and context_status:
+            console.print(create_context_bar(context_status))
+
+    except Exception as e:
+        if delegate_progress is not None:
+            delegate_progress.stop()
+        if spinner_active and status_ctx:
+            status_ctx.stop()
+        console.print(f"\n[red]Error: {e}[/red]")
+
+    return full_response
+
+
 def run_chat():
     """Run the interactive chat interface."""
     console = Console()
@@ -2549,122 +2665,8 @@ def run_chat():
 
             # Process with assistant
             console.print()
-            response_text = ""
-            full_response = ""  # Collect all response text for logging
-            context_status = None
-            spinner_active = False
-            status_ctx = None
-            tool_calls = []  # Track tool calls for logging
-            delegate_progress = None  # Rich Progress for delegate operations
-            delegate_task = None
-
-            try:
-                for event in assistant.chat(user_input):
-                    if event["type"] == "text_delta":
-                        # Collect text for markdown rendering
-                        if not spinner_active:
-                            status_ctx = console.status("[cyan]Thinking...[/cyan]", spinner="dots")
-                            status_ctx.start()
-                            spinner_active = True
-                        response_text += event["content"]
-                        full_response += event["content"]
-
-                    elif event["type"] == "tool_use":
-                        if spinner_active and status_ctx:
-                            status_ctx.stop()
-                            spinner_active = False
-                            # Render any collected text before tool call
-                            if response_text.strip():
-                                console.print("[bold cyan]Assistant:[/bold cyan]")
-                                console.print(Markdown(response_text))
-                            response_text = ""
-                        console.print()
-                        console.print(create_tool_panel(event["name"], event["input"]))
-
-                        # Track tool call for logging
-                        tool_summary = _summarize_tool_input(event["name"], event["input"])
-                        tool_calls.append({
-                            "name": event["name"],
-                            "summary": tool_summary
-                        })
-
-                    elif event["type"] == "delegate_progress":
-                        # Handle delegate progress events with a progress bar
-                        if delegate_progress is None:
-                            delegate_progress = Progress(
-                                SpinnerColumn(),
-                                TextColumn("[cyan]{task.description}"),
-                                BarColumn(),
-                                TaskProgressColumn(),
-                                TextColumn("{task.completed}/{task.total}"),
-                                console=console,
-                            )
-                            delegate_progress.start()
-                            delegate_task = delegate_progress.add_task(
-                                "Processing cards...",
-                                total=event["total"]
-                            )
-
-                        delegate_progress.update(
-                            delegate_task,
-                            completed=event["completed"],
-                            description=f"Processing: {event['current_card'][:30]}..."
-                            if event.get("current_card")
-                            else "Processing cards..."
-                        )
-
-                        # Stop progress bar when complete
-                        if event["completed"] == event["total"]:
-                            delegate_progress.stop()
-                            delegate_progress = None
-                            delegate_task = None
-
-                    elif event["type"] == "tool_result":
-                        # Ensure progress bar is stopped before showing result
-                        if delegate_progress is not None:
-                            delegate_progress.stop()
-                            delegate_progress = None
-                            delegate_task = None
-                        console.print(create_result_panel(event["name"], event["result"]))
-                        console.print()
-
-                    elif event["type"] == "error":
-                        if spinner_active and status_ctx:
-                            status_ctx.stop()
-                            spinner_active = False
-                        if delegate_progress is not None:
-                            delegate_progress.stop()
-                            delegate_progress = None
-                        console.print(f"[yellow]{event['content']}[/yellow]")
-
-                    elif event["type"] == "context_status":
-                        context_status = event["status"]
-
-                # Ensure progress bar is stopped
-                if delegate_progress is not None:
-                    delegate_progress.stop()
-                    delegate_progress = None
-
-                # Stop spinner and render final response with markdown
-                if spinner_active and status_ctx:
-                    status_ctx.stop()
-                if response_text.strip():
-                    console.print("[bold cyan]Assistant:[/bold cyan]")
-                    console.print(Markdown(response_text))
-
-                # Show context usage bar
-                if context_status:
-                    console.print(create_context_bar(context_status))
-
-                # Save exchange to chat log
-                add_exchange(user_input, full_response, tool_calls if tool_calls else None)
-
-            except Exception as e:
-                # Ensure cleanup on error
-                if delegate_progress is not None:
-                    delegate_progress.stop()
-                console.print(f"\n[red]Error: {e}[/red]")
-
+            full_response = stream_chat_response(console, assistant, user_input)
+            add_exchange(user_input, full_response, None)
             console.print()
 
         except KeyboardInterrupt:
@@ -2745,42 +2747,7 @@ def run_worker():
                 console.print(f"[dim]Messages: {len(assistant.messages)}[/dim]\n")
                 continue
 
-            # Stream Claude's response
-            full_response = ""
-            spinner_active = False
-            status_ctx = None
-
-            try:
-                for event in assistant.chat(user_input):
-                    if event["type"] == "text_delta":
-                        if spinner_active and status_ctx:
-                            status_ctx.stop()
-                            spinner_active = False
-                        console.print(event["content"], end="", highlight=False)
-                        full_response += event["content"]
-                    elif event["type"] == "text_stop":
-                        console.print()
-                    elif event["type"] == "tool_use":
-                        if spinner_active and status_ctx:
-                            status_ctx.stop()
-                            spinner_active = False
-                        console.print(create_tool_panel(event["name"], event["input"]))
-                    elif event["type"] == "tool_result":
-                        console.print(create_result_panel(event["name"], event["result"]))
-                        status_ctx = console.status("[cyan]Thinking...[/cyan]", spinner="dots")
-                        status_ctx.start()
-                        spinner_active = True
-                    elif event["type"] == "context_status":
-                        pass
-
-                if spinner_active and status_ctx:
-                    status_ctx.stop()
-
-            except Exception as e:
-                if spinner_active and status_ctx:
-                    status_ctx.stop()
-                console.print(f"\n[red]Error: {e}[/red]")
-
+            stream_chat_response(console, assistant, user_input)
             console.print()
 
         except KeyboardInterrupt:
