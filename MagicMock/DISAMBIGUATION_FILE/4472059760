@@ -1,0 +1,142 @@
+{
+  "ser-estar": {
+    "pair_id": "ser-estar",
+    "words": [
+      "ser",
+      "estar"
+    ],
+    "category": "verb_confusion",
+    "error_counts": {
+      "estar": 1
+    },
+    "practice_count": 1,
+    "last_practiced": "2026-02-05T17:46:10.582382"
+  },
+  "saber-conocer": {
+    "pair_id": "saber-conocer",
+    "words": [
+      "saber",
+      "conocer"
+    ],
+    "category": "verb_confusion",
+    "error_counts": {},
+    "practice_count": 0,
+    "last_practiced": ""
+  },
+  "por-para": {
+    "pair_id": "por-para",
+    "words": [
+      "por",
+      "para"
+    ],
+    "category": "preposition_confusion",
+    "error_counts": {},
+    "practice_count": 0,
+    "last_practiced": ""
+  },
+  "tomar-llevar-coger": {
+    "pair_id": "tomar-llevar-coger",
+    "words": [
+      "tomar",
+      "llevar",
+      "coger"
+    ],
+    "category": "verb_confusion",
+    "error_counts": {},
+    "practice_count": 0,
+    "last_practiced": ""
+  },
+  "preguntar-pedir": {
+    "pair_id": "preguntar-pedir",
+    "words": [
+      "preguntar",
+      "pedir"
+    ],
+    "category": "verb_confusion",
+    "error_counts": {},
+    "practice_count": 0,
+    "last_practiced": ""
+  },
+  "jugar-tocar": {
+    "pair_id": "jugar-tocar",
+    "words": [
+      "jugar",
+      "tocar"
+    ],
+    "category": "verb_confusion",
+    "error_counts": {},
+    "practice_count": 0,
+    "last_practiced": ""
+  },
+  "ponerse-volverse-hacerse-convertirse": {
+    "pair_id": "ponerse-volverse-hacerse-convertirse",
+    "words": [
+      "ponerse",
+      "volverse",
+      "hacerse",
+      "convertirse"
+    ],
+    "category": "verb_confusion",
+    "error_counts": {},
+    "practice_count": 0,
+    "last_practiced": ""
+  },
+  "salir-irse-dejar": {
+    "pair_id": "salir-irse-dejar",
+    "words": [
+      "salir",
+      "irse",
+      "dejar"
+    ],
+    "category": "verb_confusion",
+    "error_counts": {},
+    "practice_count": 0,
+    "last_practiced": ""
+  },
+  "volver-devolver": {
+    "pair_id": "volver-devolver",
+    "words": [
+      "volver",
+      "devolver"
+    ],
+    "category": "verb_confusion",
+    "error_counts": {},
+    "practice_count": 0,
+    "last_practiced": ""
+  },
+  "tiempo-vez-hora": {
+    "pair_id": "tiempo-vez-hora",
+    "words": [
+      "tiempo",
+      "vez",
+      "hora"
+    ],
+    "category": "noun_confusion",
+    "error_counts": {},
+    "practice_count": 0,
+    "last_practiced": ""
+  },
+  "extranar-perder-faltar": {
+    "pair_id": "extranar-perder-faltar",
+    "words": [
+      "extranar",
+      "perder",
+      "faltar"
+    ],
+    "category": "verb_confusion",
+    "error_counts": {},
+    "practice_count": 0,
+    "last_practiced": ""
+  },
+  "darse_cuenta-realizar": {
+    "pair_id": "darse_cuenta-realizar",
+    "words": [
+      "darse cuenta",
+      "realizar"
+    ],
+    "category": "verb_confusion",
+    "error_counts": {},
+    "practice_count": 0,
+    "last_practiced": ""
+  }
+}

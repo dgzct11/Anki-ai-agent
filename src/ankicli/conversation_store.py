@@ -3,7 +3,7 @@
 import json
 from datetime import datetime
 
-from .paths import CONVERSATION_FILE, ensure_data_dir
+from .paths import CONVERSATION_FILE, ensure_data_dir, atomic_json_write
 
 
 def _serialize_message(msg: dict) -> dict:
@@ -61,8 +61,7 @@ def save_conversation(messages: list[dict], input_tokens: int = 0, output_tokens
         "messages": serialized_messages,
     }
 
-    with open(CONVERSATION_FILE, "w") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+    atomic_json_write(CONVERSATION_FILE, data)
 
 
 def load_conversation() -> dict:

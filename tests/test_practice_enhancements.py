@@ -616,3 +616,64 @@ class TestNewToolCoverage:
             # Verify the tool definition exists
             tool_names = {t["name"] for t in ANKI_TOOLS}
             assert tool_name in tool_names, f"Missing tool definition for {tool_name}"
+
+
+class TestScoreRegexRegression:
+    """Regression tests for score parsing regex patterns (bug #33).
+
+    The score regex must handle various formats Claude might produce:
+    - Plain: "Meaning: 4/4"
+    - Bold markdown: "**Meaning**: 4/4"
+    - Without denominator: "Meaning: 4"
+    - Parenthetical: "Meaning (4/4)"
+    """
+
+    def _parse_scores(self, text):
+        """Extract scores using the same patterns as chat.py."""
+        import re
+        scores = {"meaning": 2, "grammar": 2, "naturalness": 2, "vocabulary": 2}
+        score_patterns = [
+            (r'\*{0,2}[Mm]eaning\*{0,2}\s*[:\-\u2014]\s*(\d)(?:/4)?', 'meaning'),
+            (r'\*{0,2}[Mm]eaning\*{0,2}\s*\((\d)(?:/4)?\)', 'meaning'),
+            (r'\*{0,2}[Gg]rammar\*{0,2}\s*[:\-\u2014]\s*(\d)(?:/4)?', 'grammar'),
+            (r'\*{0,2}[Gg]rammar\*{0,2}\s*\((\d)(?:/4)?\)', 'grammar'),
+            (r'\*{0,2}[Nn]aturalness\*{0,2}\s*[:\-\u2014]\s*(\d)(?:/4)?', 'naturalness'),
+            (r'\*{0,2}[Nn]aturalness\*{0,2}\s*\((\d)(?:/4)?\)', 'naturalness'),
+            (r'\*{0,2}[Vv]ocabulary\*{0,2}\s*[:\-\u2014]\s*(\d)(?:/4)?', 'vocabulary'),
+            (r'\*{0,2}[Vv]ocabulary\*{0,2}\s*\((\d)(?:/4)?\)', 'vocabulary'),
+        ]
+        for pattern, key in score_patterns:
+            match = re.search(pattern, text)
+            if match:
+                scores[key] = max(0, min(4, int(match.group(1))))
+        return scores
+
+    def test_plain_format(self):
+        text = "Meaning: 4/4, Grammar: 3/4, Naturalness: 2/4, Vocabulary: 4/4"
+        scores = self._parse_scores(text)
+        assert scores == {"meaning": 4, "grammar": 3, "naturalness": 2, "vocabulary": 4}
+
+    def test_bold_markdown_format(self):
+        text = "**Meaning**: 4/4, **Grammar**: 3/4, **Naturalness**: 2/4, **Vocabulary**: 4/4"
+        scores = self._parse_scores(text)
+        assert scores == {"meaning": 4, "grammar": 3, "naturalness": 2, "vocabulary": 4}
+
+    def test_without_denominator(self):
+        text = "Meaning: 3, Grammar: 2, Naturalness: 4, Vocabulary: 1"
+        scores = self._parse_scores(text)
+        assert scores == {"meaning": 3, "grammar": 2, "naturalness": 4, "vocabulary": 1}
+
+    def test_parenthetical_format(self):
+        text = "Meaning (4/4) Grammar (3/4) Naturalness (2/4) Vocabulary (1/4)"
+        scores = self._parse_scores(text)
+        assert scores == {"meaning": 4, "grammar": 3, "naturalness": 2, "vocabulary": 1}
+
+    def test_defaults_when_no_scores(self):
+        text = "Great job! Your answer was perfect."
+        scores = self._parse_scores(text)
+        assert scores == {"meaning": 2, "grammar": 2, "naturalness": 2, "vocabulary": 2}
+
+    def test_mixed_format(self):
+        text = "**Meaning**: 4/4\nGrammar: 3\n**Naturalness** - 2/4\nVocabulary (4/4)"
+        scores = self._parse_scores(text)
+        assert scores == {"meaning": 4, "grammar": 3, "naturalness": 2, "vocabulary": 4}

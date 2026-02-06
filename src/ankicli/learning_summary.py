@@ -14,7 +14,7 @@ from rich.rule import Rule
 from rich.table import Table
 from rich.text import Text
 
-from .paths import SUMMARY_FILE, ensure_data_dir
+from .paths import SUMMARY_FILE, ensure_data_dir, atomic_json_write
 
 # CEFR level descriptions
 LEVEL_DESCRIPTIONS = {
@@ -185,8 +185,7 @@ def save_progress(progress: LearningProgress) -> None:
     ensure_data_dir()
     progress.last_updated = datetime.now().isoformat()
     data = progress.to_dict()
-    with open(SUMMARY_FILE, "w") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+    atomic_json_write(SUMMARY_FILE, data)
 
 
 def load_summary() -> dict:
@@ -209,8 +208,7 @@ def save_summary(summary: dict) -> None:
     """Save the learning summary to disk (dict form for backward compat)."""
     ensure_data_dir()
     summary["last_updated"] = datetime.now().isoformat()
-    with open(SUMMARY_FILE, "w") as f:
-        json.dump(summary, f, indent=2, ensure_ascii=False)
+    atomic_json_write(SUMMARY_FILE, summary)
 
 
 def create_progress_bar(known: int, total: int, bar_width: int = 20) -> Text:

@@ -105,6 +105,31 @@ class TestLevelProgress:
         assert lp.unknown_words == []
         assert lp.categories == {}
 
+    def test_attribute_access_not_dict_get(self):
+        """Regression: LevelProgress must use attribute access, not .get().
+
+        Bug fix: code was using dict-style .get() on LevelProgress which
+        is a dataclass, not a dict. This verifies attributes work correctly.
+        """
+        lp = LevelProgress(
+            level="B1",
+            words_known=25,
+            words_total=100,
+            matched_words=["hola", "gato"],
+            unknown_words=["perro"],
+            categories={"food": CategoryProgress(category="food", known=5, total=10)},
+        )
+        # Direct attribute access (correct pattern)
+        assert lp.level == "B1"
+        assert lp.words_known == 25
+        assert lp.words_total == 100
+        assert lp.matched_words == ["hola", "gato"]
+        assert lp.unknown_words == ["perro"]
+        assert isinstance(lp.categories, dict)
+        assert lp.categories["food"].known == 5
+        # Verify it's NOT a dict (would support .get())
+        assert not isinstance(lp, dict)
+
 
 class TestCEFRData:
     """Tests for CEFRData class using real data files."""

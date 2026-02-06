@@ -21,7 +21,12 @@ class Deck:
 
 @dataclass
 class Card:
-    """Represents an Anki card."""
+    """Represents an Anki card.
+
+    Note: The `id` field stores the Anki note ID (from findNotes/notesInfo),
+    not the card ID. This is because search_cards uses findNotes internally.
+    Use findCards with nid:<id> to get actual card IDs when needed.
+    """
 
     id: str
     front: str

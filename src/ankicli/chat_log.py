@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 from typing import Optional
 
-from .paths import CHAT_LOG_FILE, ensure_data_dir
+from .paths import CHAT_LOG_FILE, ensure_data_dir, atomic_json_write
 
 # Maximum number of exchanges to keep
 MAX_EXCHANGES = 100
@@ -27,8 +27,7 @@ def save_log(log: list[dict]) -> None:
     ensure_data_dir()
     # Keep only the most recent exchanges
     log = log[-MAX_EXCHANGES:]
-    with open(CHAT_LOG_FILE, "w") as f:
-        json.dump(log, f, indent=2, ensure_ascii=False)
+    atomic_json_write(CHAT_LOG_FILE, log)
 
 
 def add_exchange(

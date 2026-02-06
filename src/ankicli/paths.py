@@ -1,5 +1,8 @@
 """Centralized storage paths for ankicli."""
 
+import json
+import os
+import tempfile
 from pathlib import Path
 
 # Base data directory for all persistent storage
@@ -56,3 +59,24 @@ VOCAB_LIST_FILE = DATA_DIR / "new_vocab.json"
 def ensure_data_dir() -> None:
     """Ensure the data directory exists."""
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def atomic_json_write(path: Path, data, *, indent: int = 2, ensure_ascii: bool = False) -> None:
+    """Write JSON data to a file atomically.
+
+    Writes to a temporary file in the same directory, then renames it
+    to the target path. This prevents data loss if a crash occurs mid-write.
+    """
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp_path = tempfile.mkstemp(dir=path.parent, suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=indent, ensure_ascii=ensure_ascii)
+        os.rename(tmp_path, path)
+    except BaseException:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+        raise

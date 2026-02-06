@@ -15,7 +15,7 @@ import json
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
 
-from .paths import DATA_DIR, ensure_data_dir
+from .paths import DATA_DIR, ensure_data_dir, atomic_json_write
 
 GRAMMAR_SCORES_FILE = DATA_DIR / "grammar_scores.json"
 
@@ -91,8 +91,7 @@ def save_grammar_scores(scores: dict[str, TopicScore]) -> None:
     """Save per-topic grammar scores to disk."""
     ensure_data_dir()
     raw = {k: v.to_dict() for k, v in scores.items()}
-    with open(GRAMMAR_SCORES_FILE, "w") as f:
-        json.dump(raw, f, indent=2, ensure_ascii=False)
+    atomic_json_write(GRAMMAR_SCORES_FILE, raw)
 
 
 def record_topic_score(

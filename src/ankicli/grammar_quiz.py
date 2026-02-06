@@ -8,7 +8,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
-from .paths import DATA_DIR, ensure_data_dir
+from .paths import DATA_DIR, ensure_data_dir, atomic_json_write
 
 
 # ---------------------------------------------------------------------------
@@ -200,8 +200,7 @@ def load_quiz_data() -> dict:
 def save_quiz_data(data: dict) -> None:
     """Save quiz data to disk."""
     ensure_data_dir()
-    with open(QUIZ_DATA_FILE, "w") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+    atomic_json_write(QUIZ_DATA_FILE, data)
 
 
 def record_quiz_result(result: QuizResult) -> dict:
@@ -420,10 +419,15 @@ def parse_quiz_questions(response_text: str) -> list[QuizQuestion]:
 
     questions = []
     for raw in raw_questions:
+        question_text = raw.get("question_text", "").strip()
+        correct_answer = raw.get("correct_answer", "").strip()
+        # Fix #38: Skip questions with empty required fields
+        if not question_text or not correct_answer:
+            continue
         questions.append(QuizQuestion(
-            question_text=raw.get("question_text", ""),
+            question_text=question_text,
             question_type=raw.get("question_type", "fill_in_blank"),
-            correct_answer=raw.get("correct_answer", ""),
+            correct_answer=correct_answer,
             grammar_topic=raw.get("grammar_topic", ""),
             cefr_level=raw.get("cefr_level", ""),
             options=raw.get("options", []),

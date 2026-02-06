@@ -11,7 +11,7 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from typing import Literal
 
-from .paths import WORD_NETWORK_FILE, DISAMBIGUATION_FILE, ensure_data_dir
+from .paths import WORD_NETWORK_FILE, DISAMBIGUATION_FILE, ensure_data_dir, atomic_json_write
 
 ConnectionType = Literal[
     "antonym", "morphological", "collocation", "thematic", "synonym", "confusable"
@@ -64,36 +64,42 @@ class WordNetwork:
             try:
                 raw = json.loads(WORD_NETWORK_FILE.read_text(encoding="utf-8"))
                 for key, entry in raw.items():
-                    connections = [
-                        WordConnection(**c) for c in entry.get("connections", [])
-                    ]
-                    node = WordNode(
-                        word=entry["word"],
-                        level=entry["level"],
-                        pos=entry["pos"],
-                        theme=entry["theme"],
-                        family_root=entry.get("family_root"),
-                        in_deck=entry.get("in_deck", False),
-                        note_id=entry.get("note_id"),
-                        connections=connections,
-                        collocations=entry.get("collocations", []),
-                        disambiguation_group=entry.get("disambiguation_group"),
-                    )
-                    self._nodes[key] = node
-            except (json.JSONDecodeError, KeyError):
+                    try:
+                        connections = [
+                            WordConnection(**c) for c in entry.get("connections", [])
+                        ]
+                        node = WordNode(
+                            word=entry.get("word", key),
+                            level=entry.get("level", ""),
+                            pos=entry.get("pos", ""),
+                            theme=entry.get("theme", ""),
+                            family_root=entry.get("family_root"),
+                            in_deck=entry.get("in_deck", False),
+                            note_id=entry.get("note_id"),
+                            connections=connections,
+                            collocations=entry.get("collocations", []),
+                            disambiguation_group=entry.get("disambiguation_group"),
+                        )
+                        self._nodes[key] = node
+                    except (KeyError, TypeError):
+                        continue
+            except json.JSONDecodeError:
                 self._nodes = {}
 
         if DISAMBIGUATION_FILE.exists():
             try:
                 raw = json.loads(DISAMBIGUATION_FILE.read_text(encoding="utf-8"))
                 for key, entry in raw.items():
-                    self._disambiguation[key] = DisambiguationPair(
-                        pair_id=entry["pair_id"],
-                        words=entry.get("words", []),
-                        category=entry.get("category", ""),
-                        error_counts=entry.get("error_counts", {}),
-                    )
-            except (json.JSONDecodeError, KeyError):
+                    try:
+                        self._disambiguation[key] = DisambiguationPair(
+                            pair_id=entry.get("pair_id", key),
+                            words=entry.get("words", []),
+                            category=entry.get("category", ""),
+                            error_counts=entry.get("error_counts", {}),
+                        )
+                    except (KeyError, TypeError):
+                        continue
+            except json.JSONDecodeError:
                 self._disambiguation = {}
 
     def save(self) -> None:
@@ -102,16 +108,12 @@ class WordNetwork:
         network_data = {}
         for key, node in self._nodes.items():
             network_data[key] = asdict(node)
-        WORD_NETWORK_FILE.write_text(
-            json.dumps(network_data, indent=2, ensure_ascii=False), encoding="utf-8"
-        )
+        atomic_json_write(WORD_NETWORK_FILE, network_data)
 
         disambig_data = {}
         for key, pair in self._disambiguation.items():
             disambig_data[key] = asdict(pair)
-        DISAMBIGUATION_FILE.write_text(
-            json.dumps(disambig_data, indent=2, ensure_ascii=False), encoding="utf-8"
-        )
+        atomic_json_write(DISAMBIGUATION_FILE, disambig_data)
 
     # -- Node operations --
 

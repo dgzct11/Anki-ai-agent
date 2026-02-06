@@ -101,3 +101,41 @@ class TestEnsureDataDir:
             ensure_data_dir()
             ensure_data_dir()  # Should not raise
             assert test_dir.exists()
+
+
+class TestAtomicJsonWrite:
+    """Regression tests for atomic_json_write (temp+rename pattern)."""
+
+    def test_writes_valid_json(self, tmp_path):
+        from ankicli.paths import atomic_json_write
+        import json
+        target = tmp_path / "test.json"
+        data = {"key": "value", "numbers": [1, 2, 3]}
+        atomic_json_write(target, data)
+        assert target.exists()
+        with open(target) as f:
+            loaded = json.load(f)
+        assert loaded == data
+
+    def test_no_leftover_temp_files(self, tmp_path):
+        from ankicli.paths import atomic_json_write
+        target = tmp_path / "test.json"
+        atomic_json_write(target, {"ok": True})
+        tmp_files = list(tmp_path.glob("*.tmp"))
+        assert len(tmp_files) == 0, f"Leftover temp files: {tmp_files}"
+
+    def test_creates_parent_directories(self, tmp_path):
+        from ankicli.paths import atomic_json_write
+        target = tmp_path / "sub" / "dir" / "test.json"
+        atomic_json_write(target, {"nested": True})
+        assert target.exists()
+
+    def test_overwrites_existing_file(self, tmp_path):
+        from ankicli.paths import atomic_json_write
+        import json
+        target = tmp_path / "test.json"
+        atomic_json_write(target, {"version": 1})
+        atomic_json_write(target, {"version": 2})
+        with open(target) as f:
+            loaded = json.load(f)
+        assert loaded["version"] == 2

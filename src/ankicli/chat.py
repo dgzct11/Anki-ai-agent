@@ -749,6 +749,10 @@ def run_practice_loop(
         first_line = clean.split('\n')[0].split('(')[0].strip()
         return first_line[:30]
 
+    # Fix #34: Track actual question number separately from card index
+    # so multi-word groups don't cause jumps like "Question 3/15" -> "Question 6/15"
+    question_display_num = 0
+
     while not session.is_finished:
         card = session.current_card
         if card is None:
@@ -763,12 +767,15 @@ def run_practice_loop(
             if idx < len(session.cards):
                 group_cards.append(session.cards[idx])
 
+        question_display_num += 1
+
         # Build info for grouped cards (what Claude must use)
         group_words = [_extract_word(gc) for gc in group_cards]
         group_info = []
         for gc in group_cards:
             clean_word = _re_group.sub(r'<[^>]+>', '', gc.back).strip().split('\n')[0][:40]
-            group_info.append(f"  - {clean_word} (EN: {gc.front})")
+            due_flag = " [DUE]" if gc.is_due else ""
+            group_info.append(f"  - {clean_word} (EN: {gc.front}){due_flag}")
         group_section = "\n".join(group_info)
 
         # Also build a wider context of upcoming words (for Claude to see what's coming)
@@ -785,28 +792,37 @@ def run_practice_loop(
         direction_label = "English" if session.direction == PracticeDirection.EN_TO_ES else "Spanish"
         target_lang = "Spanish" if session.direction == PracticeDirection.EN_TO_ES else "English"
 
+        # Fix #44: Flag due words so Claude prioritizes them
+        due_note = ""
+        due_words = [_extract_word(gc) for gc in group_cards if gc.is_due]
+        if due_words:
+            due_note = f"\nNote: Words marked [DUE] are due for Anki review - prioritize testing these.\n"
+
         if len(group_cards) > 1:
             gen_prompt = (
                 f"[PRACTICE MODE - GENERATE SENTENCE]\n"
-                f"Question {session.current_index + 1}/{session.total_questions}\n"
+                f"Question {question_display_num}\n"
                 f"Difficulty level: {session.difficulty_num}/5 ({session.difficulty_label})\n\n"
-                f"TARGET WORDS for this question (use ALL of these):\n{group_section}\n\n"
+                f"TARGET WORDS for this question (use ALL of these):\n{group_section}\n"
+                f"{due_note}\n"
                 f"Other upcoming words for context:\n{remaining_section}\n\n"
                 f"Generate a SINGLE {direction_label} sentence that naturally uses ALL {len(group_cards)} "
                 f"target words: {', '.join(group_words)}.\n"
                 f"Do NOT reveal which {target_lang} words to use. Do NOT show the translation.\n"
-                f"Just output the sentence. Keep it appropriate for difficulty level {session.difficulty_num}/5."
+                f"IMPORTANT: Output ONLY the sentence. No explanations, no commentary, no extra text."
             )
         else:
             gen_prompt = (
                 f"[PRACTICE MODE - GENERATE SENTENCE]\n"
-                f"Question {session.current_index + 1}/{session.total_questions}\n"
+                f"Question {question_display_num}\n"
                 f"Difficulty level: {session.difficulty_num}/5 ({session.difficulty_label})\n\n"
-                f"TARGET WORD: {group_words[0]}\n\n"
+                f"TARGET WORD: {group_words[0]}"
+                f"{' [DUE]' if group_cards[0].is_due else ''}\n"
+                f"{due_note}\n"
                 f"Other upcoming words for context:\n{remaining_section}\n\n"
                 f"Generate a SINGLE {direction_label} sentence using the target word.\n"
                 f"Do NOT reveal the {target_lang} translation.\n"
-                f"Just output the sentence. Keep it appropriate for difficulty level {session.difficulty_num}/5."
+                f"IMPORTANT: Output ONLY the sentence. No explanations, no commentary, no extra text."
             )
 
         # Get Claude's generated sentence
@@ -826,11 +842,37 @@ def run_practice_loop(
 
         generated_sentence = generated_sentence.strip().strip('"').strip("'")
 
+        # Fix #37: Validate generated sentence - take only the first sentence,
+        # strip any meta-text or commentary Claude may have added
+        if generated_sentence:
+            # Remove common prefixes like "Here's a sentence:" or "Sure:"
+            import re as _re_validate
+            generated_sentence = _re_validate.sub(
+                r'^(?:(?:Here(?:\'s| is) (?:a |the )?(?:sentence|translation|example)[:\.]?\s*)|(?:Sure[,!:]?\s*)|(?:Of course[,!:]?\s*))',
+                '', generated_sentence, flags=_re_validate.IGNORECASE
+            ).strip()
+            # Take only the first sentence (split on . ! ? followed by space or end)
+            sent_match = _re_validate.match(r'^(.+?[.!?])(?:\s|$)', generated_sentence)
+            if sent_match:
+                generated_sentence = sent_match.group(1).strip()
+            # Strip any trailing commentary after a newline
+            generated_sentence = generated_sentence.split('\n')[0].strip()
+            # Re-strip quotes
+            generated_sentence = generated_sentence.strip('"').strip("'")
+
+        # Compute total display questions (approximate: how many question groups)
+        # Use a simple estimate based on group_size vs total cards
+        effective_group_size = 1 if session.difficulty_num <= 1 else min(3, max(1, session.questions_remaining))
+        total_display_questions = max(
+            question_display_num,
+            question_display_num + (session.questions_remaining - len(group_cards) + effective_group_size - 1) // max(1, effective_group_size),
+        )
+
         # Show question panel with Claude's generated sentence (no target words shown)
         any_due = any(gc.is_due for gc in group_cards)
         console.print(create_practice_question_panel(
-            question_num=session.current_index + 1,
-            total=session.total_questions,
+            question_num=question_display_num,
+            total=total_display_questions,
             phrase=generated_sentence,
             direction=session.direction,
             is_due=any_due,
@@ -847,7 +889,26 @@ def run_practice_loop(
             answer = "/quit"
 
         if not answer:
-            continue
+            # Fix #42: Cache generated sentence - don't re-generate on empty Enter
+            console.print("[dim]Please type your translation, or use /skip or /quit.[/dim]")
+            console.print()
+            console.print(create_practice_question_panel(
+                question_num=question_display_num,
+                total=total_display_questions,
+                phrase=generated_sentence,
+                direction=session.direction,
+                is_due=any_due,
+                difficulty=session.difficulty_level,
+                target_words=f"{len(group_cards)} words" if len(group_cards) > 1 else "",
+            ))
+            try:
+                answer = prompt_session.prompt(
+                    [("class:prompt", "Your translation: ")],
+                ).strip()
+            except (KeyboardInterrupt, EOFError):
+                answer = "/quit"
+            if not answer:
+                continue
 
         # Handle practice commands
         if answer.lower() == "/quit":
@@ -856,7 +917,8 @@ def run_practice_loop(
 
         if answer.lower() == "/skip":
             from .translation_practice import PracticeResult
-            for gc in group_cards:
+            for i_skip, gc in enumerate(group_cards):
+                is_last = (i_skip == len(group_cards) - 1)
                 session.record_result(PracticeResult(
                     card_id=gc.card_id,
                     front=gc.front,
@@ -864,7 +926,7 @@ def run_practice_loop(
                     user_answer="(skipped)",
                     feedback_level=FeedbackLevel.INCORRECT,
                     feedback_text="Skipped",
-                ))
+                ), defer_difficulty=not is_last)
             console.print(f"[dim]Skipped {len(group_cards)} word(s).[/dim]\n")
             continue
 
@@ -877,24 +939,35 @@ def run_practice_loop(
             continue
 
         if answer.lower() == "/hint":
-            if session.direction == PracticeDirection.EN_TO_ES:
-                hint_source = card.back
-            else:
-                hint_source = card.front
+            # Fix #39: Show hints for ALL grouped cards, not just the first
             import re
-            clean = re.sub(r'<[^>]+>', ' ', hint_source).strip()
-            hint = clean[:3] + "..." if len(clean) > 3 else clean
-            console.print(f"[dim]Hint: {hint}[/dim]\n")
+            hints = []
+            for gc in group_cards:
+                if session.direction == PracticeDirection.EN_TO_ES:
+                    hint_source = gc.back
+                else:
+                    hint_source = gc.front
+                clean = re.sub(r'<[^>]+>', ' ', hint_source).strip()
+                hint = clean[:3] + "..." if len(clean) > 3 else clean
+                hints.append(hint)
+            console.print(f"[dim]Hint: {', '.join(hints)}[/dim]\n")
             continue
 
         # Step 2: Ask Claude to evaluate the translation
+        per_word_instruction = ""
+        if len(group_cards) > 1:
+            per_word_instruction = (
+                f"\n\nPer-word results (for EACH target word, state if correct or incorrect):\n"
+                f"Format: \"word: correct\" or \"word: incorrect (should be ...)\"\n"
+            )
         eval_prompt = (
             f"[PRACTICE MODE - EVALUATE TRANSLATION]\n"
             f"The sentence was: {generated_sentence}\n"
             f"User's translation to {target_lang}: {answer}\n\n"
             f"Target words being tested ({len(group_cards)}):\n{group_section}\n\n"
-            f"Evaluate the translation. Score each 0-4: Meaning, Grammar, Naturalness, Vocabulary.\n"
-            f"Give per-word feedback on EACH target word: did the user use the right word?\n"
+            f"Evaluate the translation. Score each 0-4:\n"
+            f"Meaning: X/4\nGrammar: X/4\nNaturalness: X/4\nVocabulary: X/4\n"
+            f"{per_word_instruction}"
             f"Show the correct translation if wrong."
         )
 
@@ -935,17 +1008,24 @@ def run_practice_loop(
         meaning = grammar = naturalness = vocabulary = 2  # Default middle scores
         feedback_level = FeedbackLevel.PARTIAL
 
-        # Look for score patterns like "Meaning: 4/4" or "meaning: 3"
+        # Fix #33: More flexible score regex patterns
+        # Handles: "Meaning: 4/4", "**Meaning**: 4/4", "Meaning: 4",
+        #          "Meaning (4/4)", "Meaning — 4/4", "**Meaning** 3/4"
         score_patterns = [
-            (r'[Mm]eaning[:\s]+(\d)/4', 'meaning'),
-            (r'[Gg]rammar[:\s]+(\d)/4', 'grammar'),
-            (r'[Nn]aturalness[:\s]+(\d)/4', 'naturalness'),
-            (r'[Vv]ocabulary[:\s]+(\d)/4', 'vocabulary'),
+            (r'\*{0,2}[Mm]eaning\*{0,2}\s*[:\-—]\s*(\d)(?:/4)?', 'meaning'),
+            (r'\*{0,2}[Mm]eaning\*{0,2}\s*\((\d)(?:/4)?\)', 'meaning'),
+            (r'\*{0,2}[Gg]rammar\*{0,2}\s*[:\-—]\s*(\d)(?:/4)?', 'grammar'),
+            (r'\*{0,2}[Gg]rammar\*{0,2}\s*\((\d)(?:/4)?\)', 'grammar'),
+            (r'\*{0,2}[Nn]aturalness\*{0,2}\s*[:\-—]\s*(\d)(?:/4)?', 'naturalness'),
+            (r'\*{0,2}[Nn]aturalness\*{0,2}\s*\((\d)(?:/4)?\)', 'naturalness'),
+            (r'\*{0,2}[Vv]ocabulary\*{0,2}\s*[:\-—]\s*(\d)(?:/4)?', 'vocabulary'),
+            (r'\*{0,2}[Vv]ocabulary\*{0,2}\s*\((\d)(?:/4)?\)', 'vocabulary'),
         ]
         for pattern, key in score_patterns:
             match = re.search(pattern, response_text)
             if match:
-                val = int(match.group(1))
+                # Fix #43: Clamp scores to 0-4 range
+                val = max(0, min(4, int(match.group(1))))
                 if key == 'meaning':
                     meaning = val
                 elif key == 'grammar':
@@ -966,12 +1046,16 @@ def run_practice_loop(
 
         # Show feedback panel
         console.print()
-        # Determine the correct answer for word-level diff (U1)
+        # Fix #40: Combine correct answers from ALL grouped cards, not just the first
         import re as _re_clean
-        if session.direction == PracticeDirection.EN_TO_ES:
-            correct_ans = _re_clean.sub(r'<[^>]+>', ' ', card.back).strip()
-        else:
-            correct_ans = _re_clean.sub(r'<[^>]+>', ' ', card.front).strip()
+        correct_parts = []
+        for gc in group_cards:
+            if session.direction == PracticeDirection.EN_TO_ES:
+                part = _re_clean.sub(r'<[^>]+>', ' ', gc.back).strip()
+            else:
+                part = _re_clean.sub(r'<[^>]+>', ' ', gc.front).strip()
+            correct_parts.append(part)
+        correct_ans = " / ".join(correct_parts)
 
         console.print(create_practice_feedback_panel(
             feedback_level=feedback_level,
@@ -986,28 +1070,67 @@ def run_practice_loop(
             correct_answer=correct_ans,
         ))
 
-        # Record results for all grouped cards
+        # Fix #31: Parse per-word feedback for multi-word groups
+        # Try to extract per-word correctness from Claude's evaluation
         from .translation_practice import PracticeResult
-        for gc in group_cards:
+        per_word_correct = {}  # word -> bool
+        if len(group_cards) > 1:
+            for gc in group_cards:
+                word = _extract_word(gc)
+                # Look for patterns like "hablar: correct", "hablar - incorrect",
+                # "✓ hablar", "✗ hablar", "hablar ✓", "hablar: wrong"
+                word_escaped = re.escape(word)
+                correct_patterns = [
+                    rf'{word_escaped}\s*[:\-—]\s*(?:correct|right|good|✓|✅)',
+                    rf'(?:✓|✅|correct|right)\s*[:\-—]?\s*{word_escaped}',
+                    rf'{word_escaped}.*?(?:correctly|properly|right)',
+                ]
+                incorrect_patterns = [
+                    rf'{word_escaped}\s*[:\-—]\s*(?:incorrect|wrong|missing|✗|❌|not used)',
+                    rf'(?:✗|❌|incorrect|wrong|missing)\s*[:\-—]?\s*{word_escaped}',
+                    rf'{word_escaped}.*?(?:incorrectly|wrong|missing|not (?:used|included))',
+                ]
+                is_correct = any(re.search(p, response_text, re.IGNORECASE) for p in correct_patterns)
+                is_incorrect = any(re.search(p, response_text, re.IGNORECASE) for p in incorrect_patterns)
+                if is_correct and not is_incorrect:
+                    per_word_correct[word] = True
+                elif is_incorrect and not is_correct:
+                    per_word_correct[word] = False
+                # If ambiguous, leave out and use overall score
+
+        # Fix #41: Record all group results, then update difficulty once at end
+        for i_gc, gc in enumerate(group_cards):
+            word = _extract_word(gc)
+            # Determine per-card feedback level
+            card_feedback_level = feedback_level
+            card_vocab_score = vocabulary
+            if word in per_word_correct:
+                if per_word_correct[word]:
+                    card_vocab_score = max(vocabulary, 3)  # At least 3 if correct
+                    if feedback_level == FeedbackLevel.INCORRECT:
+                        card_feedback_level = FeedbackLevel.PARTIAL
+                else:
+                    card_vocab_score = min(vocabulary, 1)  # At most 1 if wrong
+                    if feedback_level == FeedbackLevel.CORRECT:
+                        card_feedback_level = FeedbackLevel.PARTIAL
+
             result = PracticeResult(
                 card_id=gc.card_id,
                 front=gc.front,
                 back=gc.back,
                 user_answer=answer,
-                feedback_level=feedback_level,
+                feedback_level=card_feedback_level,
                 feedback_text=response_text,
                 meaning_score=meaning,
                 grammar_score=grammar,
                 naturalness_score=naturalness,
-                vocabulary_score=vocabulary,
+                vocabulary_score=card_vocab_score,
                 is_due_for_review=gc.is_due,
             )
 
-            # Track due cards for session-end review summary
-            if gc.is_due:
-                result.is_due_for_review = True
-
-            session.record_result(result)
+            # Defer difficulty update for all but the last card in the group
+            is_last = (i_gc == len(group_cards) - 1)
+            session.record_result(result, defer_difficulty=not is_last)
 
         # Skip ahead past the grouped cards (first one was already advanced by record_result)
         # record_result increments current_index, so after recording all group_cards,
@@ -1604,8 +1727,6 @@ def create_conversation_commands_panel() -> Panel:
     content = Text()
     content.append("/hint", style="cyan")
     content.append(" vocabulary help  ", style="dim")
-    content.append("/vocab", style="cyan")
-    content.append(" new words  ", style="dim")
     content.append("/quit", style="cyan")
     content.append(" end conversation", style="dim")
     return Panel(content, border_style="dim", box=box.ROUNDED, padding=(0, 1))
@@ -1628,7 +1749,6 @@ def run_conversation_loop(
     console.print()
 
     turn_count = 0
-    new_vocab: list[str] = []
 
     while True:
         # Get user input
@@ -1663,16 +1783,6 @@ def run_conversation_loop(
                     console.print(Markdown(response_text))
             except Exception as e:
                 console.print(f"[yellow]Error: {e}[/yellow]")
-            console.print()
-            continue
-
-        if user_input.lower() == "/vocab":
-            if new_vocab:
-                console.print("[bold]New vocabulary this session:[/bold]")
-                for word in new_vocab:
-                    console.print(f"  - {word}", style="cyan")
-            else:
-                console.print("[dim]No new vocabulary recorded yet.[/dim]")
             console.print()
             continue
 
@@ -1713,7 +1823,20 @@ def run_conversation_loop(
                     if event["name"] != "log_error":
                         console.print(create_result_panel(event["name"], event["result"]))
                 elif event["type"] == "context_status":
-                    pass  # Suppress context bar during conversation
+                    # Fix #35: Warn user when approaching context limit
+                    ctx = event["status"]
+                    pct = ctx.get("percent_used", 0)
+                    if pct >= 90:
+                        console.print(
+                            "\n[bold red]Warning: Context window is nearly full "
+                            f"({pct:.0f}%). The conversation may end soon. "
+                            "Type /quit to save your progress.[/bold red]\n"
+                        )
+                    elif pct >= 75:
+                        console.print(
+                            f"\n[yellow]Context usage: {pct:.0f}% - "
+                            "consider wrapping up soon.[/yellow]\n"
+                        )
 
             if spinner_active and status_ctx:
                 status_ctx.stop()

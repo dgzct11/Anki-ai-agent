@@ -6,7 +6,7 @@ import json
 from datetime import date, datetime, timedelta
 from typing import Any
 
-from .paths import STREAKS_FILE, PROGRESS_HISTORY_FILE, ensure_data_dir
+from .paths import STREAKS_FILE, PROGRESS_HISTORY_FILE, ensure_data_dir, atomic_json_write
 
 
 # ---------------------------------------------------------------------------
@@ -28,8 +28,7 @@ def _load_streaks() -> dict:
 def _save_streaks(data: dict) -> None:
     """Save streaks data to disk."""
     ensure_data_dir()
-    with open(STREAKS_FILE, "w") as f:
-        json.dump(data, f, indent=2)
+    atomic_json_write(STREAKS_FILE, data)
 
 
 def record_activity(activity_date: date | None = None) -> dict:
@@ -304,8 +303,7 @@ def _load_progress_history() -> list[dict]:
 def _save_progress_history(history: list[dict]) -> None:
     """Save progress history to disk."""
     ensure_data_dir()
-    with open(PROGRESS_HISTORY_FILE, "w") as f:
-        json.dump(history, f, indent=2)
+    atomic_json_write(PROGRESS_HISTORY_FILE, history)
 
 
 def record_progress_snapshot(

@@ -177,6 +177,9 @@ class AnkiClient:
                     "Back": card["back"],
                 },
                 "tags": card.get("tags", []),
+                "options": {
+                    "allowDuplicate": False,
+                },
             })
 
         result = _request("addNotes", notes=notes)
@@ -340,11 +343,11 @@ class AnkiClient:
             Number of notes modified
         """
         return _request(
-            "findAndReplaceInModels" if regex else "findAndReplaceInModels",
-            notes=note_ids,
+            "findAndReplace",
+            nids=note_ids,
             field=field,
-            find=search,
-            replace=replace,
+            search=search,
+            replacement=replace,
             regex=regex,
         )
 
@@ -410,7 +413,7 @@ class AnkiClient:
         """Get new (unseen) cards in a deck."""
         return self.search_cards(f'deck:"{deck_name}" is:new', limit=limit)
 
-    def get_next_intervals(self, card_id: int) -> dict[str, str]:
+    def get_next_intervals(self, note_id: int) -> dict[str, str]:
         """Estimate the next review intervals for each ease button.
 
         Uses cardsInfo to get current interval and ease factor, then
@@ -418,13 +421,13 @@ class AnkiClient:
         scheduling behavior as closely as possible.
 
         Args:
-            card_id: The card/note ID.
+            note_id: The note ID (Card.id stores note IDs from findNotes).
 
         Returns:
             Dict with keys "again", "hard", "good", "easy" mapping to
             human-readable interval strings like "10 min", "2 days", etc.
         """
-        card_ids = _request("findCards", query=f"nid:{card_id}")
+        card_ids = _request("findCards", query=f"nid:{note_id}")
         if not card_ids:
             return {"again": "?", "hard": "?", "good": "?", "easy": "?"}
 
@@ -471,7 +474,7 @@ class AnkiClient:
             "easy": _format_interval(easy_ivl),
         }
 
-    def answer_card(self, card_id: int, ease: int) -> tuple[bool, str]:
+    def answer_card(self, note_id: int, ease: int) -> tuple[bool, str]:
         """Mark a card as reviewed via answerCards (preserves full SRS).
 
         answerCards calls Anki's native scheduler.answerCard() — the exact
@@ -480,16 +483,16 @@ class AnkiClient:
         corrupts SRS data (no ease factor update, no FSRS stability, etc).
 
         Args:
-            card_id: The note ID to answer. Will find associated card IDs.
+            note_id: The note ID to answer. Will find associated card IDs.
             ease: Ease rating (1=Again, 2=Hard, 3=Good, 4=Easy).
 
         Returns:
             Tuple of (success: bool, message: str).
             On failure, message explains why so it can be shown to the user.
         """
-        card_ids = _request("findCards", query=f"nid:{card_id}")
+        card_ids = _request("findCards", query=f"nid:{note_id}")
         if not card_ids:
-            return False, f"No card found for note ID {card_id}"
+            return False, f"No card found for note ID {note_id}"
 
         for cid in card_ids:
             try:
@@ -570,6 +573,7 @@ class AnkiClient:
         new_count = 0
         total_reps = 0
         total_lapses = 0
+        stats_note = None
 
         if all_cards:
             try:
@@ -588,17 +592,27 @@ class AnkiClient:
                         mature_count += 1
                     else:
                         learning_count += 1
+
+                if len(all_cards) > 2000:
+                    stats_note = (
+                        f"Stats based on first 2000 of {len(all_cards)} cards. "
+                        "Retention rate and maturity counts may be incomplete."
+                    )
             except AnkiConnectError:
                 # Fall back to deck-level stats
                 new_count = total_new
                 learning_count = total_learn
+                stats_note = (
+                    "Could not fetch detailed card stats. "
+                    "Retention rate unavailable; counts are estimates from deck-level data."
+                )
 
         # Retention rate: (reps - lapses) / reps * 100
         retention_rate = 0.0
         if total_reps > 0:
             retention_rate = ((total_reps - total_lapses) / total_reps) * 100
 
-        return {
+        result = {
             "total_decks": len(decks),
             "total_notes": len(all_notes) if all_notes else 0,
             "total_cards": len(all_cards) if all_cards else 0,
@@ -614,3 +628,6 @@ class AnkiClient:
             "retention_rate": round(retention_rate, 1),
             "decks": [{"name": d.name, "due": d.total_due} for d in decks],
         }
+        if stats_note:
+            result["stats_note"] = stats_note
+        return result

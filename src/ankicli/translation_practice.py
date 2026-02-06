@@ -154,17 +154,31 @@ class PracticeSession:
         """Human-readable label for current difficulty level."""
         return self.DIFFICULTY_LABELS.get(self.difficulty_num, "normal")
 
-    def record_result(self, result: PracticeResult) -> None:
-        """Record a practice result and update streaks + adaptive difficulty."""
+    def record_result(self, result: PracticeResult, defer_difficulty: bool = False) -> None:
+        """Record a practice result and update streaks + adaptive difficulty.
+
+        Args:
+            result: The practice result to record.
+            defer_difficulty: If True, record the result and advance the index
+                but don't update streaks or difficulty. Use this for grouped
+                cards where difficulty should only change after the entire group.
+        """
         self.results.append(result)
-        if result.feedback_level == FeedbackLevel.CORRECT:
+        self.current_index += 1
+        if defer_difficulty:
+            return
+        self._update_difficulty(result.feedback_level)
+
+    def _update_difficulty(self, feedback_level: FeedbackLevel) -> None:
+        """Update streaks and adaptive difficulty based on feedback level."""
+        if feedback_level == FeedbackLevel.CORRECT:
             self.correct_streak += 1
             self.incorrect_streak = 0
             # A2: Increase difficulty after 3+ correct
             if self.correct_streak >= 3 and self.difficulty_num < 5:
                 self.difficulty_num += 1
                 self.correct_streak = 0  # Reset streak after level change
-        elif result.feedback_level == FeedbackLevel.INCORRECT:
+        elif feedback_level == FeedbackLevel.INCORRECT:
             self.incorrect_streak += 1
             self.correct_streak = 0
             # A2: Decrease difficulty after 2+ wrong
@@ -175,7 +189,6 @@ class PracticeSession:
             # Partial - reset both streaks
             self.correct_streak = 0
             self.incorrect_streak = 0
-        self.current_index += 1
 
     def get_weak_words(self) -> list[str]:
         """Return words the user got wrong or partially wrong."""
@@ -267,6 +280,8 @@ def load_practice_cards(
                 is_due=c.id in due_ids,
             ))
 
+    # Fix #44: Sort due cards first so practice prioritizes them
+    cards.sort(key=lambda c: (not c.is_due, c.card_id))
     return cards[:count]
 
 

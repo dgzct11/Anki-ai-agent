@@ -6,7 +6,7 @@ import json
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from .paths import ERROR_JOURNAL_FILE, ensure_data_dir
+from .paths import ERROR_JOURNAL_FILE, ensure_data_dir, atomic_json_write
 
 
 @dataclass
@@ -63,8 +63,7 @@ def save_journal(journal: dict[str, ErrorEntry]) -> None:
     """Save the error journal to disk."""
     ensure_data_dir()
     raw = {k: v.to_dict() for k, v in journal.items()}
-    with open(ERROR_JOURNAL_FILE, "w") as f:
-        json.dump(raw, f, indent=2, ensure_ascii=False)
+    atomic_json_write(ERROR_JOURNAL_FILE, raw)
 
 
 def log_error(

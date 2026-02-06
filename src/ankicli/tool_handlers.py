@@ -153,8 +153,8 @@ def handle_get_collection_stats(anki: AnkiClient, tool_input: dict, **ctx) -> st
             progress = load_progress_cache()
             if progress:
                 for level_key in ("A1", "A2", "B1", "B2", "C1", "C2"):
-                    level_data = progress.get(level_key, {})
-                    cefr_levels[level_key] = level_data.get("percent", 0)
+                    level_data = progress.get(level_key)
+                    cefr_levels[level_key] = level_data.percent if level_data else 0
         except Exception:
             pass
         record_progress_snapshot(
@@ -257,6 +257,10 @@ def handle_add_multiple_cards(anki: AnkiClient, tool_input: dict, **ctx) -> str:
         note_type=tool_input.get("note_type", "Basic"),
     )
     successful = sum(1 for nid in note_ids if nid is not None)
+    duplicates = [
+        cards[i]["front"][:40] for i, nid in enumerate(note_ids)
+        if nid is None
+    ]
     assistant = ctx.get("assistant")
     if assistant:
         assistant.session_cards_added += successful
@@ -272,7 +276,12 @@ def handle_add_multiple_cards(anki: AnkiClient, tool_input: dict, **ctx) -> str:
         if any(t.startswith("cefr::") for t in (c.get("tags") or []))
     )
     cefr_info = f" ({tagged_count} CEFR-tagged)" if tagged_count else ""
-    return f"Added {successful}/{len(cards)} cards successfully{cefr_info}"
+    result = f"Added {successful}/{len(cards)} cards successfully{cefr_info}"
+    if duplicates:
+        dup_list = ", ".join(f'"{d}"' for d in duplicates[:5])
+        extra = f" and {len(duplicates) - 5} more" if len(duplicates) > 5 else ""
+        result += f"\nSkipped duplicates: {dup_list}{extra}"
+    return result
 
 
 @handler("get_note")
@@ -333,10 +342,11 @@ def handle_search_cards(anki: AnkiClient, tool_input: dict, **ctx) -> str:
 
 @handler("check_word_exists")
 def handle_check_word_exists(anki: AnkiClient, tool_input: dict, **ctx) -> str:
-    word = tool_input["word"]
+    word = tool_input["word"].lower().strip()
     deck_name = tool_input.get("deck_name")
 
-    query = f"*{word}*"
+    tag = f"word::{word}"
+    query = f'tag:"{tag}"'
     if deck_name:
         query = f'deck:"{deck_name}" {query}'
 
@@ -364,7 +374,9 @@ def handle_check_words_exist(anki: AnkiClient, tool_input: dict, **ctx) -> str:
     not_found_words = []
 
     for word in words:
-        query = f"*{word}*"
+        w = word.lower().strip()
+        tag = f"word::{w}"
+        query = f'tag:"{tag}"'
         if deck_name:
             query = f'deck:"{deck_name}" {query}'
 
@@ -1071,7 +1083,7 @@ def handle_start_conversation_sim(anki: AnkiClient, tool_input: dict, **ctx) -> 
 def handle_get_daily_challenge(anki: AnkiClient, tool_input: dict, **ctx) -> str:
     import json as _json
     from datetime import date
-    from .paths import DAILY_CHALLENGE_FILE, ensure_data_dir
+    from .paths import DAILY_CHALLENGE_FILE, ensure_data_dir, atomic_json_write
     from .cefr import CEFRData, load_progress_cache, match_cards_to_cefr, save_progress_cache
 
     today = date.today().isoformat()
@@ -1111,8 +1123,10 @@ def handle_get_daily_challenge(anki: AnkiClient, tool_input: dict, **ctx) -> str
     challenge_word = None
     challenge_level = None
     for level_key in ("A1", "A2", "B1", "B2", "C1", "C2"):
-        level_data = progress.get(level_key, {})
-        unknown = level_data.get("unknown_words", [])
+        level_data = progress.get(level_key)
+        if not level_data:
+            continue
+        unknown = level_data.unknown_words
         if unknown:
             # Pick a different word than yesterday
             yesterday_word = state.get("word", "")
@@ -1145,8 +1159,7 @@ def handle_get_daily_challenge(anki: AnkiClient, tool_input: dict, **ctx) -> str
         "category": category,
         "completed": False,
     }
-    with open(DAILY_CHALLENGE_FILE, "w") as f:
-        _json.dump(state, f, indent=2, ensure_ascii=False)
+    atomic_json_write(DAILY_CHALLENGE_FILE, state)
 
     # Build the challenge
     lines = [
@@ -1207,7 +1220,7 @@ def handle_get_study_suggestion(anki: AnkiClient, tool_input: dict, **ctx) -> st
             weakest_level = None
             weakest_pct = 100.0
             for level_key, level_data in sorted(progress.items()):
-                pct = level_data.get("percent", 0)
+                pct = level_data.percent
                 if pct < 90 and pct < weakest_pct:
                     weakest_level = level_key
                     weakest_pct = pct
@@ -1217,10 +1230,10 @@ def handle_get_study_suggestion(anki: AnkiClient, tool_input: dict, **ctx) -> st
                 lines.append(f"\nCEFR focus: {weakest_level} ({weakest_pct:.0f}% complete)")
 
                 # Find weakest category
-                cats = level_data.get("categories", {})
+                cats = level_data.categories
                 if cats:
-                    weakest_cat = min(cats.items(), key=lambda x: x[1].get("percent", 0))
-                    lines.append(f"Weakest category: {weakest_cat[0]} ({weakest_cat[1].get('percent', 0):.0f}%)")
+                    weakest_cat = min(cats.items(), key=lambda x: x[1].percent)
+                    lines.append(f"Weakest category: {weakest_cat[0]} ({weakest_cat[1].percent:.0f}%)")
                     lines.append(f"SUGGESTION: Focus on {weakest_level} {weakest_cat[0]} vocabulary.")
     except Exception:
         pass
@@ -2215,11 +2228,17 @@ def handle_get_morphological_family(anki: AnkiClient, tool_input: dict, **ctx) -
 
     lines = [f"Morphological family for '{word}':", ""]
 
+    # Check Anki status for each family member once (avoid duplicate API calls)
+    known_members: set[str] = set()
     if result["family"]:
         for member in result["family"]:
             tag = f"word::{member}"
             cards = anki.search_cards(f'tag:"{tag}"', limit=1)
-            status = "KNOWN" if cards else "NEW"
+            if cards:
+                known_members.add(member)
+
+        for member in result["family"]:
+            status = "KNOWN" if member in known_members else "NEW"
             lines.append(f"  [{status}] {member}")
     else:
         lines.append("  No morphological relatives found.")
@@ -2230,12 +2249,7 @@ def handle_get_morphological_family(anki: AnkiClient, tool_input: dict, **ctx) -
     if result["network_family"]:
         lines.append(f"Network family: {', '.join(result['network_family'])}")
 
-    new_words = []
-    for member in result["family"]:
-        tag = f"word::{member}"
-        cards = anki.search_cards(f'tag:"{tag}"', limit=1)
-        if not cards:
-            new_words.append(member)
+    new_words = [m for m in result["family"] if m not in known_members]
 
     if new_words:
         lines.append(f"\n{len(new_words)} new word(s) to learn: {', '.join(new_words[:10])}")
@@ -2375,11 +2389,17 @@ def handle_get_semantic_field_progress(anki: AnkiClient, tool_input: dict, **ctx
             all_categories[cat]["total"] += 1
             all_categories[cat]["words"].append(w.word)
 
+    # Batch: fetch all cards once and extract word:: tags into a set
+    all_cards = anki.search_cards("tag:word::*", limit=5000)
+    known_words_set: set[str] = set()
+    for card in all_cards:
+        for tag in card.tags:
+            if tag.startswith("word::"):
+                known_words_set.add(tag[6:])  # strip "word::" prefix
+
     for cat, data in all_categories.items():
         for word_str in data["words"]:
-            tag = f"word::{word_str}"
-            cards = anki.search_cards(f'tag:"{tag}"', limit=1)
-            if cards:
+            if word_str in known_words_set:
                 data["known"] += 1
                 data["known_words"].append(word_str)
 
@@ -2560,11 +2580,9 @@ def _load_vocab_list() -> list[dict]:
 
 def _save_vocab_list(items: list[dict]) -> None:
     """Save the vocab staging list to disk."""
-    from .paths import VOCAB_LIST_FILE, ensure_data_dir
-    import json
+    from .paths import VOCAB_LIST_FILE, ensure_data_dir, atomic_json_write
     ensure_data_dir()
-    with open(VOCAB_LIST_FILE, "w") as f:
-        json.dump(items, f, indent=2, ensure_ascii=False)
+    atomic_json_write(VOCAB_LIST_FILE, items)
 
 
 @handler("add_to_vocab_list")

@@ -464,3 +464,51 @@ class TestNetworkHandlers:
         ]
         for tool_name in network_tools:
             assert tool_name in HANDLERS, f"Handler '{tool_name}' not registered"
+
+
+class TestBugfixRegressions:
+    """Regression tests to prevent re-introduction of fixed bugs."""
+
+    def test_check_word_exists_uses_tag_query(self):
+        """Bug fix: check_word_exists must use tag:'word::X' query, not wildcard *X*."""
+        anki = MagicMock()
+        anki.search_cards.return_value = []
+        HANDLERS["check_word_exists"](anki, {"word": "gato"})
+        query = anki.search_cards.call_args[0][0]
+        assert 'tag:' in query, f"Expected tag-based query, got: {query}"
+        assert 'word::gato' in query, f"Expected word::gato in query, got: {query}"
+
+    def test_check_word_exists_lowercases_word(self):
+        """Bug fix: check_word_exists must lowercase the word for tag matching."""
+        anki = MagicMock()
+        anki.search_cards.return_value = []
+        HANDLERS["check_word_exists"](anki, {"word": "GATO"})
+        query = anki.search_cards.call_args[0][0]
+        assert 'word::gato' in query, f"Expected lowercase word::gato, got: {query}"
+
+    def test_check_word_exists_with_deck(self):
+        """Bug fix: check_word_exists with deck should still use tag-based matching."""
+        anki = MagicMock()
+        anki.search_cards.return_value = []
+        HANDLERS["check_word_exists"](anki, {"word": "gato", "deck_name": "Spanish"})
+        query = anki.search_cards.call_args[0][0]
+        assert 'tag:' in query, f"Expected tag-based query, got: {query}"
+        assert 'deck:"Spanish"' in query, f"Expected deck filter in query, got: {query}"
+
+    def test_find_card_by_word_uses_tag_query(self):
+        """Bug fix: find_card_by_word must use tag-based matching."""
+        anki = MagicMock()
+        anki.search_cards.return_value = []
+        HANDLERS["find_card_by_word"](anki, {"word": "hablar"})
+        query = anki.search_cards.call_args[0][0]
+        assert 'tag:' in query, f"Expected tag-based query, got: {query}"
+        assert 'word::hablar' in query
+
+    def test_check_words_exist_uses_tag_query(self):
+        """Bug fix: check_words_exist must use tag-based matching for each word."""
+        anki = MagicMock()
+        anki.search_cards.return_value = []
+        HANDLERS["check_words_exist"](anki, {"words": ["gato", "perro"]})
+        for call_args in anki.search_cards.call_args_list:
+            query = call_args[0][0]
+            assert 'tag:' in query, f"Expected tag-based query, got: {query}"

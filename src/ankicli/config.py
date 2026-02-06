@@ -1,9 +1,10 @@
 """Configuration management for ankicli."""
 
 import json
+import shutil
 from dataclasses import dataclass, field, asdict
 
-from .paths import DATA_DIR, CONFIG_FILE
+from .paths import DATA_DIR, CONFIG_FILE, atomic_json_write
 
 # Available Claude models with their specifications
 CLAUDE_MODELS: dict[str, dict] = {
@@ -62,7 +63,12 @@ def load_config() -> Config:
                 **{k: v for k, v in data.items() if k in Config.__dataclass_fields__}
             )
         except (json.JSONDecodeError, TypeError):
-            pass
+            # Back up corrupted config before overwriting with defaults
+            backup_path = CONFIG_FILE.with_suffix(".json.bak")
+            try:
+                shutil.copy2(CONFIG_FILE, backup_path)
+            except OSError:
+                pass
 
     # Return defaults and save them
     config = Config()
@@ -73,8 +79,7 @@ def load_config() -> Config:
 def save_config(config: Config) -> None:
     """Save config to disk."""
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    with open(CONFIG_FILE, "w") as f:
-        json.dump(asdict(config), f, indent=2)
+    atomic_json_write(CONFIG_FILE, asdict(config))
 
 
 def get_tool_notes(config: Config) -> dict[str, str]:

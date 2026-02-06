@@ -7,7 +7,7 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from .paths import CEFR_CACHE_FILE, DATA_DIR, ensure_data_dir
+from .paths import CEFR_CACHE_FILE, DATA_DIR, ensure_data_dir, atomic_json_write
 
 # Where the vocabulary/grammar JSON files live
 _CEFR_DIR = Path(__file__).parent / "data" / "cefr"
@@ -98,22 +98,25 @@ class CEFRData:
                     raw = json.loads(vocab_file.read_text(encoding="utf-8"))
                     words = []
                     for entry in raw:
-                        w = CEFRWord(
-                            word=entry["word"],
-                            english=entry["english"],
-                            pos=entry["pos"],
-                            gender=entry.get("gender"),
-                            category=entry["category"],
-                            subcategory=entry.get("subcategory", ""),
-                            tags=entry.get("tags", []),
-                            level=level,
-                            cognate_type=entry.get("cognate_type"),
-                        )
-                        words.append(w)
-                        # Index by lowercase word for fast lookup
-                        self._word_index[w.word.lower()] = (level, w)
+                        try:
+                            w = CEFRWord(
+                                word=entry["word"],
+                                english=entry["english"],
+                                pos=entry["pos"],
+                                gender=entry.get("gender"),
+                                category=entry.get("category", ""),
+                                subcategory=entry.get("subcategory", ""),
+                                tags=entry.get("tags", []),
+                                level=level,
+                                cognate_type=entry.get("cognate_type"),
+                            )
+                            words.append(w)
+                            # Index by lowercase word for fast lookup
+                            self._word_index[w.word.lower()] = (level, w)
+                        except (KeyError, TypeError):
+                            continue
                     self._words[level] = words
-                except (json.JSONDecodeError, KeyError):
+                except json.JSONDecodeError:
                     self._words[level] = []
             else:
                 self._words[level] = []
@@ -125,19 +128,22 @@ class CEFRData:
                     raw = json.loads(grammar_file.read_text(encoding="utf-8"))
                     concepts = []
                     for entry in raw:
-                        g = CEFRGrammarConcept(
-                            id=entry["id"],
-                            concept=entry["concept"],
-                            category=entry.get("category", ""),
-                            description=entry.get("description", ""),
-                            key_verbs=entry.get("key_verbs", []),
-                            common_errors=entry.get("common_errors", []),
-                            practice_patterns=entry.get("practice_patterns", []),
-                            level=level,
-                        )
-                        concepts.append(g)
+                        try:
+                            g = CEFRGrammarConcept(
+                                id=entry.get("id", ""),
+                                concept=entry.get("concept", ""),
+                                category=entry.get("category", ""),
+                                description=entry.get("description", ""),
+                                key_verbs=entry.get("key_verbs", []),
+                                common_errors=entry.get("common_errors", []),
+                                practice_patterns=entry.get("practice_patterns", []),
+                                level=level,
+                            )
+                            concepts.append(g)
+                        except (KeyError, TypeError):
+                            continue
                     self._grammar[level] = concepts
-                except (json.JSONDecodeError, KeyError):
+                except json.JSONDecodeError:
                     self._grammar[level] = []
             else:
                 self._grammar[level] = []
@@ -283,12 +289,13 @@ def save_progress_cache(progress: dict[str, LevelProgress]) -> None:
             "words_known": lp.words_known,
             "words_total": lp.words_total,
             "matched_words": lp.matched_words,
+            "unknown_words": lp.unknown_words,
             "categories": {
                 k: {"known": v.known, "total": v.total}
                 for k, v in lp.categories.items()
             },
         }
-    CEFR_CACHE_FILE.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+    atomic_json_write(CEFR_CACHE_FILE, data)
 
 
 def load_progress_cache() -> dict[str, LevelProgress] | None:
@@ -304,6 +311,7 @@ def load_progress_cache() -> dict[str, LevelProgress] | None:
                 words_known=lp_data["words_known"],
                 words_total=lp_data["words_total"],
                 matched_words=lp_data.get("matched_words", []),
+                unknown_words=lp_data.get("unknown_words", []),
             )
             for cat_key, cat_data in lp_data.get("categories", {}).items():
                 lp.categories[cat_key] = CategoryProgress(

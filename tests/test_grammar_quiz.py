@@ -395,13 +395,43 @@ class TestParseQuizQuestions:
     def test_parse_fills_defaults(self):
         response = json.dumps([{
             "question_text": "Q?",
+            "question_type": "",
+            "correct_answer": "a",
             "grammar_topic": "t",
             "cefr_level": "A1",
         }])
         questions = parse_quiz_questions(response)
-        assert questions[0].question_type == "fill_in_blank"  # default
-        assert questions[0].correct_answer == ""
+        assert len(questions) == 1
+        assert questions[0].question_type == ""
         assert questions[0].options == []
+
+    def test_parse_skips_empty_question_text(self):
+        """Fix #38: Questions with empty question_text are skipped."""
+        response = json.dumps([
+            {"question_text": "", "correct_answer": "a", "grammar_topic": "t", "cefr_level": "A1"},
+            {"question_text": "Q?", "correct_answer": "b", "grammar_topic": "t", "cefr_level": "A1"},
+        ])
+        questions = parse_quiz_questions(response)
+        assert len(questions) == 1
+        assert questions[0].correct_answer == "b"
+
+    def test_parse_skips_empty_correct_answer(self):
+        """Fix #38: Questions with empty correct_answer are skipped."""
+        response = json.dumps([
+            {"question_text": "Q?", "correct_answer": "", "grammar_topic": "t", "cefr_level": "A1"},
+            {"question_text": "Q2?", "correct_answer": "b", "grammar_topic": "t", "cefr_level": "A1"},
+        ])
+        questions = parse_quiz_questions(response)
+        assert len(questions) == 1
+        assert questions[0].question_text == "Q2?"
+
+    def test_parse_skips_whitespace_only_fields(self):
+        """Fix #38: Questions with whitespace-only required fields are skipped."""
+        response = json.dumps([
+            {"question_text": "  ", "correct_answer": "a", "grammar_topic": "t", "cefr_level": "A1"},
+        ])
+        questions = parse_quiz_questions(response)
+        assert len(questions) == 0
 
 
 class TestBuildPrompts:
