@@ -1,3 +1,4 @@
+.venv/bin/python -m ankicli chat  
 # Anki AI Agent
 
 An AI-powered command-line agent that manages your Anki flashcards through natural conversation. Powered by Claude, it autonomously decides which tools to use, chains operations together, and handles complex card management tasks.

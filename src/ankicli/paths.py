@@ -55,6 +55,9 @@ PROGRESS_HISTORY_FILE = DATA_DIR / "progress_history.json"
 # New vocab staging list
 VOCAB_LIST_FILE = DATA_DIR / "new_vocab.json"
 
+# Reminders
+REMINDERS_FILE = DATA_DIR / "reminders.json"
+
 
 def ensure_data_dir() -> None:
     """Ensure the data directory exists."""

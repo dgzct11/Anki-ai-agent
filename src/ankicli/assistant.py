@@ -15,10 +15,10 @@ load_dotenv()
 load_dotenv(Path(__file__).parent.parent.parent / ".env")
 
 from .client import AnkiClient, AnkiConnectError
-from .config import load_config, save_config, get_model_specs, format_tool_notes_display
+from .config import load_config, get_model_specs
 from .conversation_store import load_conversation, save_conversation
 from .delegate import CardDelegateProcessor, ProgressEvent
-from .learning_summary import load_summary, save_summary, format_summary_as_text
+from .learning_summary import load_summary
 from .tool_handlers import HANDLERS
 from .tools import ANKI_TOOLS
 
@@ -297,7 +297,9 @@ Build vocabulary networks, not isolated flashcards. After adding a card:
 morphological family, collocations, thematic links, confusables). Use show_word_connections to display them.
 
 **V3 - Morphological families:** Use get_morphological_family to find word relatives (-cion, -mente,
--dor, -able, des-, re-). Suggest creating cards for unknown family members.
+-dor, -able, des-, re-). IMPORTANT: After adding ANY card, the tool will show related word family
+members not yet in the deck. Always ask the user if they want to add those related words too
+(e.g. "I see 'educación' is related to 'educar'. Want me to add 'educador' and 'educable' too?").
 
 **V4 - Disambiguation practice:** Use get_disambiguation_practice for confusable pairs (ser/estar,
 por/para, saber/conocer). INTERNAL practice mode, not Anki cards. Use show_disambiguation_pairs to list all.
@@ -744,6 +746,26 @@ def build_system_prompt(*, general_note: str | None = None, extra_sections: list
         prompt += f"\n\n{student_context}"
     if general_note:
         prompt += f"\n\n## Active User Preferences\n\nIMPORTANT - The user has set these global preferences. Always follow them:\n{general_note}"
+
+    # Inject due reminders
+    try:
+        from datetime import datetime
+        from .tool_handlers import _load_reminders
+        reminders = _load_reminders()
+        now = datetime.now()
+        due = [r for r in reminders if datetime.fromisoformat(r.get("remind_at", "9999-12-31")) <= now]
+        if due:
+            lines = ["## Active Reminders", "", "You have reminders that are now due. Mention these to the user:"]
+            for r in due:
+                rid = r.get("id", "?")
+                msg = r.get("message", "?")
+                remind_at = datetime.fromisoformat(r["remind_at"])
+                time_label = remind_at.strftime("%b %d %I:%M %p")
+                lines.append(f"- [{rid}] \"{msg}\" (was set for {time_label})")
+            prompt += "\n\n" + "\n".join(lines)
+    except Exception:
+        pass  # Don't break the prompt if reminders fail to load
+
     return prompt
 
 

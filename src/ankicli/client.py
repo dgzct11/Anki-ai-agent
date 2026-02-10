@@ -31,10 +31,22 @@ def _request(action: str, **params) -> Any:
         req = urllib.request.Request(ANKI_CONNECT_URL, payload)
         req.add_header("Content-Type", "application/json")
         response = urllib.request.urlopen(req, timeout=10)
-        result = json.loads(response.read().decode("utf-8"))
+        raw = response.read().decode("utf-8")
     except urllib.error.URLError as e:
         raise ConnectionError(
             "Cannot connect to Anki. Make sure Anki is running with AnkiConnect installed."
+        ) from e
+    except TimeoutError as e:
+        raise ConnectionError(
+            "Anki is not responding (timed out after 10s). "
+            "Check if Anki is frozen or busy syncing."
+        ) from e
+
+    try:
+        result = json.loads(raw)
+    except json.JSONDecodeError as e:
+        raise AnkiConnectError(
+            f"Invalid response from AnkiConnect for action '{action}': {raw[:200]}"
         ) from e
 
     if result.get("error"):
@@ -89,7 +101,11 @@ class AnkiClient:
             # Get deck stats
             try:
                 stats = _request("getDeckStats", decks=[name])
-                stat = stats.get(str(list(stats.keys())[0]), {}) if stats else {}
+                if stats and stats.keys():
+                    deck_id = next(iter(stats.keys()))
+                    stat = stats[deck_id]
+                else:
+                    stat = {}
                 decks.append(Deck(
                     id=str(stat.get("deck_id", name)),
                     name=name,
@@ -97,7 +113,7 @@ class AnkiClient:
                     learn_count=stat.get("learn_count", 0),
                     review_count=stat.get("review_count", 0),
                 ))
-            except Exception:
+            except AnkiConnectError:
                 decks.append(Deck(id=name, name=name))
 
         return decks
@@ -115,7 +131,7 @@ class AnkiClient:
                     name=name,
                     fields=fields or []
                 ))
-            except Exception:
+            except AnkiConnectError:
                 note_types.append(NoteType(id=name, name=name))
 
         return note_types
@@ -182,8 +198,38 @@ class AnkiClient:
                 },
             })
 
-        result = _request("addNotes", notes=notes)
-        return result
+        # addNotes returns note IDs (null for failures) in the result field,
+        # but also sets the error field for duplicates. We need the result
+        # even when there are errors, so bypass _request and parse manually.
+        payload = json.dumps({
+            "action": "addNotes",
+            "version": 6,
+            "params": {"notes": notes},
+        }).encode("utf-8")
+
+        try:
+            req = urllib.request.Request(ANKI_CONNECT_URL, payload)
+            req.add_header("Content-Type", "application/json")
+            response = urllib.request.urlopen(req, timeout=10)
+            raw = response.read().decode("utf-8")
+        except urllib.error.URLError as e:
+            raise ConnectionError(
+                "Cannot connect to Anki. Make sure Anki is running with AnkiConnect installed."
+            ) from e
+
+        parsed = json.loads(raw)
+        result = parsed.get("result")
+
+        # If we got a result list, return it (None entries = duplicates/failures)
+        if isinstance(result, list):
+            return result
+
+        # No result at all — raise whatever error AnkiConnect reported
+        error = parsed.get("error")
+        if error:
+            raise AnkiConnectError(error)
+
+        return []
 
     def search_cards(self, query: str, limit: int = 50) -> list[Card]:
         """
@@ -263,7 +309,7 @@ class AnkiClient:
 
         _request("updateNote", note=note_update)
 
-    def update_notes(self, updates: list[dict]) -> list[bool]:
+    def update_notes(self, updates: list[dict]) -> list[tuple[bool, str]]:
         """
         Update multiple notes at once.
 
@@ -271,7 +317,7 @@ class AnkiClient:
             updates: List of dicts with 'note_id' and optional 'front', 'back', 'tags'
 
         Returns:
-            List of success booleans
+            List of (success, message) tuples
         """
         results = []
         for update in updates:
@@ -282,9 +328,11 @@ class AnkiClient:
                     back=update.get("back"),
                     tags=update.get("tags"),
                 )
-                results.append(True)
-            except Exception:
-                results.append(False)
+                results.append((True, "OK"))
+            except AnkiConnectError as e:
+                results.append((False, str(e)))
+            except Exception as e:
+                results.append((False, f"Unexpected error: {e}"))
         return results
 
     def delete_notes(self, note_ids: list[int]) -> None:
@@ -307,6 +355,8 @@ class AnkiClient:
             return None
 
         note = notes_info[0]
+        if not note.get("noteId"):
+            return None
         fields = note.get("fields", {})
         return Card(
             id=str(note.get("noteId", "")),
@@ -327,29 +377,6 @@ class AnkiClient:
     def remove_tags(self, note_ids: list[int], tags: str) -> None:
         """Remove tags from notes (space-separated tag string)."""
         _request("removeTags", notes=note_ids, tags=tags)
-
-    def find_and_replace(
-        self,
-        note_ids: list[int],
-        field: str,
-        search: str,
-        replace: str,
-        regex: bool = False,
-    ) -> int:
-        """
-        Find and replace text in a field across multiple notes.
-
-        Returns:
-            Number of notes modified
-        """
-        return _request(
-            "findAndReplace",
-            nids=note_ids,
-            field=field,
-            search=search,
-            replacement=replace,
-            regex=regex,
-        )
 
     def get_deck_stats(self, deck_name: str) -> dict:
         """
@@ -427,17 +454,21 @@ class AnkiClient:
             Dict with keys "again", "hard", "good", "easy" mapping to
             human-readable interval strings like "10 min", "2 days", etc.
         """
-        card_ids = _request("findCards", query=f"nid:{note_id}")
+        unknown = {"again": "?", "hard": "?", "good": "?", "easy": "?"}
+        try:
+            card_ids = _request("findCards", query=f"nid:{note_id}")
+        except AnkiConnectError:
+            return unknown
         if not card_ids:
-            return {"again": "?", "hard": "?", "good": "?", "easy": "?"}
+            return unknown
 
         try:
             cards_info = _request("cardsInfo", cards=[card_ids[0]])
             if not cards_info:
-                return {"again": "?", "hard": "?", "good": "?", "easy": "?"}
+                return unknown
             info = cards_info[0]
         except (AnkiConnectError, IndexError):
-            return {"again": "?", "hard": "?", "good": "?", "easy": "?"}
+            return unknown
 
         interval = info.get("interval", 0)  # current interval in days (negative = seconds)
         factor = info.get("factor", 2500) / 1000  # ease factor (e.g., 2.5)
@@ -474,85 +505,210 @@ class AnkiClient:
             "easy": _format_interval(easy_ivl),
         }
 
-    def answer_card(self, note_id: int, ease: int) -> tuple[bool, str]:
-        """Mark a card as reviewed via answerCards (preserves full SRS).
+    # ------------------------------------------------------------------
+    # Review helpers
+    # ------------------------------------------------------------------
 
-        answerCards calls Anki's native scheduler.answerCard() — the exact
-        same method the GUI uses. It only works if the card is currently
-        in Anki's review queue. No fallback to setDueDate since that
-        corrupts SRS data (no ease factor update, no FSRS stability, etc).
+    def suspend_cards(self, card_ids: list[int]) -> None:
+        """Suspend cards so they are excluded from review."""
+        if card_ids:
+            _request("suspend", cards=card_ids)
+
+    def unsuspend_cards(self, card_ids: list[int]) -> None:
+        """Unsuspend previously suspended cards.
+
+        Exits the review session first (via guiDeckBrowser) to avoid
+        Anki search index conflicts, then unsuspends cards one at a time
+        to avoid UNIQUE constraint DB errors that occur with batch unsuspend.
+        """
+        if not card_ids:
+            return
+
+        # Exit review session first — avoids Anki DB conflicts
+        try:
+            _request("guiDeckBrowser")
+        except AnkiConnectError:
+            pass
+
+        # Unsuspend one at a time to avoid UNIQUE constraint DB errors
+        for cid in card_ids:
+            try:
+                _request("unsuspend", cards=[cid])
+            except AnkiConnectError:
+                pass  # Card may already be unsuspended or deleted
+
+    def _answer_cards_direct(self, answers: list[dict]) -> list:
+        """Call answerCards, retrying once via guiDeckBrowser if needed.
+
+        Anki's V3 scheduler rejects answerCards with "not at top of queue"
+        when the GUI reviewer is active. Calling guiDeckBrowser and retrying
+        clears this state and allows answerCards to work for any card.
+
+        Args:
+            answers: List of {"cardId": int, "ease": int} dicts.
+
+        Returns:
+            List of booleans from answerCards.
+
+        Raises:
+            AnkiConnectError: If answerCards fails even after retry.
+        """
+        try:
+            result = _request("answerCards", answers=answers)
+            if isinstance(result, list):
+                return result
+        except AnkiConnectError as e:
+            if "not at top of queue" not in str(e):
+                raise
+
+        # Scheduler rejected it — exit reviewer and retry once
+        try:
+            _request("guiDeckBrowser")
+        except AnkiConnectError:
+            pass
+
+        return _request("answerCards", answers=answers)
+
+    def answer_card(self, note_id: int, ease: int, deck_name: str | None = None) -> tuple[bool, str]:
+        """Mark a card as reviewed via AnkiConnect's answerCards.
+
+        Resolves the note ID to a card ID and calls answerCards directly.
+        If Anki's V3 scheduler rejects the call (e.g. because the GUI
+        reviewer is open), exits the reviewer and retries once.
 
         Args:
             note_id: The note ID to answer. Will find associated card IDs.
             ease: Ease rating (1=Again, 2=Hard, 3=Good, 4=Easy).
+            deck_name: Unused, kept for API compatibility.
 
         Returns:
             Tuple of (success: bool, message: str).
-            On failure, message explains why so it can be shown to the user.
         """
-        card_ids = _request("findCards", query=f"nid:{note_id}")
+        try:
+            card_ids = _request("findCards", query=f"nid:{note_id}")
+        except AnkiConnectError as e:
+            return False, f"Could not look up card for note {note_id}: {e}"
         if not card_ids:
             return False, f"No card found for note ID {note_id}"
 
+        target_card_id = card_ids[0]
+
+        # Pre-condition: ensure non-new cards are answerable by the scheduler.
+        # Skip for new cards (type=0) — setDueDate would corrupt their SRS
+        # by converting them to review cards and skipping learning steps.
         try:
-            result = _request("answerCards", answers=[{"cardId": card_ids[0], "ease": ease}])
+            info = _request("cardsInfo", cards=[target_card_id])
+            if info and info[0].get("type", 0) != 0:
+                _request("setDueDate", cards=[target_card_id], days="0")
+        except AnkiConnectError:
+            pass
+
+        try:
+            result = self._answer_cards_direct([{"cardId": target_card_id, "ease": ease}])
             if isinstance(result, list) and result and result[0] is True:
                 return True, "OK"
-            return False, "Card could not be answered"
+            return False, f"answerCards returned {result}"
         except AnkiConnectError as e:
-            return False, str(e)
+            return False, f"answerCards failed: {e}"
 
-    def answer_cards_batch(self, note_ease_pairs: list[tuple[int, int]]) -> dict[int, tuple[bool, str]]:
-        """Answer multiple cards in a single answerCards API call.
+    def answer_cards_batch(
+        self,
+        note_ease_pairs: list[tuple[int, int]],
+        deck_name: str | None = None,
+    ) -> dict[int, tuple[bool, str]]:
+        """Answer multiple cards via AnkiConnect's answerCards.
 
-        Batching all cards in one call lets Anki's scheduler process them
-        sequentially, which is more reliable than separate calls where
-        the queue state changes between requests.
+        Resolves each note ID to a card ID, then answers all cards in a
+        single API call. If Anki's V3 scheduler rejects the call (e.g.
+        because the GUI reviewer is open), exits the reviewer and retries.
 
         Args:
             note_ease_pairs: List of (note_id, ease) tuples.
+            deck_name: Unused, kept for API compatibility.
 
         Returns:
             Dict mapping note_id -> (success, message).
         """
-        # Resolve all note IDs to card IDs first
-        answers = []
+        if not note_ease_pairs:
+            return {}
+
+        # Resolve note IDs to card IDs and build answers list
         note_to_card: dict[int, int] = {}
+        answers: list[dict] = []
+        resolve_errors: dict[int, str] = {}
+
         for note_id, ease in note_ease_pairs:
-            card_ids = _request("findCards", query=f"nid:{note_id}")
+            try:
+                card_ids = _request("findCards", query=f"nid:{note_id}")
+            except AnkiConnectError as e:
+                resolve_errors[note_id] = f"Could not find card: {e}"
+                continue
             if card_ids:
-                answers.append({"cardId": card_ids[0], "ease": ease})
                 note_to_card[note_id] = card_ids[0]
+                answers.append({"cardId": card_ids[0], "ease": ease})
 
+        # If no cards were resolved, return errors for all
         if not answers:
-            return {nid: (False, "No card found") for nid, _ in note_ease_pairs}
+            return {
+                nid: (False, resolve_errors.get(nid, "No card found"))
+                for nid, _ in note_ease_pairs
+            }
 
-        # Single batched API call
+        # Pre-condition: setDueDate ensures non-new cards are answerable.
+        # Without this, Anki's V3 scheduler rejects cards that aren't "due"
+        # with "not at top of queue" error.
+        # IMPORTANT: Do NOT call setDueDate on new cards (type=0) — it converts
+        # them to review cards, skipping learning steps and corrupting SRS.
+        # answerCards works directly on new cards without pre-conditioning.
+        all_card_ids = [a["cardId"] for a in answers]
         try:
-            results = _request("answerCards", answers=answers)
+            cards_info = _request("cardsInfo", cards=all_card_ids)
+            non_new_ids = [
+                c["cardId"] for c in (cards_info or [])
+                if c.get("type", 0) != 0
+            ]
+            if non_new_ids:
+                _request("setDueDate", cards=non_new_ids, days="0")
+        except AnkiConnectError:
+            pass  # Best effort — answerCards might still work
+
+        # Answer all cards in a single API call
+        try:
+            results = self._answer_cards_direct(answers)
         except AnkiConnectError as e:
-            return {nid: (False, str(e)) for nid, _ in note_ease_pairs}
+            # Batch failed — try one at a time
+            results = []
+            for answer in answers:
+                try:
+                    r = _request("answerCards", answers=[answer])
+                    results.append(r[0] if isinstance(r, list) and r else False)
+                except AnkiConnectError:
+                    results.append(False)
 
-        # Map results back to note IDs
+        # Build output from results
         output: dict[int, tuple[bool, str]] = {}
-        card_to_note = {cid: nid for nid, cid in note_to_card.items()}
 
-        if isinstance(results, list):
-            for i, answer in enumerate(answers):
-                cid = answer["cardId"]
-                nid = card_to_note.get(cid, cid)
-                if i < len(results) and results[i] is True:
-                    output[nid] = (True, "OK")
+        for note_id, _ in note_ease_pairs:
+            if note_id in resolve_errors:
+                output[note_id] = (False, resolve_errors[note_id])
+                continue
+            card_id = note_to_card.get(note_id)
+            if card_id is None:
+                output[note_id] = (False, "No card found")
+                continue
+
+            # Find this card's result in the answers list
+            answer_idx = next(
+                (i for i, a in enumerate(answers) if a["cardId"] == card_id),
+                None,
+            )
+            if answer_idx is not None and isinstance(results, list) and answer_idx < len(results):
+                if results[answer_idx] is True:
+                    output[note_id] = (True, "OK")
                 else:
-                    output[nid] = (False, "Card could not be answered")
-        else:
-            for nid, _ in note_ease_pairs:
-                output[nid] = (False, "Unexpected response from answerCards")
-
-        # Fill in any note IDs that weren't in the batch (no card found)
-        for nid, _ in note_ease_pairs:
-            if nid not in output:
-                output[nid] = (False, "No card found")
+                    output[note_id] = (False, "Anki scheduler rejected the card")
+            else:
+                output[note_id] = (False, "No result from answerCards")
 
         return output
 
@@ -575,23 +731,20 @@ class AnkiClient:
             return []
 
         reviews = []
-        # Try to get review data via cardsInfo which has interval/ease/due info
-        try:
-            cards_info = _request("cardsInfo", cards=card_ids[:500])
-            for info in (cards_info or []):
-                reviews.append({
-                    "card_id": info.get("cardId"),
-                    "note_id": info.get("note"),
-                    "interval": info.get("interval", 0),
-                    "ease": info.get("factor", 0),
-                    "due": info.get("due", 0),
-                    "type": info.get("type", 0),  # 0=new, 1=learning, 2=review, 3=relearn
-                    "queue": info.get("queue", 0),
-                    "reps": info.get("reps", 0),
-                    "lapses": info.get("lapses", 0),
-                })
-        except AnkiConnectError:
-            pass
+        # Get review data via cardsInfo which has interval/ease/due info
+        cards_info = _request("cardsInfo", cards=card_ids[:500])
+        for info in (cards_info or []):
+            reviews.append({
+                "card_id": info.get("cardId"),
+                "note_id": info.get("note"),
+                "interval": info.get("interval", 0),
+                "ease": info.get("factor", 0),
+                "due": info.get("due", 0),
+                "type": info.get("type", 0),  # 0=new, 1=learning, 2=review, 3=relearn
+                "queue": info.get("queue", 0),
+                "reps": info.get("reps", 0),
+                "lapses": info.get("lapses", 0),
+            })
 
         return reviews
 

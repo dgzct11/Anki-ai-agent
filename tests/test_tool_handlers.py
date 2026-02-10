@@ -512,3 +512,87 @@ class TestBugfixRegressions:
         for call_args in anki.search_cards.call_args_list:
             query = call_args[0][0]
             assert 'tag:' in query, f"Expected tag-based query, got: {query}"
+
+
+class TestReminderHandlers:
+    """Tests for set_reminder, list_reminders, remove_reminder handlers."""
+
+    def test_set_reminder(self, tmp_path, monkeypatch):
+        """set_reminder writes a reminder to disk and returns confirmation."""
+        reminders_file = tmp_path / "reminders.json"
+        monkeypatch.setattr("ankicli.tool_handlers._load_reminders", lambda: [])
+
+        saved = []
+        def fake_save(reminders):
+            saved.extend(reminders)
+        monkeypatch.setattr("ankicli.tool_handlers._save_reminders", fake_save)
+
+        anki = MagicMock()
+        result = HANDLERS["set_reminder"](anki, {
+            "message": "Review irregular verbs",
+            "remind_at": "2025-06-15T09:00:00",
+        })
+        assert "Review irregular verbs" in result
+        assert "Jun 15 2025" in result
+        assert len(saved) == 1
+        assert saved[0]["message"] == "Review irregular verbs"
+        assert saved[0]["remind_at"] == "2025-06-15T09:00:00"
+        assert len(saved[0]["id"]) == 4  # 4-char hex
+
+    def test_set_reminder_invalid_datetime(self, monkeypatch):
+        """set_reminder returns error for invalid datetime."""
+        anki = MagicMock()
+        result = HANDLERS["set_reminder"](anki, {
+            "message": "test",
+            "remind_at": "not-a-date",
+        })
+        assert "Invalid datetime" in result
+
+    def test_list_reminders_empty(self, monkeypatch):
+        """list_reminders returns message when no reminders."""
+        monkeypatch.setattr("ankicli.tool_handlers._load_reminders", lambda: [])
+        anki = MagicMock()
+        result = HANDLERS["list_reminders"](anki, {})
+        assert "No reminders" in result
+
+    def test_list_reminders_with_data(self, monkeypatch):
+        """list_reminders shows pending and triggered reminders."""
+        from datetime import datetime, timedelta
+        past = (datetime.now() - timedelta(hours=1)).isoformat()
+        future = (datetime.now() + timedelta(days=1)).isoformat()
+
+        monkeypatch.setattr("ankicli.tool_handlers._load_reminders", lambda: [
+            {"id": "ab12", "message": "Past reminder", "remind_at": past},
+            {"id": "cd34", "message": "Future reminder", "remind_at": future},
+        ])
+        anki = MagicMock()
+        result = HANDLERS["list_reminders"](anki, {})
+        assert "ab12" in result
+        assert "Past reminder" in result
+        assert "TRIGGERED" in result
+        assert "cd34" in result
+        assert "Future reminder" in result
+        assert "pending" in result
+
+    def test_remove_reminder(self, monkeypatch):
+        """remove_reminder deletes the reminder and saves."""
+        monkeypatch.setattr("ankicli.tool_handlers._load_reminders", lambda: [
+            {"id": "ab12", "message": "Test", "remind_at": "2025-06-15T09:00:00"},
+            {"id": "cd34", "message": "Keep", "remind_at": "2025-07-01T10:00:00"},
+        ])
+        saved = []
+        monkeypatch.setattr("ankicli.tool_handlers._save_reminders", lambda r: saved.extend(r))
+
+        anki = MagicMock()
+        result = HANDLERS["remove_reminder"](anki, {"reminder_id": "ab12"})
+        assert "ab12" in result
+        assert "removed" in result.lower()
+        assert len(saved) == 1
+        assert saved[0]["id"] == "cd34"
+
+    def test_remove_reminder_not_found(self, monkeypatch):
+        """remove_reminder returns error for unknown ID."""
+        monkeypatch.setattr("ankicli.tool_handlers._load_reminders", lambda: [])
+        anki = MagicMock()
+        result = HANDLERS["remove_reminder"](anki, {"reminder_id": "xxxx"})
+        assert "No reminder found" in result

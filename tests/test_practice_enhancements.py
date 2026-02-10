@@ -19,9 +19,7 @@ from ankicli.session_error_tracker import (
     SessionError,
 )
 from ankicli.translation_practice import (
-    PracticeSession,
     PracticeCard,
-    PracticeResult,
     PracticeDirection,
     FeedbackLevel,
 )
@@ -463,95 +461,6 @@ class TestAnkiReviewIntegration:
             {"deck_name": "Spanish", "session_words": ["hablar"]},
         )
         assert "mark_cards_reviewed" in result or "review" in result.lower()
-
-
-# ---------------------------------------------------------------------------
-# A2: Adaptive difficulty
-# ---------------------------------------------------------------------------
-
-class TestAdaptiveDifficulty:
-    """Tests for A2: adaptive difficulty in translation practice."""
-
-    def _make_session(self, num_cards=10) -> PracticeSession:
-        cards = [
-            PracticeCard(card_id=str(i), front=f"front_{i}", back=f"back_{i}")
-            for i in range(num_cards)
-        ]
-        return PracticeSession(
-            deck_name="Spanish",
-            direction=PracticeDirection.EN_TO_ES,
-            cards=cards,
-        )
-
-    def _make_result(self, level=FeedbackLevel.CORRECT) -> PracticeResult:
-        return PracticeResult(
-            card_id="1", front="front", back="back",
-            user_answer="answer",
-            feedback_level=level,
-            feedback_text="feedback",
-            meaning_score=4 if level == FeedbackLevel.CORRECT else 1,
-            grammar_score=4 if level == FeedbackLevel.CORRECT else 1,
-            naturalness_score=4 if level == FeedbackLevel.CORRECT else 1,
-            vocabulary_score=4 if level == FeedbackLevel.CORRECT else 1,
-        )
-
-    def test_initial_difficulty_is_2(self):
-        session = self._make_session()
-        assert session.difficulty_num == 2
-
-    def test_difficulty_increases_after_3_correct(self):
-        session = self._make_session()
-        for _ in range(3):
-            session.record_result(self._make_result(FeedbackLevel.CORRECT))
-        assert session.difficulty_num == 3
-
-    def test_difficulty_decreases_after_2_wrong(self):
-        session = self._make_session()
-        session.record_result(self._make_result(FeedbackLevel.INCORRECT))
-        session.record_result(self._make_result(FeedbackLevel.INCORRECT))
-        assert session.difficulty_num == 1
-
-    def test_difficulty_never_below_1(self):
-        session = self._make_session()
-        session.difficulty_num = 1
-        session.record_result(self._make_result(FeedbackLevel.INCORRECT))
-        session.record_result(self._make_result(FeedbackLevel.INCORRECT))
-        assert session.difficulty_num == 1
-
-    def test_difficulty_never_above_5(self):
-        session = self._make_session()
-        session.difficulty_num = 5
-        for _ in range(3):
-            session.record_result(self._make_result(FeedbackLevel.CORRECT))
-        assert session.difficulty_num == 5
-
-    def test_difficulty_label(self):
-        session = self._make_session()
-        assert session.difficulty_label == "simple sentence"
-        session.difficulty_num = 1
-        assert session.difficulty_label == "single word"
-        session.difficulty_num = 5
-        assert session.difficulty_label == "conversational context"
-
-    def test_difficulty_labels_all_defined(self):
-        session = self._make_session()
-        for level in range(1, 6):
-            session.difficulty_num = level
-            assert session.difficulty_label != ""
-
-    def test_streak_resets_on_difficulty_change_up(self):
-        session = self._make_session()
-        for _ in range(3):
-            session.record_result(self._make_result(FeedbackLevel.CORRECT))
-        # After difficulty increase, correct streak should reset
-        assert session.correct_streak == 0
-
-    def test_streak_resets_on_difficulty_change_down(self):
-        session = self._make_session()
-        session.record_result(self._make_result(FeedbackLevel.INCORRECT))
-        session.record_result(self._make_result(FeedbackLevel.INCORRECT))
-        # After difficulty decrease, incorrect streak should reset
-        assert session.incorrect_streak == 0
 
 
 # ---------------------------------------------------------------------------

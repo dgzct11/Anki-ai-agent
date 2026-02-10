@@ -69,6 +69,31 @@ class TestBuildSystemPrompt:
         idx_core = result.index("Anki flashcard assistant")
         assert idx_preference > idx_core
 
+    @patch("ankicli.tool_handlers._load_reminders")
+    def test_includes_triggered_reminders(self, mock_load):
+        """build_system_prompt includes due reminders in output."""
+        from datetime import datetime, timedelta
+        past = (datetime.now() - timedelta(hours=1)).isoformat()
+        mock_load.return_value = [
+            {"id": "ab12", "message": "Review irregular verbs", "remind_at": past},
+        ]
+        result = build_system_prompt()
+        assert "Active Reminders" in result
+        assert "Review irregular verbs" in result
+        assert "ab12" in result
+
+    @patch("ankicli.tool_handlers._load_reminders")
+    def test_excludes_future_reminders(self, mock_load):
+        """build_system_prompt does not show future reminders."""
+        from datetime import datetime, timedelta
+        future = (datetime.now() + timedelta(days=1)).isoformat()
+        mock_load.return_value = [
+            {"id": "ff99", "message": "Future task", "remind_at": future},
+        ]
+        result = build_system_prompt()
+        assert "Active Reminders" not in result
+        assert "Future task" not in result
+
 
 class TestBuildStudentContext:
     """Tests for build_student_context function.

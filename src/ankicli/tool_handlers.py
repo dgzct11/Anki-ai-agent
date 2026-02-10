@@ -62,6 +62,8 @@ def handle_get_deck_stats(anki: AnkiClient, tool_input: dict, **ctx) -> str:
 
 @handler("get_deck_summary")
 def handle_get_deck_summary(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    if not tool_input.get("deck_name"):
+        return "Error: deck_name is required and cannot be empty."
     summary = anki.get_deck_summary(
         tool_input["deck_name"],
         limit=tool_input.get("limit", 100)
@@ -242,7 +244,39 @@ def handle_add_card(anki: AnkiClient, tool_input: dict, **ctx) -> str:
         cefr_tags = [t for t in tags if t.startswith("cefr::") or t.startswith("theme::")]
         if cefr_tags:
             cefr_info = f" [auto-tagged: {', '.join(cefr_tags)}]"
-    return f"Card added successfully (note ID: {note_id}){cefr_info}"
+
+    # Look up morphological family to suggest related words
+    family_suggestion = ""
+    try:
+        from .word_network import get_morphological_family
+        back_text = tool_input["back"]
+        # Extract the main word (first word, strip HTML)
+        import re
+        clean_word = re.sub(r'<[^>]+>', '', back_text).strip().split('\n')[0].split('(')[0].strip().split(',')[0].strip().lower()
+        if clean_word and len(clean_word) >= 3:
+            family = get_morphological_family(clean_word)
+            suggestions = family.get("suggestions", [])
+            if suggestions:
+                # Check which ones are already in the deck
+                deck_name = tool_input["deck_name"]
+                existing = set()
+                try:
+                    existing_cards = anki.get_all_fronts(deck_name, limit=500)
+                    existing_backs = [c.back for c in anki.search_cards(f'deck:"{deck_name}"', limit=500)]
+                    for text in existing_cards + existing_backs:
+                        existing.add(re.sub(r'<[^>]+>', '', text).strip().lower())
+                except Exception:
+                    pass
+                new_suggestions = [s for s in suggestions if s.lower() not in existing]
+                if new_suggestions:
+                    family_suggestion = (
+                        f"\n\nWord family for '{clean_word}': {', '.join(new_suggestions[:6])}"
+                        f"\nAsk the user if they want to add any of these related words."
+                    )
+    except Exception:
+        pass
+
+    return f"Card added successfully (note ID: {note_id}){cefr_info}{family_suggestion}"
 
 
 @handler("add_multiple_cards")
@@ -308,8 +342,15 @@ def handle_update_card(anki: AnkiClient, tool_input: dict, **ctx) -> str:
 def handle_update_multiple_cards(anki: AnkiClient, tool_input: dict, **ctx) -> str:
     updates = tool_input["updates"]
     results = anki.update_notes(updates)
-    successful = sum(results)
-    return f"Updated {successful}/{len(updates)} cards successfully"
+    successful = sum(1 for ok, _ in results if ok)
+    failed = [(updates[i], msg) for i, (ok, msg) in enumerate(results) if not ok]
+    result_str = f"Updated {successful}/{len(updates)} cards successfully"
+    if failed:
+        fail_details = "; ".join(
+            f"note {u.get('note_id', '?')}: {msg}" for u, msg in failed[:5]
+        )
+        result_str += f"\nFailed: {fail_details}"
+    return result_str
 
 
 @handler("delete_cards")
@@ -513,6 +554,8 @@ def handle_remove_tags_from_cards(anki: AnkiClient, tool_input: dict, **ctx) -> 
 @handler("move_cards_to_deck")
 def handle_move_cards_to_deck(anki: AnkiClient, tool_input: dict, **ctx) -> str:
     note_ids = tool_input["note_ids"]
+    if not note_ids:
+        return "No cards to move (empty list)."
     from .client import _request
     card_ids = _request("findCards", query=f"nid:{','.join(map(str, note_ids))}")
     if card_ids:
@@ -684,46 +727,211 @@ def handle_card_subset_delegate(anki: AnkiClient, tool_input: dict, **ctx) -> st
 
 @handler("start_translation_practice")
 def handle_start_translation_practice(anki: AnkiClient, tool_input: dict, **ctx) -> str:
-    from .translation_practice import PracticeDirection, PracticeSession
+    from .translation_practice import PracticeDirection, CardSource, start_session
 
     deck_name = tool_input["deck_name"]
     direction_str = tool_input.get("direction", "en_to_es")
     direction = PracticeDirection(direction_str)
+    count = tool_input.get("count", 10)
+    card_source_str = tool_input.get("card_source", "mixed")
+    card_source = CardSource(card_source_str)
 
     # Check deck exists and has cards
     try:
-        due_cards = anki.get_due_cards(deck_name, limit=5)
-        new_cards = anki.get_new_cards(deck_name, limit=5)
+        due_cards = anki.get_due_cards(deck_name, limit=50)
+        new_cards = anki.get_new_cards(deck_name, limit=50)
     except Exception:
         return f"Could not access deck '{deck_name}'. Make sure it exists and Anki is running."
 
     if not due_cards and not new_cards:
         return f"No cards to practice in '{deck_name}'. All caught up!"
 
-    # Create a minimal session — the practice loop pulls fresh cards each question
-    session = PracticeSession(
-        deck_name=deck_name,
-        direction=direction,
-        cards=[],  # Empty — loop pulls fresh cards dynamically
-    )
-
-    assistant = ctx.get("assistant")
-    if assistant:
-        assistant._practice_session = session
+    # Create session state so subsequent tool calls share context
+    start_session(deck_name, direction, count=count, card_source=card_source)
 
     dir_label = "English -> Spanish" if direction == PracticeDirection.EN_TO_ES else "Spanish -> English"
     due_count = len(due_cards)
     new_count = len(new_cards)
 
+    # Build direction-specific instructions
+    if direction == PracticeDirection.EN_TO_ES:
+        gen_step = (
+            f"3. Generate a natural English sentence using the words' meanings — do NOT reveal the Spanish words\n"
+            f"4. Present the English sentence for the user to translate into Spanish"
+        )
+    else:
+        gen_step = (
+            f"3. Generate a natural Spanish sentence using the target words — do NOT reveal the English meanings\n"
+            f"4. Present the Spanish sentence for the user to translate into English"
+        )
+
     return (
-        f"Practice session starting for deck '{deck_name}'\n"
-        f"Direction: {dir_label}\n"
-        f"Available: {due_count}+ due, {new_count}+ new\n\n"
-        f"The practice loop will now take over. It pulls fresh due cards before each question,\n"
-        f"generates sentences testing 3-5 words, evaluates translations, and marks cards automatically.\n"
-        f"Do NOT generate any questions yourself — the practice loop handles everything.\n"
-        f"Just acknowledge the session is starting."
+        f"Practice session ready for deck '{deck_name}' ({dir_label}).\n"
+        f"Available: {due_count} due, {new_count} new | Target: {count} questions\n\n"
+        f"HOW TO RUN THIS SESSION:\n"
+        f"1. Call generate_practice_question with deck_name='{deck_name}' to get the next question's words\n"
+        f"2. If any words are NEW, show them with their definitions before the question\n"
+        f"{gen_step}\n"
+        f"5. When the user provides a translation, evaluate it inline:\n"
+        f"   - Score each dimension 0-4: Meaning (correct content?), Grammar (conjugation, agreement?), Naturalness (sounds native?), Vocabulary (right word choices?)\n"
+        f"   - 0=completely wrong, 1=major errors, 2=partially correct, 3=correct with minor issues, 4=perfect\n"
+        f"   - Show per-word results (correct/incorrect)\n"
+        f"   - Show the correct translation if wrong\n"
+        f"6. After evaluation, ask the user for ease ratings:\n"
+        f"   1=Again (didn't know it), 2=Hard (struggled), 3=Good (knew with effort), 4=Easy (instant recall)\n"
+        f"7. When the user provides ratings, call mark_cards_reviewed with deck_name='{deck_name}', card_ids, per_card_ease, and card_words\n"
+        f"8. Then call generate_practice_question for the next round\n"
+        f"9. Aim for about {count} questions total. When done or the user wants to stop, call end_practice_session with correct_count, total_count, and weak_words\n\n"
+        f"IMPORTANT: Start by calling generate_practice_question now."
     )
+
+
+@handler("generate_practice_question")
+def handle_generate_practice_question(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    import json
+    import re
+    import random
+    from .translation_practice import CardSource, load_practice_cards, get_session
+
+    deck_name = tool_input["deck_name"]
+    count = tool_input.get("count", 4)
+    count = max(1, min(count, 5))  # Clamp to 1-5
+
+    # Use session state for direction and card deduplication
+    session = get_session()
+    direction = "en_to_es"
+    card_source = CardSource.MIXED
+    if session:
+        direction = session.direction.value
+        card_source = session.card_source
+
+    # Pull cards, filtering out already-served ones.
+    # Try MIXED first, then ALL as fallback to catch any remaining cards.
+    try:
+        cards = load_practice_cards(anki, deck_name, card_source, count=count * 5)
+    except Exception:
+        return f"Could not pull cards from deck '{deck_name}'. Make sure it exists and Anki is running."
+
+    # Filter out cards already served in this session
+    if session:
+        cards = [c for c in cards if c.card_id not in session.served_card_ids]
+
+    # If MIXED/DUE didn't find unserved cards, try ALL to catch stragglers (e.g. new cards)
+    if not cards and card_source != CardSource.ALL:
+        try:
+            all_cards = load_practice_cards(anki, deck_name, CardSource.ALL, count=count * 5)
+            if session:
+                all_cards = [c for c in all_cards if c.card_id not in session.served_card_ids]
+            cards = all_cards
+        except Exception:
+            pass
+
+    if not cards:
+        return f"No more cards available in '{deck_name}'. Call end_practice_session to finish."
+
+    # Pick a subset
+    selected = cards[:count] if len(cards) <= count else random.sample(cards, count)
+
+    # Track served cards in session
+    if session:
+        session.record_served([c.card_id for c in selected])
+
+    # Build structured response
+    card_data = []
+    for card in selected:
+        # Extract the Spanish word from tags (word::xxx)
+        spanish_word = None
+        for tag in card.tags:
+            if tag.startswith("word::"):
+                spanish_word = tag[6:]
+                break
+        # Fallback: strip HTML and take first line of card back
+        if not spanish_word:
+            clean = re.sub(r'<[^>]+>', ' ', card.back).strip()
+            spanish_word = clean.split('\n')[0].split('(')[0].strip()[:40]
+
+        entry = {
+            "card_id": card.card_id,
+            "spanish": spanish_word,
+            "english": card.front,
+            "is_new": card.is_new,
+            "is_due": card.is_due,
+            "tags": card.tags,
+        }
+        # For new words, include extra info so Claude can show definitions
+        if card.is_new:
+            entry["back_content"] = card.back
+
+        card_data.append(entry)
+
+    result = {
+        "cards": card_data,
+        "deck_name": deck_name,
+        "direction": direction,
+    }
+
+    return json.dumps(result, ensure_ascii=False, indent=2)
+
+
+@handler("end_practice_session")
+def handle_end_practice_session(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    from .learning_summary import load_summary, save_summary
+    from .translation_practice import get_session, clear_session
+
+    correct_count = max(0, tool_input["correct_count"])
+    total_count = max(0, tool_input["total_count"])
+    # Clamp correct to total to prevent >100% scores
+    correct_count = min(correct_count, total_count)
+    weak_words = tool_input.get("weak_words", [])
+
+    score_percent = round((correct_count / total_count) * 100, 1) if total_count > 0 else 0
+
+    # Pull session metadata if available
+    session = get_session()
+    session_direction = ""
+    session_deck = ""
+    if session:
+        session_direction = session.direction.value
+        session_deck = session.deck_name
+
+    # Log to learning summary
+    summary = load_summary()
+    if "practice_sessions" not in summary:
+        summary["practice_sessions"] = []
+
+    session_record = {
+        "type": "translation",
+        "direction": session_direction,
+        "deck_name": session_deck,
+        "phrases_attempted": total_count,
+        "correct": correct_count,
+        "score_percent": score_percent,
+        "weak_words": weak_words,
+        "timestamp": __import__("datetime").datetime.now().isoformat(),
+    }
+    summary["practice_sessions"].append(session_record)
+    summary["practice_sessions"] = summary["practice_sessions"][-50:]
+    save_summary(summary)
+
+    # Clear session state
+    clear_session()
+
+    # Record study activity for streaks
+    try:
+        from .progress_tracking import record_activity
+        record_activity()
+    except Exception:
+        pass
+
+    lines = [
+        "Practice session ended!",
+        f"Score: {correct_count}/{total_count} ({score_percent}%)",
+    ]
+    if weak_words:
+        lines.append(f"Weak words: {', '.join(weak_words)}")
+    lines.append("Session logged to learning summary.")
+
+    return "\n".join(lines)
 
 
 @handler("log_practice_session")
@@ -1843,15 +2051,15 @@ def handle_get_session_due_words(anki: AnkiClient, tool_input: dict, **ctx) -> s
     lines.extend([
         "Present a review table to the user with suggested ratings and intervals.",
         "Ask user to confirm or override ratings.",
-        "Then use mark_cards_reviewed with per-card ease and card_words.",
-        "Some cards may be marked successfully, others may need manual review in Anki.",
-        "Present both outcomes cleanly — no confusing error messages.",
+        f"Then use mark_cards_reviewed with deck_name='{deck_name}', per-card ease, and card_words.",
+        "Cards are answered through Anki's native review queue for reliable scheduling.",
     ])
     return "\n".join(lines)
 
 
 @handler("mark_cards_reviewed")
 def handle_mark_cards_reviewed(anki: AnkiClient, tool_input: dict, **ctx) -> str:
+    deck_name = tool_input.get("deck_name")
     card_ids = tool_input["card_ids"]
     default_ease = tool_input.get("ease", 3)
     per_card_ease = tool_input.get("per_card_ease", {})
@@ -1881,20 +2089,20 @@ def handle_mark_cards_reviewed(anki: AnkiClient, tool_input: dict, **ctx) -> str
 
     # Single batched API call
     try:
-        results = anki.answer_cards_batch(note_ease_pairs)
-    except Exception:
-        results = {nid: (False, "API error") for nid, _ in note_ease_pairs}
+        results = anki.answer_cards_batch(note_ease_pairs, deck_name=deck_name)
+    except Exception as e:
+        results = {nid: (False, f"Error: {e}") for nid, _ in note_ease_pairs}
 
     marked = []
-    review_in_anki = []
+    failed = []
     for note_id, card_ease in note_ease_pairs:
         word = note_to_word[note_id]
         ease_label = ease_labels.get(card_ease, "Good")
-        success, _ = results.get(note_id, (False, ""))
+        success, msg = results.get(note_id, (False, ""))
         if success:
             marked.append(f"  {word} → {ease_label}")
         else:
-            review_in_anki.append(f"  {word} → press {ease_label}")
+            failed.append(f"  {word}: {msg}")
 
     # Record study activity for streaks
     try:
@@ -1907,12 +2115,12 @@ def handle_mark_cards_reviewed(anki: AnkiClient, tool_input: dict, **ctx) -> str
     if marked:
         lines.append(f"Marked in Anki ({len(marked)}):")
         lines.extend(marked)
-    if review_in_anki:
+    if failed:
         if marked:
             lines.append("")
-        lines.append(f"Review these in Anki manually ({len(review_in_anki)}):")
-        lines.extend(review_in_anki)
-    if not marked and not review_in_anki:
+        lines.append(f"Could not mark ({len(failed)}):")
+        lines.extend(failed)
+    if not marked and not failed:
         lines.append("No cards to mark.")
 
     return "\n".join(lines)
@@ -2679,3 +2887,96 @@ def handle_remove_from_vocab_list(anki: "AnkiClient", tool_input: dict, **ctx) -
 
     _save_vocab_list(items)
     return f"Removed '{word}' from your vocab list. {len(items)} word(s) remaining."
+
+
+# ---------------------------------------------------------------------------
+# Reminders
+# ---------------------------------------------------------------------------
+
+def _load_reminders() -> list[dict]:
+    """Load reminders from disk."""
+    from .paths import REMINDERS_FILE, ensure_data_dir
+    import json
+    ensure_data_dir()
+    if not REMINDERS_FILE.exists():
+        return []
+    try:
+        with open(REMINDERS_FILE) as f:
+            return json.load(f)
+    except (json.JSONDecodeError, IOError):
+        return []
+
+
+def _save_reminders(reminders: list[dict]) -> None:
+    """Save reminders to disk."""
+    from .paths import REMINDERS_FILE, ensure_data_dir, atomic_json_write
+    ensure_data_dir()
+    atomic_json_write(REMINDERS_FILE, reminders)
+
+
+@handler("set_reminder")
+def handle_set_reminder(anki: "AnkiClient", tool_input: dict, **ctx) -> str:
+    from datetime import datetime
+    import secrets
+
+    message = tool_input["message"].strip()
+    remind_at_str = tool_input["remind_at"].strip()
+
+    try:
+        remind_at = datetime.fromisoformat(remind_at_str)
+    except ValueError:
+        return f"Invalid datetime format: '{remind_at_str}'. Use ISO 8601 (e.g., '2025-06-15T09:00:00')."
+
+    reminder_id = secrets.token_hex(2)  # 4-char hex ID
+    reminders = _load_reminders()
+    reminders.append({
+        "id": reminder_id,
+        "message": message,
+        "remind_at": remind_at.isoformat(),
+        "created_at": datetime.now().isoformat(),
+    })
+    _save_reminders(reminders)
+
+    formatted_time = remind_at.strftime("%b %d %Y at %I:%M %p")
+    return f"Reminder set (ID: {reminder_id}): \"{message}\" — {formatted_time}"
+
+
+@handler("list_reminders")
+def handle_list_reminders(anki: "AnkiClient", tool_input: dict, **ctx) -> str:
+    from datetime import datetime
+
+    reminders = _load_reminders()
+    if not reminders:
+        return "No reminders set."
+
+    now = datetime.now()
+    lines = [f"Reminders ({len(reminders)}):", ""]
+    for r in reminders:
+        rid = r.get("id", "?")
+        msg = r.get("message", "?")
+        remind_at_str = r.get("remind_at", "")
+        try:
+            remind_at = datetime.fromisoformat(remind_at_str)
+            time_label = remind_at.strftime("%b %d %Y at %I:%M %p")
+            status = "TRIGGERED" if remind_at <= now else "pending"
+        except ValueError:
+            time_label = remind_at_str
+            status = "unknown"
+        lines.append(f"  [{rid}] \"{msg}\" — {time_label} ({status})")
+
+    return "\n".join(lines)
+
+
+@handler("remove_reminder")
+def handle_remove_reminder(anki: "AnkiClient", tool_input: dict, **ctx) -> str:
+    reminder_id = tool_input["reminder_id"].strip()
+    reminders = _load_reminders()
+
+    original_len = len(reminders)
+    reminders = [r for r in reminders if r.get("id") != reminder_id]
+
+    if len(reminders) == original_len:
+        return f"No reminder found with ID '{reminder_id}'."
+
+    _save_reminders(reminders)
+    return f"Reminder '{reminder_id}' removed. {len(reminders)} reminder(s) remaining."

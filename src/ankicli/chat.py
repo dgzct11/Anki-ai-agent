@@ -9,18 +9,11 @@ from rich import box
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
-from rich.progress import (
-    BarColumn,
-    Progress,
-    SpinnerColumn,
-    TaskProgressColumn,
-    TextColumn,
-)
 from rich.table import Table
 from rich.text import Text
 
 from .assistant import AnkiAssistant
-from .chat_log import add_exchange, format_history_for_display, clear_log
+from .chat_log import add_exchange, format_history_for_display
 from .client import AnkiClient
 from .config import CLAUDE_MODELS, get_model_specs, load_config, save_config, format_tool_notes_display
 from .conversation_store import get_conversation_age
@@ -36,13 +29,6 @@ from .grammar_quiz import (
     QUESTION_TYPE_LABELS,
     QuestionType,
     get_topic_mastery,
-    get_quiz_history,
-)
-from .translation_practice import (
-    PracticeSession,
-    PracticeDirection,
-    FeedbackLevel,
-    feedback_to_ease,
 )
 
 # Style for prompt_toolkit
@@ -117,33 +103,104 @@ def create_context_bar(status: dict) -> Text:
 
 
 def create_tool_panel(name: str, input_data: dict) -> Panel:
-    """Create a panel showing tool usage."""
+    """Create a compact panel showing tool usage."""
+    # Tools that should show minimal info (hide card content to avoid spoilers)
+    _QUIET_TOOLS = {
+        "generate_practice_question",
+        "start_translation_practice",
+        "end_practice_session",
+    }
+
     content = Text()
-    content.append(f"{name}\n", style="bold yellow")
-    for key, value in input_data.items():
-        if isinstance(value, list):
-            content.append(f"  {key}: ", style="dim")
-            content.append(f"{len(value)} items\n", style="white")
-        elif isinstance(value, str) and len(value) > 60:
-            content.append(f"  {key}: ", style="dim")
-            content.append(f"{value[:60]}...\n", style="white")
-        else:
-            content.append(f"  {key}: ", style="dim")
-            content.append(f"{value}\n", style="white")
-    return Panel(content, title="[bold blue]Tool Call[/bold blue]", border_style="blue")
+    content.append(name, style="bold yellow")
+
+    if name in _QUIET_TOOLS:
+        # Just show the tool name + deck if available
+        deck = input_data.get("deck_name", "")
+        if deck:
+            content.append(f"  deck={deck}", style="dim")
+    elif name == "mark_cards_reviewed":
+        # Show word list and ease, but not card IDs
+        words = input_data.get("card_words", {})
+        ease = input_data.get("per_card_ease", {})
+        ease_labels = {"1": "Again", "2": "Hard", "3": "Good", "4": "Easy"}
+        if words:
+            parts = []
+            for cid, word in words.items():
+                e = str(ease.get(cid, input_data.get("ease", 3)))
+                parts.append(f"{word}→{ease_labels.get(e, e)}")
+            content.append(f"  {', '.join(parts)}", style="dim")
+    else:
+        # Generic: show key=value, compact
+        parts = []
+        for key, value in input_data.items():
+            if isinstance(value, list):
+                parts.append(f"{key}: {len(value)} items")
+            elif isinstance(value, str) and len(value) > 40:
+                parts.append(f"{key}: {value[:40]}...")
+            elif isinstance(value, dict):
+                parts.append(f"{key}: {len(value)} entries")
+            else:
+                parts.append(f"{key}: {value}")
+        if parts:
+            content.append(f"  {', '.join(parts[:4])}", style="dim")
+            if len(parts) > 4:
+                content.append(f" (+{len(parts) - 4} more)", style="dim")
+
+    return Panel(content, border_style="dim blue", padding=(0, 1))
 
 
 def create_result_panel(name: str, result: str) -> Panel:
-    """Create a panel showing tool result."""
-    # Truncate long results
-    if len(result) > 500:
-        display_result = result[:500] + "..."
+    """Create a compact panel showing tool result."""
+    import re as _panel_re
+
+    # Tools whose results should be hidden from user (contain card answers)
+    _HIDDEN_RESULTS = {"generate_practice_question"}
+    # Tools with short, user-relevant results
+    _BRIEF_RESULTS = {
+        "start_translation_practice",
+        "end_practice_session",
+        "mark_cards_reviewed",
+    }
+
+    if name in _HIDDEN_RESULTS:
+        # Don't show card data — Claude will present it naturally
+        try:
+            import json
+            data = json.loads(result)
+            cards = data.get("cards", [])
+            new_count = sum(1 for c in cards if c.get("is_new"))
+            due_count = sum(1 for c in cards if c.get("is_due"))
+            display = f"{len(cards)} cards loaded ({due_count} due, {new_count} new)"
+        except (json.JSONDecodeError, AttributeError):
+            display = result[:80] + "..." if len(result) > 80 else result
+        return Panel(
+            Text(display, style="dim green"),
+            title=f"[dim green]{name}[/dim green]",
+            border_style="dim green",
+            padding=(0, 1),
+        )
+
+    if name in _BRIEF_RESULTS:
+        # Show result but keep it concise
+        display = result[:200] + "..." if len(result) > 200 else result
+        return Panel(
+            Text(display, style="green"),
+            title=f"[green]{name}[/green]",
+            border_style="green",
+            padding=(0, 1),
+        )
+
+    # Default: truncate long results
+    if len(result) > 300:
+        display = result[:300] + "..."
     else:
-        display_result = result
+        display = result
     return Panel(
-        Text(display_result, style="green"),
-        title=f"[bold green]Result: {name}[/bold green]",
+        Text(display, style="green"),
+        title=f"[green]{name}[/green]",
         border_style="green",
+        padding=(0, 1),
     )
 
 
@@ -521,640 +578,6 @@ def create_session_progress_bar(current: int, total: int) -> Text:
     return text
 
 
-def create_practice_question_panel(
-    question_num: int,
-    total: int,
-    phrase: str,
-    direction: PracticeDirection,
-    is_due: bool,
-    difficulty: str,
-    target_words: str = "",
-) -> Panel:
-    """Create a styled panel for a practice question."""
-    content = Text()
-
-    # Header: question number (no progress bar in continuous mode)
-    if total > 0:
-        content.append_text(create_session_progress_bar(question_num, total))
-    else:
-        content.append(f"Question {question_num}", style="bold")
-    if difficulty == "harder":
-        content.append("  [HARDER]", style="bold magenta")
-    elif difficulty == "easier":
-        content.append("  [EASIER]", style="bold yellow")
-    content.append("\n\n")
-
-    if direction == PracticeDirection.EN_TO_ES:
-        content.append("Translate to Spanish:\n", style="dim")
-    else:
-        content.append("Translate to English:\n", style="dim")
-
-    content.append(f"  {phrase}", style="bold white")
-
-    return Panel(
-        content,
-        title="[bold bright_blue]TRANSLATE[/bold bright_blue]",
-        border_style="bright_blue",
-        padding=(1, 2),
-    )
-
-
-def highlight_word_diff(user_answer: str, correct_answer: str) -> Text:
-    """Highlight words in user's answer: green=correct, red=wrong, yellow=partial.
-
-    Compares user answer words to correct answer words positionally.
-    """
-    import re as _re
-
-    user_words = _re.findall(r'\S+', user_answer.strip())
-    correct_words = _re.findall(r'\S+', correct_answer.strip())
-
-    result = Text()
-
-    for i, word in enumerate(user_words):
-        if i > 0:
-            result.append(" ")
-        if i < len(correct_words):
-            clean_u = _re.sub(r'[^\w]', '', word.lower())
-            clean_c = _re.sub(r'[^\w]', '', correct_words[i].lower())
-            if clean_u == clean_c:
-                result.append(word, style="green")
-            elif clean_u and clean_c and (clean_u in clean_c or clean_c in clean_u):
-                result.append(word, style="yellow")
-            else:
-                result.append(word, style="red")
-        else:
-            result.append(word, style="red")
-
-    return result
-
-
-def create_practice_feedback_panel(
-    feedback_level: FeedbackLevel,
-    feedback_text: str,
-    scores: dict[str, int],
-    user_answer: str = "",
-    correct_answer: str = "",
-) -> Panel:
-    """Create a styled feedback panel after answer evaluation.
-
-    When user_answer and correct_answer are provided, highlights words
-    in the user's answer: green for correct, red for wrong, yellow for
-    partially matching words.
-    """
-    if feedback_level == FeedbackLevel.CORRECT:
-        border = "green"
-        title = "[bold green]CORRECT[/bold green]"
-        icon = "+"
-    elif feedback_level == FeedbackLevel.PARTIAL:
-        border = "yellow"
-        title = "[bold yellow]PARTIAL[/bold yellow]"
-        icon = "~"
-    else:
-        border = "red"
-        title = "[bold red]INCORRECT[/bold red]"
-        icon = "x"
-
-    content = Text()
-    content.append(f" {icon} ", style=f"bold {border}")
-
-    # U1: Word-level highlighting when both answers are available
-    if user_answer and correct_answer and feedback_level != FeedbackLevel.CORRECT:
-        content.append("Your answer: ", style="dim")
-        content.append_text(highlight_word_diff(user_answer, correct_answer))
-        content.append("\n")
-        content.append("  Correct:    ", style="dim")
-        content.append(correct_answer, style="green")
-        content.append("\n\n")
-    else:
-        content.append(feedback_text)
-        content.append("\n\n")
-
-    # Score breakdown
-    content.append("Scores: ", style="bold dim")
-    score_parts = []
-    for label, score in scores.items():
-        if score >= 3:
-            style = "green"
-        elif score >= 2:
-            style = "yellow"
-        else:
-            style = "red"
-        score_parts.append((f"{label}:{score}/4", style))
-
-    for i, (text, style) in enumerate(score_parts):
-        if i > 0:
-            content.append("  ", style="dim")
-        content.append(text, style=style)
-
-    return Panel(
-        content,
-        title=title,
-        border_style=border,
-        padding=(0, 2),
-    )
-
-
-def create_practice_summary_panel(session: PracticeSession) -> Panel:
-    """Create a session summary panel."""
-    content = Text()
-
-    # Score bar
-    content.append("SCORE\n", style="bold")
-    score_pct = session.score_percent
-    bar_width = 30
-    filled = int(bar_width * score_pct / 100)
-    empty = bar_width - filled
-    bar = "\u2588" * filled + "\u2591" * empty
-
-    if score_pct >= 80:
-        color = "green"
-    elif score_pct >= 60:
-        color = "yellow"
-    else:
-        color = "red"
-
-    content.append("  [", style="dim")
-    content.append(bar, style=color)
-    content.append("] ", style="dim")
-    content.append(f"{score_pct:.0f}%\n\n", style=f"bold {color}")
-
-    # Counts
-    content.append(f"  Correct:   {session.correct_count}", style="green")
-    content.append(f"  Partial: {session.partial_count}", style="yellow")
-    content.append(f"  Wrong:   {session.incorrect_count}\n", style="red")
-
-    # Reviewed
-    reviewed = sum(1 for r in session.results if r.marked_reviewed)
-    if reviewed > 0:
-        content.append(f"  Anki reviews marked: {reviewed}\n", style="cyan")
-
-    # Weak words
-    weak = session.get_weak_words()
-    if weak:
-        content.append("\n")
-        content.append("  Words to review: ", style="bold dim")
-        content.append(", ".join(weak[:10]), style="yellow")
-        if len(weak) > 10:
-            content.append(f" (+{len(weak) - 10} more)", style="dim")
-
-    return Panel(
-        content,
-        title="[bold cyan]SESSION COMPLETE[/bold cyan]",
-        border_style="cyan",
-        box=box.DOUBLE,
-        padding=(1, 2),
-    )
-
-
-def create_practice_commands_panel() -> Panel:
-    """Create a small panel showing available practice commands."""
-    content = Text()
-    content.append("/skip", style="cyan")
-    content.append(" skip  ", style="dim")
-    content.append("/hint", style="cyan")
-    content.append(" hint  ", style="dim")
-    content.append("?", style="cyan")
-    content.append(" ask question  ", style="dim")
-    content.append("/score", style="cyan")
-    content.append(" scores  ", style="dim")
-    content.append("exit", style="cyan")
-    content.append(" quit", style="dim")
-    return Panel(content, border_style="dim", box=box.ROUNDED, padding=(0, 1))
-
-
-def run_practice_loop(
-    console: Console,
-    assistant: "AnkiAssistant",
-    session: "PracticeSession",
-    prompt_session: "PromptSession",
-) -> None:
-    """Run the interactive practice loop.
-
-    Continuously pulls due/new cards from Anki, generates multi-word sentences,
-    evaluates translations, and marks cards. Loops until no cards remain or user quits.
-    """
-    from .translation_practice import PracticeResult, PracticeCard, feedback_to_ease
-
-    console.print()
-    console.print(create_practice_commands_panel())
-    console.print()
-
-    import re as _re
-
-    def _extract_word(c):
-        # Replace <br> with newline before stripping HTML, so we can split on first line
-        text = _re.sub(r'<br\s*/?>', '\n', c.back, flags=_re.IGNORECASE)
-        clean = _re.sub(r'<[^>]+>', '', text).strip()
-        # Take just the first word/phrase (before newline, parentheses, or bullet)
-        first_line = clean.split('\n')[0].split('(')[0].split('•')[0].strip()
-        return first_line[:30]
-
-    def _pull_due_cards(deck_name, limit=15):
-        """Pull fresh due + new cards from Anki."""
-        cards = []
-        try:
-            due = assistant.anki.get_due_cards(deck_name, limit=limit)
-            for c in due:
-                cards.append(PracticeCard(card_id=c.id, front=c.front, back=c.back, tags=c.tags, is_due=True))
-        except Exception:
-            pass
-        if len(cards) < limit:
-            try:
-                new = assistant.anki.get_new_cards(deck_name, limit=limit - len(cards))
-                existing_ids = {c.card_id for c in cards}
-                for c in new:
-                    if c.id not in existing_ids:
-                        cards.append(PracticeCard(card_id=c.id, front=c.front, back=c.back, tags=c.tags, is_new=True))
-            except Exception:
-                pass
-        return cards
-
-    question_num = 0
-    direction_label = "English" if session.direction == PracticeDirection.EN_TO_ES else "Spanish"
-    target_lang = "Spanish" if session.direction == PracticeDirection.EN_TO_ES else "English"
-
-    while True:
-        # Pull fresh cards from Anki each iteration
-        available = _pull_due_cards(session.deck_name)
-        if not available:
-            console.print("[bold green]No more cards to practice! All caught up.[/bold green]")
-            break
-
-        due_count = sum(1 for c in available if c.is_due)
-        new_count = sum(1 for c in available if c.is_new)
-        console.print(f"[dim]{due_count} due, {new_count} new cards available[/dim]")
-
-        # Pick 3-5 words for the sentence
-        group_size = min(5, max(3, len(available)))
-        group_cards = available[:group_size]
-        question_num += 1
-
-        # Build target word info for Claude (internal, not shown to user)
-        group_words = [_extract_word(gc) for gc in group_cards]
-        group_info = []
-        for gc in group_cards:
-            clean_word = _re.sub(r'<[^>]+>', '', gc.back).strip().split('\n')[0][:40]
-            group_info.append(f"  - {clean_word} (EN: {gc.front})")
-        group_section = "\n".join(group_info)
-
-        # Generate sentence
-        gen_prompt = (
-            f"[PRACTICE MODE - GENERATE SENTENCE]\n"
-            f"Question {question_num}\n"
-            f"Difficulty level: {session.difficulty_num}/5 ({session.difficulty_label})\n\n"
-            f"TARGET WORDS for this question (use ALL of these):\n{group_section}\n\n"
-            f"Generate a SINGLE {direction_label} sentence that naturally uses ALL {len(group_cards)} "
-            f"target words: {', '.join(group_words)}.\n"
-            f"Do NOT reveal which {target_lang} words to use. Do NOT show the translation.\n"
-            f"IMPORTANT: Output ONLY the sentence to translate. NEVER mention target words, "
-            f"due words, or remaining words. No explanations, no commentary, no meta-text."
-        )
-
-        generated_sentence = ""
-        try:
-            with console.status("[cyan]Generating sentence...[/cyan]", spinner="dots"):
-                for event in assistant.chat(gen_prompt):
-                    if event["type"] == "text_delta":
-                        generated_sentence += event["content"]
-        except Exception as e:
-            console.print(f"[red]Error generating: {e}[/red]")
-            generated_sentence = group_cards[0].front
-
-        # Clean up generated sentence
-        generated_sentence = generated_sentence.strip().strip('"').strip("'")
-        if generated_sentence:
-            generated_sentence = _re.sub(
-                r'^(?:Here(?:\'s| is) (?:a |the )?(?:sentence|translation|example)[:\.]?\s*|Sure[,!:]?\s*|Of course[,!:]?\s*)',
-                '', generated_sentence, flags=_re.IGNORECASE
-            ).strip()
-            sent_match = _re.match(r'^(.+?[.!?])(?:\s|$)', generated_sentence)
-            if sent_match:
-                generated_sentence = sent_match.group(1).strip()
-            generated_sentence = generated_sentence.split('\n')[0].strip().strip('"').strip("'")
-
-        # Show question (no target words shown)
-        console.print(create_practice_question_panel(
-            question_num=question_num,
-            total=0,  # no fixed total in continuous mode
-            phrase=generated_sentence,
-            direction=session.direction,
-            is_due=any(gc.is_due for gc in group_cards),
-            difficulty=session.difficulty_level,
-            target_words="",  # Don't reveal how many words are tested
-        ))
-
-        # Get user answer
-        try:
-            answer = prompt_session.prompt([("class:prompt", "Your translation: ")]).strip()
-        except (KeyboardInterrupt, EOFError):
-            answer = "/quit"
-
-        if not answer:
-            console.print("[dim]Please type your translation, or /skip or /quit.[/dim]\n")
-            continue
-
-        if answer.lower() in ("/quit", "exit", "quit", "q"):
-            console.print("[dim]Ending practice session...[/dim]")
-            break
-
-        if answer.lower() == "/skip":
-            console.print(f"[dim]Skipped {len(group_cards)} word(s).[/dim]\n")
-            continue
-
-        if answer.lower() == "/score":
-            if session.results:
-                console.print(f"[bold]Score:[/bold] {session.correct_count}/{session.questions_answered} ({session.score_percent:.0f}%)")
-            else:
-                console.print("[dim]No answers yet.[/dim]")
-            console.print()
-            continue
-
-        if answer.lower() == "/hint":
-            hints = []
-            for gc in group_cards:
-                src = gc.back if session.direction == PracticeDirection.EN_TO_ES else gc.front
-                clean = _re.sub(r'<[^>]+>', ' ', src).strip()
-                hints.append(clean[:3] + "...")
-            console.print(f"[dim]Hint: {', '.join(hints)}[/dim]\n")
-            continue
-
-        # Handle questions (? prefix or /ask) — answer without revealing target words
-        if answer.startswith("?") or answer.lower().startswith("/ask "):
-            question = answer.lstrip("?").lstrip()
-            if answer.lower().startswith("/ask "):
-                question = answer[5:].strip()
-            if question:
-                ask_prompt = (
-                    f"[PRACTICE MODE - USER QUESTION]\n"
-                    f"The user is asking a question while working on a translation.\n"
-                    f"Question: {question}\n\n"
-                    f"Answer their question helpfully. You may provide vocabulary, "
-                    f"grammar explanations, or clarifications.\n"
-                    f"CRITICAL: Do NOT reveal which Spanish words are being tested. "
-                    f"Do NOT list target words. Do NOT give away the answer. "
-                    f"Only provide the specific information they asked for."
-                )
-                resp = ""
-                try:
-                    with console.status("[cyan]...[/cyan]", spinner="dots"):
-                        for event in assistant.chat(ask_prompt):
-                            if event["type"] == "text_delta":
-                                resp += event["content"]
-                except Exception:
-                    pass
-                if resp.strip():
-                    from rich.markdown import Markdown as _Md
-                    console.print(_Md(resp))
-                # Re-show the question
-                console.print()
-                console.print(create_practice_question_panel(
-                    question_num=question_num, total=0,
-                    phrase=generated_sentence,
-                    direction=session.direction,
-                    is_due=any(gc.is_due for gc in group_cards),
-                    difficulty=session.difficulty_level,
-                ))
-            continue
-
-        # Evaluate translation
-        eval_prompt = (
-            f"[PRACTICE MODE - EVALUATE TRANSLATION]\n"
-            f"The sentence was: {generated_sentence}\n"
-            f"User's translation to {target_lang}: {answer}\n\n"
-            f"Target words being tested ({len(group_cards)}):\n{group_section}\n\n"
-            f"Evaluate the translation. Score each 0-4:\n"
-            f"Meaning: X/4\nGrammar: X/4\nNaturalness: X/4\nVocabulary: X/4\n"
-            f"\nPer-word results (for EACH target word, state if correct or incorrect):\n"
-            f"Format: \"word: correct\" or \"word: incorrect (should be ...)\"\n"
-            f"Show the correct translation if wrong."
-        )
-
-        # Stream Claude's evaluation
-        response_text = ""
-        spinner_active = False
-        status_ctx = None
-
-        try:
-            for event in assistant.chat(eval_prompt):
-                if event["type"] == "text_delta":
-                    if not spinner_active:
-                        status_ctx = console.status("[cyan]Evaluating...[/cyan]", spinner="dots")
-                        status_ctx.start()
-                        spinner_active = True
-                    response_text += event["content"]
-                elif event["type"] == "tool_use":
-                    if spinner_active and status_ctx:
-                        status_ctx.stop()
-                        spinner_active = False
-                    console.print(create_tool_panel(event["name"], event["input"]))
-                elif event["type"] == "tool_result":
-                    console.print(create_result_panel(event["name"], event["result"]))
-                elif event["type"] == "context_status":
-                    pass
-
-            if spinner_active and status_ctx:
-                status_ctx.stop()
-        except Exception as e:
-            if spinner_active and status_ctx:
-                status_ctx.stop()
-            console.print(f"[red]Error evaluating: {e}[/red]")
-            response_text = "Could not evaluate."
-
-        # Parse scores
-        meaning = grammar = naturalness = vocabulary = 2
-        feedback_level = FeedbackLevel.PARTIAL
-        score_patterns = [
-            (r'\*{0,2}[Mm]eaning\*{0,2}\s*[:\-—]\s*(\d)(?:/4)?', 'meaning'),
-            (r'\*{0,2}[Mm]eaning\*{0,2}\s*\((\d)(?:/4)?\)', 'meaning'),
-            (r'\*{0,2}[Gg]rammar\*{0,2}\s*[:\-—]\s*(\d)(?:/4)?', 'grammar'),
-            (r'\*{0,2}[Gg]rammar\*{0,2}\s*\((\d)(?:/4)?\)', 'grammar'),
-            (r'\*{0,2}[Nn]aturalness\*{0,2}\s*[:\-—]\s*(\d)(?:/4)?', 'naturalness'),
-            (r'\*{0,2}[Nn]aturalness\*{0,2}\s*\((\d)(?:/4)?\)', 'naturalness'),
-            (r'\*{0,2}[Vv]ocabulary\*{0,2}\s*[:\-—]\s*(\d)(?:/4)?', 'vocabulary'),
-            (r'\*{0,2}[Vv]ocabulary\*{0,2}\s*\((\d)(?:/4)?\)', 'vocabulary'),
-        ]
-        for pattern, key in score_patterns:
-            match = _re.search(pattern, response_text)
-            if match:
-                val = max(0, min(4, int(match.group(1))))
-                if key == 'meaning': meaning = val
-                elif key == 'grammar': grammar = val
-                elif key == 'naturalness': naturalness = val
-                elif key == 'vocabulary': vocabulary = val
-
-        total_score = meaning + grammar + naturalness + vocabulary
-        if total_score >= 14:
-            feedback_level = FeedbackLevel.CORRECT
-        elif total_score >= 8:
-            feedback_level = FeedbackLevel.PARTIAL
-        else:
-            feedback_level = FeedbackLevel.INCORRECT
-
-        # Show feedback
-        console.print()
-        if response_text.strip():
-            from rich.markdown import Markdown as _Md
-            console.print(_Md(response_text))
-
-        # Record results for session tracking
-        for gc in group_cards:
-            session.record_result(PracticeResult(
-                card_id=gc.card_id, front=gc.front, back=gc.back,
-                user_answer=answer, feedback_level=feedback_level,
-                feedback_text=response_text,
-                meaning_score=meaning, grammar_score=grammar,
-                naturalness_score=naturalness, vocabulary_score=vocabulary,
-                is_due_for_review=gc.is_due,
-            ))
-
-        # Show per-word suggested ratings and prompt user
-        ease_labels = {1: "Again", 2: "Hard", 3: "Good", 4: "Easy"}
-        ease_reverse = {"again": 1, "hard": 2, "good": 3, "easy": 4, "g": 3, "h": 2, "a": 1, "e": 4}
-        suggested_ease = feedback_to_ease(feedback_level)
-        suggested_label = ease_labels.get(suggested_ease, "Good")
-
-        console.print()
-        word_ease_map = {}  # word -> (card, suggested_ease)
-        for gc in group_cards:
-            word = _extract_word(gc)
-            word_ease_map[word.lower()] = (gc, suggested_ease)
-            console.print(f"  [cyan]{word}[/cyan] → {suggested_label}")
-
-        try:
-            console.print(f"[dim]  (enter per word: 'word ease', or 'all good', or 'n' to skip)[/dim]")
-            mark_input = prompt_session.prompt(
-                [("class:prompt", "Mark: ")],
-            ).strip().lower()
-        except (KeyboardInterrupt, EOFError):
-            mark_input = "n"
-
-        if mark_input in ("exit", "quit", "q", "/quit"):
-            console.print("[dim]Ending practice session...[/dim]")
-            break
-        elif mark_input in ("n", "no", ""):
-            console.print("[dim]Skipped marking.[/dim]")
-        else:
-            # Parse per-word overrides: "siempre again, tarde good, anoche n"
-            # Or "all good", "all 3", "y" (accept all suggestions)
-            per_card_ease = {}  # card_id -> ease
-            skip_ids = set()
-
-            if mark_input in ("y", "yes"):
-                # Accept all suggestions
-                for word, (gc, ease) in word_ease_map.items():
-                    per_card_ease[gc.card_id] = ease
-            elif mark_input.startswith("all "):
-                # "all good", "all 3", "all again"
-                rating_str = mark_input[4:].strip()
-                if rating_str in ease_reverse:
-                    all_ease = ease_reverse[rating_str]
-                elif rating_str.isdigit() and int(rating_str) in (1, 2, 3, 4):
-                    all_ease = int(rating_str)
-                else:
-                    all_ease = suggested_ease
-                for word, (gc, _) in word_ease_map.items():
-                    per_card_ease[gc.card_id] = all_ease
-            else:
-                # Parse "siempre again, tarde good, anoche n"
-                # First, set all to suggested as default
-                for word, (gc, ease) in word_ease_map.items():
-                    per_card_ease[gc.card_id] = ease
-
-                # Then parse overrides
-                parts = [p.strip() for p in mark_input.replace(",", " ").split() if p.strip()]
-                i = 0
-                while i < len(parts):
-                    token = parts[i]
-                    # Find which word this matches
-                    matched_word = None
-                    for w in word_ease_map:
-                        if w.startswith(token) or token.startswith(w[:3]):
-                            matched_word = w
-                            break
-
-                    if matched_word and i + 1 < len(parts):
-                        rating_str = parts[i + 1]
-                        gc, _ = word_ease_map[matched_word]
-                        if rating_str in ("n", "no", "skip"):
-                            skip_ids.add(gc.card_id)
-                            if gc.card_id in per_card_ease:
-                                del per_card_ease[gc.card_id]
-                        elif rating_str in ease_reverse:
-                            per_card_ease[gc.card_id] = ease_reverse[rating_str]
-                        elif rating_str.isdigit() and int(rating_str) in (1, 2, 3, 4):
-                            per_card_ease[gc.card_id] = int(rating_str)
-                        i += 2
-                    else:
-                        i += 1
-
-            # Batch mark all non-skipped cards
-            if per_card_ease:
-                note_ease_pairs = [(int(cid), ease) for cid, ease in per_card_ease.items()]
-                try:
-                    results = assistant.anki.answer_cards_batch(note_ease_pairs)
-                    marked = []
-                    manual = []
-                    for cid, ease in per_card_ease.items():
-                        word = next((w for w, (gc, _) in word_ease_map.items() if gc.card_id == str(cid) or gc.card_id == cid), str(cid))
-                        success, msg = results.get(int(cid), (False, "unknown error"))
-                        label = ease_labels.get(ease, "Good")
-                        if success:
-                            marked.append(f"{word}→{label}")
-                        else:
-                            manual.append((word, label, msg))
-                    if marked:
-                        console.print(f"[green]  ✓ Marked in Anki: {', '.join(marked)}[/green]")
-                    if manual:
-                        console.print(f"[yellow]  ✗ Could not mark — card not in Anki's review queue.[/yellow]")
-                        console.print(f"[yellow]    (answerCards only works for the card Anki is currently showing)[/yellow]")
-                        console.print(f"[dim]    When you review in Anki, press:[/dim]")
-                        for word, label, _ in manual:
-                            console.print(f"[dim]      {word} → {label}[/dim]")
-                except Exception:
-                    console.print("[dim]Could not mark. Review in Anki manually.[/dim]")
-            if skip_ids:
-                skipped_words = [w for w, (gc, _) in word_ease_map.items() if gc.card_id in skip_ids or int(gc.card_id) in skip_ids]
-                if skipped_words:
-                    console.print(f"[dim]Skipped: {', '.join(skipped_words)}[/dim]")
-
-        console.print()
-
-    # Show session summary
-    if session.results:
-        console.print(create_practice_summary_panel(session))
-
-        # Log via Claude
-        summary = session.get_summary_dict()
-        log_prompt = (
-            f"[PRACTICE SESSION COMPLETE - LOG IT]\n"
-            f"Please call log_practice_session with these results:\n"
-            f"practice_type: translation, direction: {summary['direction']}, "
-            f"deck_name: {summary['deck_name']}, phrases_attempted: {summary['total_questions']}, "
-            f"correct: {summary['correct']}, partial: {summary['partial']}, "
-            f"incorrect: {summary['incorrect']}, score_percent: {summary['score_percent']}, "
-            f"weak_words: {summary['weak_words']}\n"
-            f"Briefly summarize the session results."
-        )
-        try:
-            resp = ""
-            for event in assistant.chat(log_prompt):
-                if event["type"] == "text_delta":
-                    resp += event["content"]
-                elif event["type"] == "tool_use":
-                    console.print(create_tool_panel(event["name"], event["input"]))
-                elif event["type"] == "tool_result":
-                    console.print(create_result_panel(event["name"], event["result"]))
-            if resp.strip():
-                from rich.markdown import Markdown as Md
-                console.print("[bold cyan]Assistant:[/bold cyan]")
-                console.print(Md(resp))
-        except Exception:
-            pass
-
-    console.print()
-
-
 # ---------------------------------------------------------------------------
 # Grammar quiz UI
 # ---------------------------------------------------------------------------
@@ -1372,8 +795,6 @@ def create_quiz_summary_panel(
     # U4: Per-type quiz score breakdown as a Rich Table
     if type_breakdown:
         content.append("\n")
-        type_table = create_quiz_type_breakdown_table(type_breakdown)
-        # We embed the table content as text lines for panel compatibility
         content.append("  BY TYPE\n", style="bold dim")
         for qt, data in type_breakdown.items():
             label = QUESTION_TYPE_LABELS.get(
@@ -1965,7 +1386,7 @@ def stream_chat_response(
     return full_response
 
 
-def run_chat():
+def run_chat(initial_input: str | None = None):
     """Run the interactive chat interface."""
     console = Console()
 
@@ -2058,10 +1479,16 @@ def run_chat():
 
     while True:
         try:
-            # Get user input
-            user_input = session.prompt(
-                [("class:prompt", "You: ")],
-            ).strip()
+            # Use initial_input if provided (from CLI subcommands)
+            if initial_input:
+                user_input = initial_input
+                initial_input = None  # Only use once
+                console.print(f"[dim]> {user_input}[/dim]")
+            else:
+                # Get user input
+                user_input = session.prompt(
+                    [("class:prompt", "You: ")],
+                ).strip()
 
             if not user_input:
                 continue
@@ -2202,27 +1629,15 @@ def run_chat():
                 continue
 
             if user_input.lower().startswith("practice"):
-                # Parse practice command: practice [deck] [--count N] [--direction DIR] [--focus SOURCE]
+                # Parse practice command: practice [deck] [--direction DIR]
                 parts = user_input.strip().split()
                 deck_name = None
-                count = 10
                 direction = "en_to_es"
-                card_source = "mixed"
 
-                # Simple argument parsing
                 i = 1
                 while i < len(parts):
-                    if parts[i] == "--count" and i + 1 < len(parts):
-                        try:
-                            count = int(parts[i + 1])
-                        except ValueError:
-                            pass
-                        i += 2
-                    elif parts[i] == "--direction" and i + 1 < len(parts):
+                    if parts[i] == "--direction" and i + 1 < len(parts):
                         direction = parts[i + 1]
-                        i += 2
-                    elif parts[i] == "--focus" and i + 1 < len(parts):
-                        card_source = parts[i + 1]
                         i += 2
                     elif not parts[i].startswith("--"):
                         deck_name = parts[i]
@@ -2230,86 +1645,16 @@ def run_chat():
                     else:
                         i += 1
 
-                if not deck_name:
-                    # Ask Claude to pick a deck via natural language
-                    console.print("[dim]Starting practice session via AI...[/dim]")
-                    # Fall through to let Claude handle "start a practice session"
-                    user_input = "Start a translation practice session. Use the main Spanish deck, 10 questions, English to Spanish, mixed cards."
-                else:
-                    # Start practice directly
-                    console.print(f"[dim]Starting practice: deck={deck_name}, count={count}, direction={direction}[/dim]")
-                    console.print()
-
-                    # Trigger via the assistant so Claude can manage the session
+                if deck_name:
+                    console.print(f"[dim]Starting practice: deck={deck_name}, direction={direction}[/dim]")
                     user_input = (
                         f"Start a translation practice session from deck '{deck_name}' "
-                        f"with {count} questions, direction {direction}, card source {card_source}."
+                        f"with direction {direction}."
                     )
-
-                # Send to assistant and check if practice session was started
-                response_text = ""
-                full_response = ""
-                context_status = None
-                spinner_active = False
-                status_ctx = None
-                tool_calls = []
-                delegate_progress = None
-                delegate_task = None
-
-                try:
-                    for event in assistant.chat(user_input):
-                        if event["type"] == "text_delta":
-                            if not spinner_active:
-                                status_ctx = console.status("[cyan]Setting up practice...[/cyan]", spinner="dots")
-                                status_ctx.start()
-                                spinner_active = True
-                            response_text += event["content"]
-                            full_response += event["content"]
-                        elif event["type"] == "tool_use":
-                            if spinner_active and status_ctx:
-                                status_ctx.stop()
-                                spinner_active = False
-                                if response_text.strip():
-                                    console.print("[bold cyan]Assistant:[/bold cyan]")
-                                    console.print(Markdown(response_text))
-                                response_text = ""
-                            console.print()
-                            console.print(create_tool_panel(event["name"], event["input"]))
-                            tool_summary = _summarize_tool_input(event["name"], event["input"])
-                            tool_calls.append({"name": event["name"], "summary": tool_summary})
-                        elif event["type"] == "tool_result":
-                            console.print(create_result_panel(event["name"], event["result"]))
-                            console.print()
-                        elif event["type"] == "context_status":
-                            context_status = event["status"]
-
-                    if spinner_active and status_ctx:
-                        status_ctx.stop()
-
-                    # Check if a practice session was created on the assistant
-                    practice_session = getattr(assistant, "_practice_session", None)
-                    if practice_session:
-                        # Don't show Claude's text response — practice loop takes over
-                        run_practice_loop(console, assistant, practice_session, session)
-                        assistant._practice_session = None
-                    elif response_text.strip():
-                        console.print("[bold cyan]Assistant:[/bold cyan]")
-                        console.print(Markdown(response_text))
-                    else:
-                        console.print("[yellow]Could not start practice session. Try specifying a deck name.[/yellow]")
-
-                    if context_status:
-                        console.print(create_context_bar(context_status))
-
-                    add_exchange(user_input, full_response, tool_calls if tool_calls else None)
-
-                except Exception as e:
-                    if spinner_active and status_ctx:
-                        status_ctx.stop()
-                    console.print(f"\n[red]Error: {e}[/red]")
-
-                console.print()
-                continue
+                else:
+                    console.print("[dim]Starting practice session...[/dim]")
+                    user_input = "Start a translation practice session. Use the main Spanish deck, English to Spanish."
+                # Fall through to normal chat processing below
 
             if user_input.lower().startswith("quiz"):
                 # Parse quiz command: quiz [--level LEVEL] [--topic TOPIC] [--count N]

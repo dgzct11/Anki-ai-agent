@@ -14,19 +14,15 @@ from ankicli.chat import (
     create_conjugation_table,
     create_context_bar,
     create_grammar_mastery_checklist,
-    create_practice_feedback_panel,
-    create_practice_question_panel,
     create_quiz_question_panel,
     create_quiz_summary_panel,
     create_quiz_type_breakdown_table,
     create_session_progress_bar,
-    highlight_word_diff,
 )
 from ankicli.learning_summary import (
     _create_activity_heatmap,
     compute_study_streak,
 )
-from ankicli.translation_practice import FeedbackLevel, PracticeDirection
 
 
 def _render(renderable) -> str:
@@ -35,126 +31,6 @@ def _render(renderable) -> str:
     with console.capture() as capture:
         console.print(renderable)
     return capture.get()
-
-
-# ---------------------------------------------------------------------------
-# U1: Refined practice feedback panels with word-level highlighting
-# ---------------------------------------------------------------------------
-
-
-class TestHighlightWordDiff:
-    """Tests for highlight_word_diff (U1)."""
-
-    def test_all_correct_words_green(self):
-        result = highlight_word_diff("yo como pan", "yo como pan")
-        rendered = _render(result)
-        assert "yo" in rendered
-        assert "como" in rendered
-        assert "pan" in rendered
-
-    def test_wrong_words_present(self):
-        result = highlight_word_diff("yo como pan", "yo bebo agua")
-        # Result should contain user's words
-        rendered = _render(result)
-        assert "yo" in rendered
-        assert "como" in rendered
-        assert "pan" in rendered
-
-    def test_partial_match_words(self):
-        result = highlight_word_diff("comer", "comemos")
-        # "comer" partially contains "come" from "comemos"
-        rendered = _render(result)
-        assert "comer" in rendered
-
-    def test_extra_words_in_user_answer(self):
-        result = highlight_word_diff("yo como mucho pan", "yo como pan")
-        rendered = _render(result)
-        assert "mucho" in rendered
-
-    def test_empty_user_answer(self):
-        result = highlight_word_diff("", "yo como pan")
-        rendered = _render(result)
-        assert rendered.strip() == ""
-
-    def test_returns_text_object(self):
-        result = highlight_word_diff("hola", "hola")
-        assert isinstance(result, Text)
-
-    def test_exact_match_single_word(self):
-        result = highlight_word_diff("hola", "hola")
-        # Should have green style for correct word
-        assert len(result._spans) > 0
-
-
-class TestPracticeFeedbackPanel:
-    """Tests for create_practice_feedback_panel with U1 enhancements."""
-
-    def test_correct_feedback_no_diff(self):
-        """Correct answers don't show word diff."""
-        panel = create_practice_feedback_panel(
-            feedback_level=FeedbackLevel.CORRECT,
-            feedback_text="Perfect!",
-            scores={"Meaning": 4, "Grammar": 4, "Natural": 4, "Vocab": 4},
-            user_answer="yo como",
-            correct_answer="yo como",
-        )
-        rendered = _render(panel)
-        assert "CORRECT" in rendered
-
-    def test_incorrect_shows_word_diff(self):
-        """Incorrect answers show word-level highlighting."""
-        panel = create_practice_feedback_panel(
-            feedback_level=FeedbackLevel.INCORRECT,
-            feedback_text="Try again",
-            scores={"Meaning": 1, "Grammar": 1, "Natural": 1, "Vocab": 1},
-            user_answer="yo como pan",
-            correct_answer="yo bebo agua",
-        )
-        rendered = _render(panel)
-        assert "INCORRECT" in rendered
-        assert "Your answer:" in rendered
-        assert "Correct:" in rendered
-
-    def test_partial_shows_word_diff(self):
-        """Partial answers show word-level highlighting."""
-        panel = create_practice_feedback_panel(
-            feedback_level=FeedbackLevel.PARTIAL,
-            feedback_text="Almost",
-            scores={"Meaning": 3, "Grammar": 2, "Natural": 2, "Vocab": 3},
-            user_answer="yo como pan",
-            correct_answer="yo como arroz",
-        )
-        rendered = _render(panel)
-        assert "PARTIAL" in rendered
-
-    def test_backward_compatible_without_answers(self):
-        """Still works without user_answer/correct_answer."""
-        panel = create_practice_feedback_panel(
-            feedback_level=FeedbackLevel.CORRECT,
-            feedback_text="Good job!",
-            scores={"Meaning": 4, "Grammar": 4, "Natural": 4, "Vocab": 4},
-        )
-        rendered = _render(panel)
-        assert "CORRECT" in rendered
-        assert "Scores:" in rendered
-
-    def test_scores_displayed(self):
-        panel = create_practice_feedback_panel(
-            feedback_level=FeedbackLevel.PARTIAL,
-            feedback_text="Close",
-            scores={"Meaning": 3, "Grammar": 2, "Natural": 3, "Vocab": 2},
-        )
-        rendered = _render(panel)
-        assert "Meaning" in rendered
-        assert "Grammar" in rendered
-
-    def test_returns_panel(self):
-        panel = create_practice_feedback_panel(
-            feedback_level=FeedbackLevel.CORRECT,
-            feedback_text="OK",
-            scores={"Meaning": 4},
-        )
-        assert isinstance(panel, Panel)
 
 
 # ---------------------------------------------------------------------------
@@ -196,19 +72,6 @@ class TestSessionProgressBar:
     def test_returns_text(self):
         bar = create_session_progress_bar(5, 10)
         assert isinstance(bar, Text)
-
-    def test_practice_panel_has_progress_bar(self):
-        panel = create_practice_question_panel(
-            question_num=3,
-            total=10,
-            phrase="Hello world",
-            direction=PracticeDirection.EN_TO_ES,
-            is_due=False,
-            difficulty="normal",
-        )
-        rendered = _render(panel)
-        assert "Question 3/10" in rendered
-        assert "30%" in rendered
 
     def test_quiz_panel_has_progress_bar(self):
         panel = create_quiz_question_panel(

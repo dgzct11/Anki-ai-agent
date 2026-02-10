@@ -78,11 +78,12 @@ def practice(deck: str | None, count: int, direction: str, focus: str) -> None:
     If DECK is not specified, starts the chat and asks which deck to use.
     """
     from .chat import run_chat
-    # We start the chat UI which handles the practice command
-    # by simulating the "practice" command input
-    import os
-    os.environ["_ANKICLI_PRACTICE_ARGS"] = f"{deck or ''} --count {count} --direction {direction} --focus {focus}"
-    run_chat()
+    # Build a practice command string that run_chat() recognizes
+    parts = ["practice"]
+    if deck:
+        parts.append(deck)
+    parts.extend(["--direction", direction])
+    run_chat(initial_input=" ".join(parts))
 
 
 @cli.command()
@@ -98,14 +99,12 @@ def quiz(topic: str | None, level: str, count: int, size: str | None) -> None:
     If TOPIC is not specified, shows a topic selection menu.
     """
     from .chat import run_chat
-    import os
-    args = f"--level {level} --count {count}"
+    parts = ["quiz", "--level", level, "--count", str(count)]
     if size:
-        args += f" --size {size}"
+        parts.extend(["--size", size])
     if topic:
-        args += f" --topic {topic}"
-    os.environ["_ANKICLI_QUIZ_ARGS"] = args
-    run_chat()
+        parts.extend(["--topic", topic])
+    run_chat(initial_input=" ".join(parts))
 
 
 @cli.command()
@@ -120,14 +119,12 @@ def converse(scenario: str | None, level: str, character: str | None) -> None:
     If SCENARIO is not specified, shows a scenario selection menu.
     """
     from .chat import run_chat
-    import os
-    args = f"--level {level}"
+    parts = ["converse", "--level", level]
     if scenario:
-        args += f" --scenario {scenario}"
+        parts.extend(["--scenario", scenario])
     if character:
-        args += f" --character {character}"
-    os.environ["_ANKICLI_CONVERSE_ARGS"] = args
-    run_chat()
+        parts.extend(["--character", character])
+    run_chat(initial_input=" ".join(parts))
 
 
 @cli.command()

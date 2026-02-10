@@ -672,7 +672,7 @@ ANKI_TOOLS = [
     },
     {
         "name": "start_translation_practice",
-        "description": "Start a translation practice session using cards from an Anki deck. Presents phrases in one language and the user translates to the other. Evaluates meaning, grammar, naturalness, and vocabulary. After session, shows which words are due for Anki review.",
+        "description": "Start a translation practice session using cards from an Anki deck. Sets up session state and returns instructions for how to run the practice using generate_practice_question and mark_cards_reviewed tools. Claude drives the practice conversation naturally.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -699,6 +699,47 @@ ANKI_TOOLS = [
         }
     },
     {
+        "name": "generate_practice_question",
+        "description": "Pull the next batch of cards from Anki for a practice question. Returns card details (Spanish word, English definition, card ID, whether new/due). Claude should then: (1) show new word definitions if any cards are new, (2) generate a sentence using the English meanings for the user to translate, (3) NOT reveal Spanish target words.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "deck_name": {
+                    "type": "string",
+                    "description": "Name of the Anki deck to pull cards from"
+                },
+                "count": {
+                    "type": "integer",
+                    "description": "Number of words to include (default: 3-5)"
+                }
+            },
+            "required": ["deck_name"]
+        }
+    },
+    {
+        "name": "end_practice_session",
+        "description": "End the current practice session and log results.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "correct_count": {
+                    "type": "integer",
+                    "description": "Number of correct translations"
+                },
+                "total_count": {
+                    "type": "integer",
+                    "description": "Total number of translations attempted"
+                },
+                "weak_words": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Words the user struggled with"
+                }
+            },
+            "required": ["correct_count", "total_count"]
+        }
+    },
+    {
         "name": "log_practice_session",
         "description": "Log a completed practice session to the learning summary for long-term tracking. Call this after a practice session ends.",
         "input_schema": {
@@ -706,7 +747,7 @@ ANKI_TOOLS = [
             "properties": {
                 "practice_type": {
                     "type": "string",
-                    "enum": ["translation", "grammar_quiz"],
+                    "enum": ["translation", "grammar_quiz", "conversation"],
                     "description": "Type of practice session"
                 },
                 "direction": {
@@ -1009,10 +1050,14 @@ ANKI_TOOLS = [
     },
     {
         "name": "mark_cards_reviewed",
-        "description": "Mark specific cards as reviewed in Anki. ONLY call this AFTER the user explicitly confirms they want to mark cards as reviewed. Never call without user confirmation. Supports per-card ease ratings so the user can choose different ratings for each word.",
+        "description": "Mark specific cards as reviewed in Anki by walking the deck's review queue. ONLY call this AFTER the user explicitly confirms they want to mark cards as reviewed. Never call without user confirmation. Supports per-card ease ratings so the user can choose different ratings for each word.",
         "input_schema": {
             "type": "object",
             "properties": {
+                "deck_name": {
+                    "type": "string",
+                    "description": "Name of the Anki deck these cards belong to. Required for queue-based answering."
+                },
                 "card_ids": {
                     "type": "array",
                     "items": {"type": "string"},
@@ -1031,7 +1076,7 @@ ANKI_TOOLS = [
                     "description": "Optional mapping of card ID (string) to the Spanish word on that card. Used for clearer confirmation messages."
                 }
             },
-            "required": ["card_ids"]
+            "required": ["deck_name", "card_ids"]
         }
     },
     {
@@ -1439,6 +1484,48 @@ ANKI_TOOLS = [
                 }
             },
             "required": ["word"]
+        }
+    },
+    # --- Reminders ---
+    {
+        "name": "set_reminder",
+        "description": "Set a reminder for the user. The reminder will appear in context once its time has passed, so you can naturally bring it up. Use this when the user asks to be reminded of something.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "description": "What to remind the user about"
+                },
+                "remind_at": {
+                    "type": "string",
+                    "description": "When to trigger the reminder, in ISO 8601 datetime format (e.g., '2025-06-15T09:00:00')"
+                }
+            },
+            "required": ["message", "remind_at"]
+        }
+    },
+    {
+        "name": "list_reminders",
+        "description": "List all pending and triggered reminders.",
+        "input_schema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+        }
+    },
+    {
+        "name": "remove_reminder",
+        "description": "Remove a reminder by its ID.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "reminder_id": {
+                    "type": "string",
+                    "description": "The reminder ID to remove"
+                }
+            },
+            "required": ["reminder_id"]
         }
     },
 ]
