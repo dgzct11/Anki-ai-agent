@@ -1216,6 +1216,10 @@ def run_conversation_loop(
 
             if spinner_active and status_ctx:
                 status_ctx.stop()
+        except KeyboardInterrupt:
+            if spinner_active and status_ctx:
+                status_ctx.stop()
+            console.print("\n[dim]Stopped.[/dim]")
         except Exception as e:
             if spinner_active and status_ctx:
                 status_ctx.stop()
@@ -1295,6 +1299,7 @@ def stream_chat_response(
     delegate_task = None
     context_status = None
 
+    interrupted = False
     try:
         for event in assistant.chat(user_input):
             if event["type"] == "text_delta":
@@ -1375,6 +1380,17 @@ def stream_chat_response(
             console.print(Markdown(response_text))
         if show_context_bar and context_status:
             console.print(create_context_bar(context_status))
+
+    except KeyboardInterrupt:
+        interrupted = True
+        if delegate_progress is not None:
+            delegate_progress.stop()
+        if spinner_active and status_ctx:
+            status_ctx.stop()
+        if response_text.strip():
+            console.print("[bold cyan]Assistant:[/bold cyan]")
+            console.print(Markdown(response_text))
+        console.print("\n[dim]Stopped.[/dim]")
 
     except Exception as e:
         if delegate_progress is not None:
