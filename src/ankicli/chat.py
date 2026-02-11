@@ -1551,7 +1551,7 @@ def run_chat(initial_input: str | None = None):
                 console.print()
                 continue
 
-            if user_input.lower().startswith("notes"):
+            if first_word == "notes":
                 parts = user_input.strip().split(maxsplit=2)
                 config = load_config()
 
@@ -1586,7 +1586,7 @@ def run_chat(initial_input: str | None = None):
                 console.print()
                 continue
 
-            if user_input.lower().startswith("model"):
+            if first_word == "model":
                 parts = user_input.strip().split(maxsplit=1)
                 if len(parts) == 1:
                     # Show current model and list available models
@@ -1644,7 +1644,9 @@ def run_chat(initial_input: str | None = None):
                 console.print()
                 continue
 
-            if user_input.lower().startswith("practice"):
+            first_word = user_input.lower().split()[0] if user_input.strip() else ""
+
+            if first_word == "practice":
                 # Parse practice command: practice [deck] [--direction DIR]
                 parts = user_input.strip().split()
                 deck_name = None
@@ -1672,7 +1674,7 @@ def run_chat(initial_input: str | None = None):
                     user_input = "Start a translation practice session. Use the main Spanish deck, English to Spanish."
                 # Fall through to normal chat processing below
 
-            if user_input.lower().startswith("quiz"):
+            if first_word == "quiz":
                 # Parse quiz command: quiz [--level LEVEL] [--topic TOPIC] [--count N]
                 parts = user_input.strip().split()
                 level = None
@@ -1807,7 +1809,7 @@ def run_chat(initial_input: str | None = None):
                 console.print()
                 continue
 
-            if user_input.lower().startswith("converse"):
+            if first_word == "converse":
                 # Parse converse command: converse [--level LEVEL] [--scenario SCENARIO]
                 parts = user_input.strip().split()
                 level = None
