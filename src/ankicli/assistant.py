@@ -984,9 +984,9 @@ class AnkiAssistant:
         """Handle the all_cards_delegate tool."""
         deck_name = tool_input["deck_name"]
         limit = tool_input.get("limit")
-        workers = min(tool_input.get("workers", self.config.delegate_max_workers), 10)
+        workers = min(tool_input.get("workers", self.config.delegate_max_workers), 40)
 
-        cards = self.anki.get_deck_cards(deck_name, limit=limit or 1000)
+        cards = self.anki.get_deck_cards(deck_name, limit=limit or 50000)
         if not cards:
             return f"No cards found in deck '{deck_name}'"
         if limit:
@@ -999,7 +999,7 @@ class AnkiAssistant:
 
     def _handle_card_subset_delegate(self, tool_input: dict) -> str:
         """Handle the card_subset_delegate tool."""
-        workers = min(tool_input.get("workers", self.config.delegate_max_workers), 10)
+        workers = min(tool_input.get("workers", self.config.delegate_max_workers), 40)
 
         cards = []
         for note_id in tool_input["note_ids"]:

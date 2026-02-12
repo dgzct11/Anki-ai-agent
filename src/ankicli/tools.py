@@ -629,7 +629,7 @@ ANKI_TOOLS = [
                 },
                 "workers": {
                     "type": "integer",
-                    "description": "Parallel workers (default: 5, max: 10)"
+                    "description": "Parallel workers (default: 5, max: 40)"
                 },
                 "dry_run": {
                     "type": "boolean",
@@ -660,7 +660,7 @@ ANKI_TOOLS = [
                 },
                 "workers": {
                     "type": "integer",
-                    "description": "Parallel workers (default: 5, max: 10)"
+                    "description": "Parallel workers (default: 5, max: 40)"
                 },
                 "dry_run": {
                     "type": "boolean",
@@ -1101,7 +1101,7 @@ ANKI_TOOLS = [
                 },
                 "workers": {
                     "type": "integer",
-                    "description": "Parallel workers (default: 5, max: 10)"
+                    "description": "Parallel workers (default: 5, max: 40)"
                 }
             },
             "required": ["delegate_type", "items"]
