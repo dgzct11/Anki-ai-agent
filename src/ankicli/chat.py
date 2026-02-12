@@ -1551,6 +1551,8 @@ def run_chat(initial_input: str | None = None):
                 console.print()
                 continue
 
+            first_word = user_input.lower().split()[0] if user_input.strip() else ""
+
             if first_word == "notes":
                 parts = user_input.strip().split(maxsplit=2)
                 config = load_config()
@@ -1643,8 +1645,6 @@ def run_chat(initial_input: str | None = None):
                         )
                 console.print()
                 continue
-
-            first_word = user_input.lower().split()[0] if user_input.strip() else ""
 
             if first_word == "practice":
                 # Parse practice command: practice [deck] [--direction DIR]
